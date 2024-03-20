@@ -1,0 +1,56 @@
+.text {
+    white-space: nowrap;
+    display: flex;
+    min-width: 100%;
+    width: fit-content;
+    place-items: center;
+    place-content: center;
+    height: 100%;
+    gap: inherit;
+    transform-origin: left;
+  }
+
+.content {
+    display: flex;
+    flex-direction: row;
+    gap: 40px;
+}
+
+.column {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+
+.set {
+    display: flex;
+    flex-direction: column;
+
+    width: 400px;
+    border-radius: 20px;
+}
+
+.player {
+    height: 75px;
+    width: 100%;
+
+}
+
+.playerName {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 40px;
+    padding: 10px;
+    white-space: nowrap;
+}
+
+.p2 {
+    border-top: 2px solid grey;
+}
+
+.called {
+    border: 10px solid orange;
+}
+
+.started {
+    border: 10px solid green;
+}

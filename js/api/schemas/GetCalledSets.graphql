@@ -1,0 +1,17 @@
+query CalledSets($slug: String) {
+	event(slug: $slug){
+    sets(page: 0, perPage: 100,filters: {
+      state: [2, 6]
+    }){
+      nodes {
+        state
+        fullRoundText
+      	slots {
+          entrant {
+            name
+          }
+        }
+      }
+    }
+  }
+}
