@@ -1,14 +1,13 @@
-import { requestStartGG } from "./request.js"
+import { Query, requestStartGG } from "./request.js"
 
 const schema_filename = "./schemas/GetCalledSets.graphql"
 const default_tries = 3;
 
-export async function getCalledSetsFactory(){
-    let schema = await fetch(new URL(schema_filename, import.meta.url))
-        .then(res => res.text())
+export async function getCalledSetsFactory(maxTries = default_tries){
+    let query = await Query.load(new URL(schema_filename, import.meta.url), maxTries);
 
-    return async function getCalledSets(slug, token){
-        let response = await requestStartGG(schema, {slug}, token);
+    return async function getCalledSets(slug, client){
+        let response = await query.execute(client, {slug})
 
         console.log(response)
 
@@ -18,26 +17,4 @@ export async function getCalledSetsFactory(){
 
         return response.data.event;
     }
-}
-
-export async function fetchSetsFactory(max_tries = default_tries){
-    let getCalledSets = await getCalledSetsFactory();
-
-    async function fetchSets_(slug, token, tries){
-        try {
-            return await getCalledSets(slug, token);
-        } catch (e) {
-            console.warn("FetchSets failed with", e)
-            if (tries > max_tries){
-                console.error("Too many retries !")
-                return {}
-            }
-            return fetchSets_(eventSlug, tries ? tries + 1 : 1)
-        }
-    }
-
-    return function fetchSets(slug, token){
-        return fetchSets_(slug, token);
-    }
-
 }

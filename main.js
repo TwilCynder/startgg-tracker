@@ -1,6 +1,7 @@
 import { FitText } from "./js/DOMUtil.js";
-import { fetchSetsFactory } from "./js/api/getCalledSets.js";
-const fetchSets = await fetchSetsFactory();
+import { getCalledSetsFactory } from "./js/api/getCalledSets.js";
+import { Client } from "./js/api/request.js";
+const getCalledSets = await getCalledSetsFactory();
 
 let config = {};
 let eventSlug = config.event || "tournament/tournoi-test-halua/event/1v1-ult-2"
@@ -51,8 +52,10 @@ function fitTexts(totalSets){
     }
 }
 
-async function loadSets(){
-    let event = await fetchSets(eventSlug, "Bearer " + config.token);
+async function loadSets(client){
+    let event = await getCalledSets(eventSlug, client);
+
+    console.log(event);
 
     resetContent();
 
@@ -66,12 +69,14 @@ async function loadSets(){
 
 }
 
+let client;
+
 function init(){
     initLayout();
 }
 
 function update(){
-    loadSets();
+    loadSets(client);
 }
 
 
@@ -79,6 +84,7 @@ fetch("./config.json")
     .then(response => response.json())
     .then(json => {
         config = json;
+        client = new Client("Bearer " + config.token);
     })
     .then(async () => {
         init();
