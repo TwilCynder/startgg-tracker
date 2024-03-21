@@ -17,6 +17,26 @@ function resetContent(){
     $(".column").empty();
 }
 
+/**
+ * @param {number} time 
+ */
+//the fact that this function is necessary is so fucking stupid LMAOOOO fuck you javascipt
+function getTimeString(time){
+    let result = "";
+
+    time = Math.floor(time / 1000); //seconds 
+    let seconds = time % 60;
+    time = Math.floor(time / 60); //minutes
+    let minutes = time % 60;
+    time = Math.floor(time / 60); //hours
+
+    if (time > 0) result += time.toString().padStart(2, "0") + ":";
+    result += minutes.toString().padStart(2, "0") + ":";
+    result += seconds.toString().padStart(2, "0");
+    
+    return result
+}
+
 const state_names = {
     2: "started",
     6: "called"
@@ -25,11 +45,15 @@ function getStateName(state){
     return state_names[state];
 }
 
-function setInfoBoxHTML(state){
-    let state_name = getStateName(state)
-    return state_name ? `
-        <div class = "set-infobox set-infobox-${getStateName(state)}">test:t</div>
-    ` : ""
+function setInfoBoxHTML(set){
+    let state_name = getStateName(set.state);
+    if (!state_name) return "";
+
+    let timeElapsed = new Date() - new Date(set.startedAt * 1000);
+
+    return `
+        <div class = "set-infobox set-infobox-${state_name}">${getTimeString(timeElapsed)}</div>
+    `
 }
 
 function makeSetHTML(set, index){
@@ -51,7 +75,7 @@ function makeSetHTML(set, index){
                     </div>
                 </div>
             </div>
-            ${setInfoBoxHTML(set.state)}
+            ${setInfoBoxHTML(set)}
         </div>
 
     `

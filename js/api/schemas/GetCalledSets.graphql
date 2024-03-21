@@ -5,6 +5,7 @@ query CalledSets($slug: String) {
     }){
       nodes {
         state
+        startedAt
         fullRoundText
       	slots {
           entrant {
