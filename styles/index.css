@@ -10,6 +10,7 @@ body {
     justify-content: center;
     align-items: center;
     flex-direction: column;
+    gap: 20px;
 }
 
 .title {
@@ -26,4 +27,38 @@ body {
     width: 80px;
     height: 80px;
     margin: 10px;
+}
+
+.separator {
+    min-width: 40%;
+    max-width: 60%;
+    height: 0%;
+    
+    border: solid 2px grey;
+
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+.disclaimer {
+    width: 40vw;
+    max-width: 80%;
+}
+
+#start-button {
+    width: 150px;
+    height: 60px;
+    border-radius: 10px;
+    font-size: 39px;
+    font-family: Roboto;
+    font-weight: bold;
+    color: white;
+
+    background-color: #3F80FF;
+    border: none;
+}
+
+#start-button:hover {
+    background-color: #6F90FF;
+    cursor: pointer;
 }
