@@ -1,0 +1,29 @@
+body {
+    background-color: #F9F9FB;
+}
+
+.text {
+    white-space: nowrap;
+    display: flex;
+    min-width: 100%;
+    width: fit-content;
+    place-items: center;
+    place-content: center;
+    height: 100%;
+    gap: inherit;
+    transform-origin: left;
+  }
+
+.content {
+    display: flex;
+    flex-direction: row;
+    gap: 1.5vmax;
+    margin: 2vmax;
+}
+
+.column {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5vmax;
+}
+
