@@ -1,0 +1,5 @@
+query Test {
+    event(slug: "tournament/la-castanha/event/1v1-ultimate"){
+        id
+    }
+}

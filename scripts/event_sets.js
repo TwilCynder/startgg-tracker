@@ -1,6 +1,6 @@
 
-import { Client } from "./api/request.js";
-import { initLayout, loadSets } from "./lib.js";
+import { Client } from "./lib/api/request.js";
+import { initLayout, loadSets } from "./lib/lib.js";
 
 let eventSlug = "tournament/tournoi-test-halua/event/1v1-ult-2"
 
