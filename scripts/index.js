@@ -54,8 +54,7 @@ function displayMainMenu(){
 }
 
 document.getElementById("start-button").addEventListener("click", async (element) => {
-    displayMainMenu();
-    /*
+    
     let token = document.getElementById("apikey").value;
 
     let res = await testToken(token);
@@ -72,15 +71,45 @@ document.getElementById("start-button").addEventListener("click", async (element
     }
 
     localStorage.setItem('token', token);
-    */
+    displayMainMenu();
 })
 
-document.querySelector("#event-mode .button").addEventListener("click", async (element) => {
+function eventModeGOCallback(){
+    /**@type {string} */
     let slug = document.querySelector("#event-mode .mode-area-input").value;
+    
+    let split = slug.split("start.gg/");
+    if (split.length != 2){
+        alert("Please enter a valid event URL. Go to the page of your event on start.gg and copy the content of the URL bar.");
+        return;
+    }
+    slug = split[1];
+    split = slug.split(/\//)
+    if (split[0] != "tournament" || split[2] != "event" || split.length < 4){
+        alert("Please enter a valid event URL. Go to the page of your event on start.gg and copy the content of the URL bar.");
+        return;
+    }
+
+    slug = split.slice(0, 4).join("/");
     console.log(slug);
-    //window.location.href = "./event_sets.html?slug=" 
+
+    window.location.href = "./event_sets.html?event=" + slug 
+}
+
+document.querySelector("#event-mode .button").addEventListener("click", eventModeGOCallback)
+document.querySelector("#event-mode .mode-area-input").addEventListener("keydown", (event) => {
+    if (event.code == "Enter"){
+        eventModeGOCallback()
+    }
 })
 
-document.querySelector("#player-mode .button").addEventListener("click", async (element) => {
+function playerModeGOCallback(){
     alert("Ce mode n'est pas encore impémenté ! désooooooo")
-})
+}
+
+document.querySelector("#player-mode .button").addEventListener("click", async (element) => playerModeGOCallback);
+document.querySelector("#player-mode .mode-area-input").addEventListener("keydown", (event) => {
+    if (event.code == "Enter"){
+        playerModeGOCallback()
+    }
+});
