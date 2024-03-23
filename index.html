@@ -2,20 +2,49 @@
     <head>
         <link rel="icon" href="./icon/startggtracker256.png">
         <link rel="stylesheet" href="./styles/index.css">
+        <script src = "./scripts/lib/jquery.js"></script>
         <title>SGGT</title>
     </head>
     <body>
         <div class = "main">
-            <div class = "title">Welcome to SGGT</div>
-            <img class = "logo" src="./icon/startggtracker256.png">
-            <div class = "subtitle">(Start.GG Tracker)</div>
-            <div class = "separator"></div>
-            <div class = "disclaimer">
-                This is a closed beta with limited infrastructure ; as a result, I need your start.gg API key to work.
-                You can learn <a href="https://developer.start.gg/docs/authentication/">here</a> how to obtain one (you just need a startgg account).
+            <div class = "content header">
+                <div class = "title">Welcome to SGGT</div>
+                <img class = "logo" src="./icon/startggtracker256.png">
+                <div class = "subtitle">(Start.GG Tracker)</div>
+                <div class = "separator"></div>
             </div>
-            <input type = "text" id="apikey" name="apikey" required size="32" minlength="32" maxlength="32"/>
-            <input type="button" id="start-button" value="Start" >
+            <div class = "content">
+                <div class = "content" id = "token-input">
+
+                    <div class = "disclaimer">
+                        This is a closed beta with limited infrastructure ; as a result, I need your start.gg API key to work.
+                        You can learn <a href="https://developer.start.gg/docs/authentication/">here</a> how to obtain one (you just need a startgg account).
+                    </div>
+                    <input type = "text" id="apikey" name="apikey" required size="32" minlength="32" maxlength="32"/>
+                    <input type="button" id="start-button" class = "button" value="Start" >
+                </div>
+                <div class = "content" id = "mode-select">
+                    <div id = "event-mode" class = "mode-area">
+                        <div class = "mode-area-title"> Track an event</div>
+                        Enter a event's URL <br>
+                        <div class = "mode-area-inputs-container">
+                            <input class = "mode-area-input " type="text">
+                            <input class = "mode-area-button button" type="button" value="GO !">
+                        </div>
+                    </div>
+                    <div id = "player-mode" class = "mode-area">
+                        <div class = "mode-area-title"> Track a player</div>
+                        Enter a player's user slug. <br>
+                        <div class = "mode-area-inputs-container">
+                            <input class = "mode-area-input " type="text">
+                            <input class = "mode-area-button button" type="button" value="GO !">
+                        </div>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+
         </div>
 
         <script src="./scripts/index.js" type="module"></script>
