@@ -20,3 +20,31 @@ export function FitText(target) {
         }
     });
 }
+
+function showElement(element){
+    element.style.setProperty(`display`, "flex");
+    element.style.setProperty('opacity', "100%");
+}
+
+export function hide(elementName){
+    let element = document.querySelector(elementName);
+    
+    element.style.setProperty(`display`, "none");
+    element.style.setProperty('opacity', "0");
+}
+
+export function show(elementName){
+    let element = document.querySelector(elementName);
+
+    showElement(element);
+}
+
+export function showNotif(content){
+    let element = document.querySelector(".notif-bar");
+    element.innerHTML = content;
+    showElement(element);
+}
+
+export function hideNotif(){
+    hide(".notif-bar")
+}

@@ -1,21 +1,7 @@
 import { testTokenFactory } from "./lib/api/testToken.js"
+import { show, hide, showNotif, hideNotif } from "./lib/DOMUtil.js";
 
 let testToken = await testTokenFactory();
-
-
-
-function hide(elementName){
-    let element = document.querySelector(elementName);
-    
-    element.style.setProperty(`display`, "none");
-    element.style.setProperty('opacity', "0");
-}
-
-function show(elementName){let element = document.querySelector(elementName);
-    
-    element.style.setProperty(`display`, "flex");
-    element.style.setProperty('opacity', "100%");
-}
 
 
 class ToggleManager {
@@ -49,6 +35,7 @@ class ToggleManager {
 new ToggleManager("#token-input", "#mode-select");
 
 function displayMainMenu(){
+    console.log("dsiaplzy main menu aloooo")
     hide("#token-input");
     show("#mode-select");
 }
@@ -113,3 +100,21 @@ document.querySelector("#player-mode .mode-area-input").addEventListener("keydow
         playerModeGOCallback()
     }
 });
+
+let token = localStorage.getItem("token");
+if (token){
+    showNotif("Saved token found, verifying ...")
+    let res = await testToken(token);
+    switch (res){
+        case 0:
+            hideNotif();
+            displayMainMenu();
+            break;
+        case 1: 
+            showNotif("Saved token was invalid");
+            break;
+        case 2: 
+            showNotif("Coulnd't verify the saved token.")
+            break;
+    }
+}

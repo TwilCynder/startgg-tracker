@@ -8,62 +8,21 @@ body {
     font-family: Roboto, Helvetica, sans-serif;
 }
 
-.set {
-    border: solid 5px;
-    width: 15vmax;
-    height: 5vmax;
-    background-color: var(--set-bg-color);
+.notif-bar {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    height: fit-content;
+    width: fit-content;
+    padding: 10px;
+    font-size: 20px;
+    font-weight: bold;
 
-    display: flex;
+    background-color: lightblue;
+    border-bottom-right-radius: 10px;
+
+    display: none;
     flex-direction: row;
-}
-
-.set-infobox {
-    height: 5vmax;
-    width: 4vmax;
-    min-width: 5vmax;
-
-    display: flex;
+    justify-content: space-evenly;
     align-items: center;
-    justify-content: center;
-
-    font-size: 1vmax;
-}
-
-.set-infobox-started {
-    background-color: #0D8225;
-}
-
-.set-infobox-called {
-    background-color: #FFD500;
-}
-
-.players-container {
-    min-width: 10vmax;
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-}
-
-.player {
-    height: 50%;
-    width: 100%;
-}
-
-.playerName {
-    font-size: 1.5vmax;
-    padding: 0.5vmax;
-    white-space: nowrap;
-}
-
-.p2 {
-    border-top: 2px solid var(--set-border-color);
-}
-
-.called {
-    border: solid var(--set-border-color);
-}
-
-.started {
-    border: solid var(--set-border-color);
 }
