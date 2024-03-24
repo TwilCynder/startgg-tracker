@@ -6,15 +6,15 @@ const getCalledSets = await getCalledSetsFactory();
 export function initLayout(columns){
     $("#content").empty();
     let html = ""
-    for (let i = 0; i < (columns || 2) ; i++){
+    /*for (let i = 0; i < (columns || 2) ; i++){
         html += `<div class = "column col${i}"></div>`
-    }
+    }*/
     $(".content").html(html);
 }
 
 
 function resetContent(){
-    $(".column").empty();
+    $(".content").empty();
 }
 
 /**
@@ -83,7 +83,7 @@ function makeSetHTML(set, index){
 
 function addSet(set, index, config){
     let html = makeSetHTML(set, index);
-    $(".column.col" + index % config.columns).append(html);
+    $(".content").append(html);
 }
 
 function fitTexts(totalSets){
@@ -99,6 +99,14 @@ export async function loadSets(client, slug, config){
     console.log(event);
 
     resetContent();
+
+    //test
+    //event.sets.nodes = Array(5).fill(event.sets.nodes).flat()
+
+    let colsN = Math.ceil(Math.sqrt(event.sets.nodes.length));
+    console.log("colsn", colsN);
+
+    document.querySelector(".content").style.setProperty("grid-template-columns", "1fr ".repeat(colsN))
 
     let i = 0;
     for (let set of event.sets.nodes){
