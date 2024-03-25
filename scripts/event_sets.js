@@ -1,6 +1,7 @@
 
 import { Client } from "./lib/api/request.js";
-import { initLayout, loadSets } from "./lib/lib.js";
+import { initLayout, loadSets } from "./lib/sets_display.js";
+import { processEventSlug } from "./lib/util.js";
 
 let config = await fetch("./config.json")
     .then(response => response.json())
@@ -20,6 +21,17 @@ let client = new Client("Bearer " + token);
 function update(){
     loadSets(client, event, config);
 }
+
+document.querySelector(".event-input").value = event;
+
+document.querySelector(".event-input").addEventListener("keydown", (event) => {
+    if (event.code == "Enter"){
+        //console.log(event)
+        console.log(event.target.value)
+        let slug = processEventSlug(event.target.value);
+        window.location.href = "./event_sets.html?event=" + slug 
+    }
+})
 
 initLayout();
 update();

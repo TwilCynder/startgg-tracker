@@ -39,10 +39,24 @@ export function show(elementName){
     showElement(element);
 }
 
+/** @type {NodeJS.Timeout}*/
+let notif_timer = null;
+function reset_notif_timer(){
+    if (notif_timer){
+        clearTimeout(notif_timer);
+    }
+}
+
 export function showNotif(content){
+    reset_notif_timer();
     let element = document.querySelector(".notif-bar");
     element.innerHTML = content;
     showElement(element);
+}
+
+export function showNotifTemp(content, timer){
+    showNotif(content);
+    notif_timer = setTimeout(hideNotif, timer);
 }
 
 export function hideNotif(){

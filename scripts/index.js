@@ -1,5 +1,6 @@
 import { testTokenFactory } from "./lib/api/testToken.js"
-import { show, hide, showNotif, hideNotif } from "./lib/DOMUtil.js";
+import { show, hide, showNotif, hideNotif, showNotifTemp } from "./lib/DOMUtil.js";
+import { processEventSlug } from "./lib/util.js";
 
 let testToken = await testTokenFactory();
 
@@ -65,20 +66,10 @@ function eventModeGOCallback(){
     /**@type {string} */
     let slug = document.querySelector("#event-mode .mode-area-input").value;
     
-    let split = slug.split("start.gg/");
-    if (split.length != 2){
+    slug = processEventSlug(slug);
+    if (!slug){
         alert("Please enter a valid event URL. Go to the page of your event on start.gg and copy the content of the URL bar.");
-        return;
     }
-    slug = split[1];
-    split = slug.split(/\//)
-    if (split[0] != "tournament" || split[2] != "event" || split.length < 4){
-        alert("Please enter a valid event URL. Go to the page of your event on start.gg and copy the content of the URL bar.");
-        return;
-    }
-
-    slug = split.slice(0, 4).join("/");
-    console.log(slug);
 
     window.location.href = "./event_sets.html?event=" + slug 
 }
@@ -114,7 +105,7 @@ if (token){
             showNotif("Saved token was invalid");
             break;
         case 2: 
-            showNotif("Coulnd't verify the saved token.")
+            showNotifTemp("Coulnd't verify the saved token.", 5000)
             break;
     }
 }

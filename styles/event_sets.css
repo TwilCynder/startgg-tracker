@@ -82,3 +82,25 @@ body {
     height: 100%;
     width: auto;
 }
+
+.event-input-container {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.event-input {
+    width: 25%;
+    min-width: 400px;
+
+    height: 40px;
+    border: solid 1px gray;
+    border-radius: 8px;
+    background-color: white;
+    
+    font-size: 15px;
+}
