@@ -106,7 +106,12 @@ export async function loadSets(client, slug, config){
     let colsN = Math.ceil(Math.sqrt(event.sets.nodes.length));
     console.log("colsn", colsN);
 
-    document.querySelector(".content").style.setProperty("grid-template-columns", "1fr ".repeat(colsN))
+    if (window.screen.width > window.screen.height){
+        document.querySelector(".content").style.setProperty("grid-template-columns", "1fr ".repeat(colsN))
+    } else {
+        document.querySelector(".content").style.setProperty("grid-template-columns", "1fr " + (event.sets.nodes.length > 4 ? "1fr" : ""))
+    }
+    
 
     let i = 0;
     for (let set of event.sets.nodes){
