@@ -30,6 +30,38 @@ body {
     transition-duration: 0.5s;
 }
 
+.title {
+    font-weight: bolder;
+    font-size: 50px;
+}
+
+.subtitle {
+    font-weight: bold;
+    font-size: 30px;
+}
+
+.logo {
+    width: 80px;
+    height: 80px;
+    margin: 10px;
+}
+
+.separator {
+    min-width: 40%;
+    max-width: 60%;
+    height: 0%;
+    
+    border: solid 2px grey;
+
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+.disclaimer {
+    width: 600px;
+    max-width: 80%;
+}
+
 #mode-select{
     display: none;
     opacity: 0;
@@ -113,39 +145,7 @@ body {
     border-radius: 10px;
     background-color: white;
     width: 100%;
-    
-}
-
-.title {
-    font-weight: bolder;
-    font-size: 50px;
-}
-
-.subtitle {
-    font-weight: bold;
-    font-size: 30px;
-}
-
-.logo {
-    width: 80px;
-    height: 80px;
-    margin: 10px;
-}
-
-.separator {
-    min-width: 40%;
-    max-width: 60%;
-    height: 0%;
-    
-    border: solid 2px grey;
-
-    margin-top: 15px;
-    margin-bottom: 15px;
-}
-
-.disclaimer {
-    width: 600px;
-    max-width: 80%;
+    font-size: 100%;
 }
 
 .button {
@@ -157,6 +157,8 @@ body {
     font-family: Roboto, Helvetica;
     font-weight: bold;
     color: white;
+    min-width: 45px;
+    font-size: 100%;
 }
 
 .big-button {
@@ -171,7 +173,6 @@ body {
 #start-button {
     width: 150px;
     height: 60px;
-    font-size: 39px;
 }
 
 .button:hover {
@@ -192,4 +193,8 @@ body {
 .paragraph {
     width: 80%;
     text-wrap: pretty;
+}
+
+a {
+    text-decoration: none;
 }

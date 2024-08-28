@@ -68,6 +68,7 @@ function eventModeGOCallback(){
     slug = processEventSlug(slug);
     if (!slug){
         alert("Please enter a valid event URL. Go to the page of your event on start.gg and copy the content of the URL bar.");
+        return;
     }
 
     window.location.href = "./event_sets.html?event=" + slug 
@@ -84,7 +85,7 @@ function playerModeGOCallback(){
     alert("Ce mode n'est pas encore impémenté ! désooooooo")
 }
 
-document.querySelector("#player-mode .button").addEventListener("click", async (element) => playerModeGOCallback);
+document.querySelector("#player-mode .button").addEventListener("click", playerModeGOCallback);
 document.querySelector("#player-mode .mode-area-input").addEventListener("keydown", (event) => {
     if (event.code == "Enter"){
         playerModeGOCallback()
