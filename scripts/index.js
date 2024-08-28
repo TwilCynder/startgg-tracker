@@ -36,7 +36,6 @@ class ToggleManager {
 new ToggleManager("#token-input", "#mode-select");
 
 function displayMainMenu(){
-    console.log("dsiaplzy main menu aloooo")
     hide("#token-input");
     show("#mode-select");
 }
