@@ -44,7 +44,7 @@ document.getElementById("start-button").addEventListener("click", async (element
     
     let token = document.getElementById("apikey").value;
 
-    let res = await testToken(token);
+    let res = 0
 
     switch (res){
         case 0:
