@@ -1,4 +1,4 @@
-import { Client, Query } from "./request.js";
+import { Client, Query } from "./sgg-helper.js";
 
 /**
  * Tests whether a given token is valid.

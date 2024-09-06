@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "startgg-helper-browser": "^1.0.2"
+  },
+  "devDependencies": {
+    "webpack": "^5.94.0"
+  },
+  "type": "module"
+}
