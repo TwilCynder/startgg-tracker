@@ -1,5 +1,9 @@
-import { Query } from "./lib/api/request.js";
+import { getEventEntrantsFactory } from "./lib/api/getEntrants.js";
+import { SGGHelperClient } from "./lib/api/sgg-helper.js";
 
-import { add } from "../test_node/main.js";
+const getEventEntrants = await getEventEntrantsFactory();
 
-console.log(add(12, 15));
+let token = localStorage.getItem("token");
+let client = new SGGHelperClient("Bearer " + token);
+
+console.log(await getEventEntrants("tournament/tls-mad-ness-29/event/1v1-ultimate", client));

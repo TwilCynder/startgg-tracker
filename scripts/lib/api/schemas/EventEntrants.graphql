@@ -1,0 +1,13 @@
+query EventEntrants($slug: String!) {
+	event(slug: $slug){
+        entrants {
+            nodes {
+                participants {
+                    user {
+                        id
+                    }
+                }
+            }
+        }
+    }
+}

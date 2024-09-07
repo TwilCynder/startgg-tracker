@@ -14,3 +14,29 @@ export function processEventSlug(slug){
     slug = split.slice(0, 4).join("/");
     return slug;
 }
+
+/**
+ * 
+ * @param {{}} obj 
+ * @param {string} path 
+ * @param {*} def 
+ * @returns 
+ */
+export function deep_get(obj, path, def = null){
+    //https://stackoverflow.com/a/8817473
+    path = path=path.split('.');
+    for (let i = 0; i < path.length; i++){
+        if (/^\d/.test(path[i])){
+            let n = parseInt(path[i]);
+            if (!isNaN){
+                path[i] = n;
+            }
+        }
+    }
+
+    for (var i=0, len=path.length; i<len; i++){
+        if (obj == undefined || obj == null) return def;
+        obj = obj[path[i]];
+    };
+    return obj;
+};
