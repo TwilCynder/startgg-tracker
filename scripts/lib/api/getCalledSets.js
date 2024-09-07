@@ -1,4 +1,4 @@
-import { loadQuery, Query } from "./sgg-helper.js"
+import { loadQuery } from "./sgg-helper.js"
 
 const schema_filename = "./schemas/GetCalledSets.graphql"
 const default_tries = 3;
