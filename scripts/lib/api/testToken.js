@@ -1,4 +1,4 @@
-import { SGGHelperClient, Query, loadQuery } from "./sgg-helper.js";
+import { SGGHelperClient, loadQuery } from "./sgg-helper.js";
 
 /**
  * Tests whether a given token is valid.
