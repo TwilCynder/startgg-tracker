@@ -1,5 +1,5 @@
 
-import { Client } from "./lib/api/request.js";
+import { SGGHelperClient } from "./lib/api/sgg-helper.js";
 import { initLayout, loadSets } from "./lib/sets_display.js";
 import { processEventSlug } from "./lib/util.js";
 
@@ -16,7 +16,7 @@ if (!token){
 let searchParameters = new URLSearchParams(window.location.search);
 let event = searchParameters.get("event");
 
-let client = new Client("Bearer " + token);
+let client = new SGGHelperClient("Bearer " + token);
 
 function update(){
     loadSets(client, event, config);
