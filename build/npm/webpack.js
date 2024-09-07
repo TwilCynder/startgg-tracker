@@ -10,7 +10,7 @@ let compiler = webpack({
             type: "module"
         }
     },
-    mode: "production",
+    mode: process.argv[2] ? "none" : "production",
     experiments: {
         outputModule: true
     }
