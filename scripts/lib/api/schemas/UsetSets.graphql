@@ -1,0 +1,21 @@
+query UserSets($slug: String!, $page: Int, $perPage: Int, $after: Timestamp) {
+	user(slug: $slug){
+    player {
+      sets(page: $page, perPage: $perPage, filters : {
+        updatedAfter: $after
+      }) {
+        nodes {
+          slots {
+            entrant {
+              participants {
+                user {
+                  slug
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
