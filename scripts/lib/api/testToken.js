@@ -15,18 +15,15 @@ export async function testTokenFactory(){
      *  2 = invalid token
      */
     return (async function testToken(token){
-        let res = await test_query.execute(new SGGHelperClient("Bearer " + token));
-
-        console.log(res);
-
-        if (!res) return 1;
-        if (res.data){
+        try {
+            let res = await test_query.execute(new SGGHelperClient("Bearer " + token));
+            console.log(res);
             return 0;
-        } else {
-            if (res.message == "Invalid authentication token"){
-                return 2;
-            } else {
+        } catch (err){
+            if(err.resBody && err.resBody.message == "Invalid authentication token"){
                 return 1;
+            } else {
+                return 2;
             }
         }
     })
