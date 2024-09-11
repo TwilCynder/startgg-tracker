@@ -1,10 +1,9 @@
-import { loadQuery } from "./sgg-helper.js"
+import queryManager from "../queryManager.js";
 
 const schema_filename = "./schemas/EventSets.graphql"
-const default_tries = 3;
 
-export async function getSetsFactory(maxTries = default_tries){
-    let query = await loadQuery(new URL(schema_filename, import.meta.url), maxTries);
+export async function getSetsFactory(){
+    let query = await queryManager.tryQuery("eventSets", new URL(schema_filename, import.meta.url));
 
     return async function getSets(slug, client, limiter){
         let sets = await query.executePaginated(client, {slug}, "event.sets.nodes", limiter);
