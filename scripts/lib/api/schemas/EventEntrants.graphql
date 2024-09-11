@@ -1,10 +1,10 @@
-query EventEntrants($slug: String!) {
+query EventEntrants($slug: String!, $page: Int, $perPage: Int) {
 	event(slug: $slug){
-        entrants {
+        entrants (query: {page: $page, perPage: $perPage}) {
             nodes {
                 participants {
                     user {
-                        id
+                        slug
                     }
                 }
             }
