@@ -1,3 +1,9 @@
+import { getEventEntrantsFactory } from "./api/getEntrants.js"
+import { getUserSetsFactory } from "./api/getUserSets.js";
+import { deep_get } from "./util.js";
+
+const getEventEntrants = await getEventEntrantsFactory();
+const getUserSets = await getUserSetsFactory();
 
 /**
  * 
@@ -6,11 +12,28 @@
  * @param {string[]} past_slugs 
  * @param {TimedQuerySemaphore} limiter 
  */
-export async function get_rematches(client, entrantsList, sets, limiter){
-    let [entrants, setsArray] = Promise.all([
-        getEntrants(current_slug, client, limiter),
-        Promise.all(past_slugs.map(slug => getSets(slug, client, limiter)))
-    ]);
- 
-    console.log(entrants, setsArray)
+export async function get_rematches(client, slug, after, limiter){
+    let entrantsList = await getEventEntrants(slug, client, limiter);
+    let slugs = entrantsList.map(entrant => {
+        let p = entrant.participants;
+        console.log(entrantsList.length)
+        if (!p || p.length != 1) return;
+        let slug = deep_get(p, "0.user.slug");
+        if (!slug) {
+            console.warn("User with no slug !");
+            return;
+        }
+        return slug;
+    }).filter(slug => !!slug);
+    let sets = Promise.all(slugs.map( slug => getUserSets(slug, after, client, limiter)));
+    console.log(slugs, sets);
+}
+
+/**
+ * 
+ * @param {string[]} slugs 
+ * @param {Array<Array<any>>} setsLists 
+ */
+function processData(slugs, setsLists){
+
 }
