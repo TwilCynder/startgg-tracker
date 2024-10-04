@@ -25,8 +25,8 @@ export async function get_rematches(client, slug, after, limiter){
         }
         return slug;
     }).filter(slug => !!slug);
-    let sets = Promise.all(slugs.map( slug => getUserSets(slug, after, client, limiter)));
-    console.log(slugs, sets);
+    let sets = await Promise.all(slugs.slice(0, 10).map( async slug => ({sets: await getUserSets(slug, after, client, limiter), slug})));
+    console.log(sets);
 }
 
 /**

@@ -5,6 +5,9 @@ query UserSets($slug: String!, $page: Int, $perPage: Int, $after: Timestamp) {
         updatedAfter: $after
       }) {
         nodes {
+          event {
+            slug
+          }
           slots {
             entrant {
               participants {
