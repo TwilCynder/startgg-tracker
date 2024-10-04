@@ -4,6 +4,9 @@ query UserSets($slug: String!, $page: Int, $perPage: Int, $after: Timestamp) {
       sets(page: $page, perPage: $perPage, filters : {
         updatedAfter: $after
       }) {
+        pageInfo {
+          totalPages
+        }
         nodes {
           event {
             slug
