@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "startgg-helper-browser": "^1.0.2"
+    "startgg-helper-browser": "^2.0.1"
   },
   "devDependencies": {
     "webpack": "^5.94.0"
