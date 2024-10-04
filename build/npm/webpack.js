@@ -8,7 +8,7 @@ let compiler = webpack({
         filename: "bundle.js",
         library: {
             type: "module"
-        }
+        },
     },
     mode: process.argv[2] ? "none" : "production",
     experiments: {
@@ -17,5 +17,18 @@ let compiler = webpack({
 });
 
 console.log("Running webpack bundler")
-compiler.run();
-console.log("Bundled npm packages")
+try {
+    await new Promise((resolve, reject) => {
+        compiler.run((err, result) => {
+            if (result.hasErrors()){
+                reject("Error(s) in compilation : " + err + "\nResult : \n" + result.toString())
+            }
+            resolve();
+        })
+    })
+    console.log("Bundled npm packages")
+} catch (err){
+    console.error("Could not compile npm packages : ")
+    console.error(err);
+}
+
