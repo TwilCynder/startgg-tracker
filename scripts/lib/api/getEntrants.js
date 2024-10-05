@@ -12,7 +12,7 @@ export async function getEventEntrantsFactory(){
         });
         
         if (!result){
-            throw new Error("Couldn't fetch events from " + slug + " ; invalid response (might indicate non-existent event) : " + JSON.stringify(response))
+            throw new Error("Couldn't fetch events from " + slug + " ; invalid response (might indicate non-existent event)");
         }
 
         return result;

@@ -5,6 +5,8 @@ import { deep_get } from "./util.js";
 const getEventEntrants = await getEventEntrantsFactory();
 const getUserSets = await getUserSetsFactory();
 
+const eventFilters = ["ladder", "2v2"]
+
 class Player {
     constructor(user, player){
         this.slug = user.slug;
@@ -34,9 +36,9 @@ export async function get_rematches(client, slug, after, limiter){
         }
         return new Player(user, player);
     }).filter(slug => !!slug);
-    let sets = await Promise.all(players.slice(0, 20).map( async player => ({sets: await getUserSets(player.id, after, client, limiter), player})));
-    console.log(sets);
-    getRematchesList(buildMatchesMatrix(sets));
+    let sets = await Promise.all(players.map( async player => ({sets: await getUserSets(player.id, after, client, limiter), player})));
+    
+    return getRematchesList(buildMatchesMatrix(sets));
 }
 
 /**
@@ -50,18 +52,14 @@ function buildMatchesMatrix(playersLists){
         return prev;
     }, {});
 
-    let earliest = Infinity
     let res = playersLists.map((playerData, currentIndex) => {
         let h2h = Array(playersLists.length - currentIndex - 1).fill(null).map(_ => ([]));
         let id = playerData.player.id;
         
         for (let set of playerData.sets){
-            console.log(set.completedAt) ; if (set.completedAt < 1722513915) {
-                console.error("TMRLPT STARTGG", set);
-                if (set.completedAt && set.completedAt < earliest){
-                    earliest = set.completedAt;
-                }
-            };
+            
+            if (eventFilters.some(filter => set.event.slug.includes(filter))) continue;
+
             let currentPlayerSlotIndex = null;
             if (set.slots[0].entrant.participants.length > 1) continue; //2v2
             for (let i = 0; i < 2; i++){
@@ -89,7 +87,6 @@ function buildMatchesMatrix(playersLists){
         }
         return {player: playerData.player, h2h}
     })
-    console.warn(earliest)
     return res;
 }
 
@@ -97,15 +94,15 @@ function buildMatchesMatrix(playersLists){
  * @param {ReturnType<buildMatchesMatrix>} matrix 
  */
 function getRematchesList(matrix){
-    for (let p of matrix){
-        console.log(p.player.name)
-    }
+    let res = [];
     matrix.forEach((playerData, lineIndex) => {
         playerData.h2h.forEach((matches, colIndex) => {
             if (matches.length > 0){
                 let otherPlayerData = matrix[lineIndex + colIndex + 1];
-                console.log(playerData.player.name, otherPlayerData.player.name, matches.length, matches);
+                res.push({players: [playerData.player, otherPlayerData.player], matches});
             }
         })
     })
+
+    return res.sort((a, b) => b.matches.length - a.matches.length);
 }
