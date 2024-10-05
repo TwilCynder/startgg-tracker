@@ -10,7 +10,7 @@ let compiler = webpack({
             type: "module"
         }
     },
-    mode: "production",
+    mode: "none",
     experiments: {
         outputModule: true
     }

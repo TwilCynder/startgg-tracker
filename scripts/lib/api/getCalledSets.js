@@ -11,10 +11,10 @@ export async function getCalledSetsFactory(maxTries = default_tries){
 
         console.log(response)
 
-        if (!response || !response.data || !response.data.event){
+        if (!response || !response.event){
             throw new Error("Couldn't fetch sets from " + slug + " ; invalid response (might indicate non-existent event) : " + response)
         }
 
-        return response.data.event;
+        return response.event;
     }
 }

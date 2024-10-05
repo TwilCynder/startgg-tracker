@@ -1,11 +1,11 @@
-import { Client, Query } from "./sgg-helper.js";
+import { loadQuery, Query, SGGHelperClient } from "./sgg-helper.js";
 
 /**
  * Tests whether a given token is valid.
  * @returns 
  */
 export async function testTokenFactory(){
-    let test_query = await Query.load(new URL("./schemas/DummyRequest.graphql", import.meta.url));
+    let test_query = await loadQuery(new URL("./schemas/DummyRequest.graphql", import.meta.url));
 
     /**
      * @param {string} token
@@ -15,12 +15,12 @@ export async function testTokenFactory(){
      *  2 = invalid token
      */
     return (async function testToken(token){
-        let res = await test_query.execute(new Client("Bearer " + token));
+        let res = await test_query.execute(new SGGHelperClient("Bearer " + token));
 
         console.log(res)
 
         if (!res) return 1;
-        if (res.data){
+        if (res.event){
             return 0;
         } else {
             if (res.message == "Invalid authentication token"){

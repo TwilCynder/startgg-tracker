@@ -37,4 +37,4 @@ initLayout();
 update();
 setInterval(() => {
     update();
-}, 50000);
+}, 10000);
