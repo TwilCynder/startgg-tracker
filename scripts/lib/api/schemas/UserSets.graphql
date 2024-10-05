@@ -1,5 +1,5 @@
-query UserSets($slug: String!, $page: Int, $perPage: Int, $after: Timestamp) {
-	user(slug: $slug){
+query UserSets($id: ID!, $page: Int, $perPage: Int, $after: Timestamp) {
+	user(id: $id){
     player {
       sets(page: $page, perPage: $perPage, filters : {
         updatedAfter: $after
@@ -8,6 +8,8 @@ query UserSets($slug: String!, $page: Int, $perPage: Int, $after: Timestamp) {
           totalPages
         }
         nodes {
+          completedAt
+          id
           event {
             slug
           }
@@ -15,7 +17,7 @@ query UserSets($slug: String!, $page: Int, $perPage: Int, $after: Timestamp) {
             entrant {
               participants {
                 user {
-                  slug
+                  id
                 }
               }
             }

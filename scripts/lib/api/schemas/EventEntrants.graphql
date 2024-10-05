@@ -5,6 +5,10 @@ query EventEntrants($slug: String!, $page: Int, $perPage: Int) {
                 participants {
                     user {
                         slug
+                        id
+                    }
+                    player {
+                        gamerTag
                     }
                 }
             }
