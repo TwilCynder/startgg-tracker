@@ -21,6 +21,7 @@ jobs:
                 uses: actions/setup-node@v4
             -   name: Build
                 run: |
+                    chmod a+x ./build.sh
                     ./build.sh 
             -   name: Upload artifact
                 uses: actions/upload-pages-artifact@v3
