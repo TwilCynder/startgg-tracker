@@ -1,8 +1,8 @@
-//import { testTokenFactory } from "./lib/api/testToken.js"
+import { testTokenFactory } from "./lib/api/testToken.js"
 import { show, hide, showNotif, hideNotif, showNotifTemp } from "./lib/DOMUtil.js";
 import { processEventSlug } from "./lib/util.js";
 
-let testToken = () => 0
+let testToken = await testTokenFactory();
 
 class ToggleManager {
     #ids;
