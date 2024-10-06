@@ -4,7 +4,6 @@ import { processEventSlug } from "./lib/util.js";
 
 let testToken = await testTokenFactory();
 
-
 class ToggleManager {
     #ids;
     #currentIdx = 0;
@@ -38,6 +37,7 @@ new ToggleManager("#token-input", "#mode-select");
 function displayMainMenu(){
     hide("#token-input");
     show("#mode-select");
+    show("#disconnect");
 }
 
 document.getElementById("start-button").addEventListener("click", async (element) => {
@@ -91,6 +91,11 @@ document.querySelector("#player-mode .mode-area-input").addEventListener("keydow
         playerModeGOCallback()
     }
 });
+
+document.querySelector("#disconnect").addEventListener("click", () => {
+    localStorage.setItem("token", "");
+    window.location.reload();
+})
 
 let token = localStorage.getItem("token");
 if (token){

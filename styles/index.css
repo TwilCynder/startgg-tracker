@@ -198,3 +198,25 @@ body {
 a {
     text-decoration: none;
 }
+
+.disconnect {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    padding: 8px;
+
+    background-color: #eeeeee;
+    border-bottom-left-radius: 10px;
+
+    display: none;
+    gap: 3px;
+    align-items: center;
+}
+
+.disconnect:hover {
+    cursor: pointer;
+}
+
+.text-sized-image {
+    height: 1em;
+}
