@@ -1,9 +1,8 @@
-import { testTokenFactory } from "./lib/api/testToken.js"
+//import { testTokenFactory } from "./lib/api/testToken.js"
 import { show, hide, showNotif, hideNotif, showNotifTemp } from "./lib/DOMUtil.js";
 import { processEventSlug } from "./lib/util.js";
 
-let testToken = await testTokenFactory();
-
+let testToken = () => 0
 
 class ToggleManager {
     #ids;
@@ -39,6 +38,7 @@ function displayMainMenu(){
     console.log("dsiaplzy main menu aloooo")
     hide("#token-input");
     show("#mode-select");
+    show("#disconnect");
 }
 
 document.getElementById("start-button").addEventListener("click", async (element) => {
@@ -92,6 +92,11 @@ document.querySelector("#player-mode .mode-area-input").addEventListener("keydow
         playerModeGOCallback()
     }
 });
+
+document.querySelector("#disconnect").addEventListener("click", () => {
+    localStorage.setItem("token", "");
+    window.location.reload();
+})
 
 let token = localStorage.getItem("token");
 if (token){
