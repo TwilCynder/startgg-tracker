@@ -8,6 +8,19 @@ body {
     font-family: Roboto, Helvetica, sans-serif;
 }
 
+.content {
+    width: 100%;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 20px;
+
+    opacity: 100%;
+    
+}
+
 .notif-bar {
     position: absolute;
     top: 15px;

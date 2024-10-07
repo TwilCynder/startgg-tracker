@@ -12,19 +12,6 @@ body {
     gap: 20px;
 }
 
-.content {
-    width: 100%;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    gap: 20px;
-
-    opacity: 100%;
-    
-}
-
 .header {
     transition-property: all;
     transition-duration: 0.5s;
