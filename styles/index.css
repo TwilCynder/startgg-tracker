@@ -128,11 +128,7 @@ body {
 }
 
 .mode-area-input {
-    border: solid 1px gray;
-    border-radius: 10px;
-    background-color: white;
     width: 100%;
-    font-size: 100%;
 }
 
 .button {
