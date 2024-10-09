@@ -23,6 +23,11 @@
 
 .time-inputs-container {
     display: flex;
+    gap: 5px;
     flex-direction: column;
     align-items: flex-start;
+}
+
+.weeksInput {
+    width: 60px;
 }
