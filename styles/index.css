@@ -131,36 +131,9 @@ body {
     width: 100%;
 }
 
-.button {
-    background-color: #1460f7;
-    border: none;
-
-    border-radius: 10px;
-
-    font-family: Roboto, Helvetica;
-    font-weight: bold;
-    color: white;
-    min-width: 45px;
-    font-size: 100%;
-}
-
-.big-button {
-    width: 50%;
-    max-width: 20vw;
-
-    height: 5vh;
-
-    font-size: 2.5vh;
-}
-
 #start-button {
     width: 150px;
     height: 60px;
-}
-
-.button:hover {
-    background-color: #6F90FF;
-    cursor: pointer;
 }
 
 .mode-area-clickable {
