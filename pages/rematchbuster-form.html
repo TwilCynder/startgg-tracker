@@ -3,6 +3,7 @@
         <title>SGGT - RematchBuster</title>
         <link rel="icon" href="../icon/startggtracker256.png">
         <link rel="stylesheet" href="../styles/main.css">
+        <link rel="stylesheet" href="../styles/forms.css">
         <link rel="stylesheet" href="../styles/rematchbuster-form.css">
     </head>
     <body>
@@ -12,20 +13,19 @@
                 <div class = "subtitle">Give me the URL of an event (not the tournament, the event), a time period, and I'll tell you how many times (and when) the attendees of your event have played each other in that period, so you can avoid rematches when seeding the event.</div>
                 <input class = "input" id="event" type="text">
                 <div class = "time-inputs-container">
-                    <div>
-                        <input type="radio" name="periodMode"/>
-                        <label for="duration">Check matches in the last <input type="number" name="weeks" min="1" class="weeksInput"/> weeks</label>
+                    <div id="duration-mode-container">
+                        <input type="radio" name="periodMode" id="duration-mode" onchange="radioButtonOnChanged(this)"/>
+                        <label for="duration-mode">Check matches in the last <input disabled type="number" name="weeks" value=1 min="1" class="numberInput weeksInput timeInput" onchange="numberInputOnChange(this)"/> weeks</label>
                     </div>
 
-                    <div>
-                        <input type="radio" name="periodMode"/>
-                        <label for="date">Check matches since <input type="date" class ="dateInput"></label>
+                    <div id="date-mode-container">
+                        <input type="radio" name="periodMode" id="date-mode" onchange="radioButtonOnChanged(this)"/>
+                        <label for="date-mode">Check matches since <input type="date" class ="dateInput timeInput"></label>
                     </div>
                 </div>
+                <input type="button" id="GO" value="GO !" class="button"/>
             </div>
         </center>
-        <script>
-
-        </script>
+        <script src="../scripts/rematchbuster-form.js"></script>
     </body>
 </html>
