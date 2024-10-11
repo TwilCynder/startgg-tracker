@@ -12,18 +12,18 @@
                 <div class = "title">RematchBuster</div>
                 <div class = "subtitle">Give me the URL of an event (not the tournament, the event), a time period, and I'll tell you how many times (and when) the attendees of your event have played each other in that period, so you can avoid rematches when seeding the event.</div>
                 <input class = "input" id="event" type="text">
-                <div class = "time-inputs-container">
-                    <div id="duration-mode-container">
-                        <input type="radio" name="periodMode" id="duration-mode" onchange="radioButtonOnChanged(this)"/>
-                        <label for="duration-mode">Check matches in the last <input disabled type="number" name="weeks" value=1 min="1" class="numberInput weeksInput timeInput" onchange="numberInputOnChange(this)"/> weeks</label>
-                    </div>
-
-                    <div id="date-mode-container">
-                        <input type="radio" name="periodMode" id="date-mode" onchange="radioButtonOnChanged(this)"/>
-                        <label for="date-mode">Check matches since <input type="date" class ="dateInput timeInput"></label>
-                    </div>
-                </div>
-                <input type="button" id="GO" value="GO !" class="button"/>
+<div class = "time-inputs-container">
+    <div id="duration-mode-container">
+        <input type="radio" name="periodMode" id="duration-mode" onchange="radioButtonOnChanged(this)"/>
+        <label for="duration-mode">Check matches in the last <input disabled type="number" name="weeks" value=1 min="1" class="numberInput weeksInput timeInput" onchange="numberInputOnChange(this)"/> weeks</label>
+    </div>
+    
+    <div id="date-mode-container">
+        <input type="radio" name="periodMode" id="date-mode" onchange="radioButtonOnChanged(this)"/>
+        <label for="date-mode">Check matches since <input type="date" class ="dateInput timeInput"></label>
+    </div>
+</div>
+<input type="button" id="GO" value="GO !" class="button"/>
             </div>
         </center>
         <script src="../scripts/rematchbuster-form.js"></script>

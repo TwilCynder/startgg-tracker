@@ -1,0 +1,13 @@
+<input class = "input" id="event" type="text">
+<div class = "time-inputs-container">
+    <div id="duration-mode-container">
+        <input type="radio" name="periodMode" id="duration-mode" onchange="radioButtonOnChanged(this)"/>
+        <label for="duration-mode">Check matches in the last <input disabled type="number" name="weeks" value=1 min="1" class="numberInput weeksInput timeInput" onchange="numberInputOnChange(this)"/> weeks</label>
+    </div>
+    
+    <div id="date-mode-container">
+        <input type="radio" name="periodMode" id="date-mode" onchange="radioButtonOnChanged(this)"/>
+        <label for="date-mode">Check matches since <input type="date" class ="dateInput timeInput"></label>
+    </div>
+</div>
+<input type="button" id="GO" value="GO !" class="button"/>
