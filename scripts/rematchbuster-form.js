@@ -1,3 +1,5 @@
+import { getRequest } from "./rematchbuster-common.js";
+
 function numberInputOnChange(el){
     if (el.value != "") {
         if (el.min && parseInt(el.value) < parseInt(el.min)) {
@@ -9,7 +11,6 @@ function numberInputOnChange(el){
       } 
 }
 
-const timeModes = ["date-mode", "duration-mode"];
 
 function radioButtonOnChanged(element){
     handleRadioButtons(element.id);
@@ -18,7 +19,6 @@ function radioButtonOnChanged(element){
 function handleRadioButtons(selected){
     document.querySelectorAll(".time-inputs-container .timeInput").forEach(el => el.disabled = true);
     document.querySelector(`#${selected}-container .timeInput`).disabled = false;
-    
 }
 
 function getSelectedRadioButton(){
@@ -26,14 +26,22 @@ function getSelectedRadioButton(){
 }
 
 function init(){
+    window.numberInputOnChange = numberInputOnChange;
+    window.radioButtonOnChanged = radioButtonOnChanged;
+
     let selected = getSelectedRadioButton();
     if (selected){
         handleRadioButtons(selected.id);
     } else {
-        console.log("AH")
         document.querySelector(".time-inputs-container #duration-mode").checked = true;
         handleRadioButtons("duration-mode");
     }
+
+    document.querySelector("#GO").addEventListener("click", () => {
+        getRequest();
+    });
+
+    document.querySelectorAll(".dateInput").forEach(el => el.max = new Date().toISOString().split("T")[0])
 }
 
 init();
