@@ -1,3 +1,4 @@
+./render.sh
 cd build/npm
 mkdir -p dist
 npm install
