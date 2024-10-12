@@ -1,3 +1,5 @@
 import { init } from "./rematchbuster-common.js";
 
-init(req => console.log(req));
+init(req => {
+    window.location.assign("../rematchbuster.html?" + req.getURL());
+});

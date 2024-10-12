@@ -72,6 +72,10 @@ function getSelectedRadioButton(){
     return document.querySelector('input[name="periodMode"]:checked');
 }
 
+/**
+ * 
+ * @param {(req: Request) => void} goCallback 
+ */
 export function init(goCallback){
     window.numberInputOnChange = numberInputOnChange;
     window.radioButtonOnChanged = radioButtonOnChanged;
