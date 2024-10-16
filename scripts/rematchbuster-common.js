@@ -20,6 +20,25 @@ export class Request {
 
         return params.toString();
     }
+
+    static fromURL(string){
+        let params = new URLSearchParams(string);
+        let slug = params.get("event");
+        slug = processEventSlug(slug);
+        if (!slug){
+            throw new RequestValidityError("Please specify a valid event URL. Go to the page of your event on start.gg and copy the content of the URL bar.");
+        }
+        console.log(slug);
+        let timePeriod = {
+            date: params.get("date"),
+            duration: params.get("duration")
+        };
+        if (!timePeriod.date && !timePeriod.duration){
+            throw new RequestValidityError("Please specify a time period (either a starting date or a duration)");
+        }
+    
+        return new Request(slug, timePeriod);
+    }
 }
 
 function getRequest(){
@@ -35,8 +54,8 @@ function getRequest(){
         console.log(timePeriod.duration);
     } else {
         let dateString = document.querySelector(".time-inputs-container .dateInput").value;
-        if (!dateString){
-            throw new RequestValidityError("Please select a date");
+        if (!dateString){  
+            throw new RequestValidityError("Please select a date.");
         }
         timePeriod.date = new Date(dateString);
         console.log(timePeriod.date)
@@ -89,8 +108,17 @@ export function init(goCallback){
     }
 
     document.querySelector("#GO").addEventListener("click", () => {
-        let req = getRequest();
-        goCallback(req);
+        let req;
+        try {
+            req = getRequest();
+            goCallback(req);
+        } catch (err){
+            if (err instanceof RequestValidityError){
+                alert(err.message);
+            }
+        }
+        
+        
     });
 
     document.querySelectorAll(".dateInput").forEach(el => el.max = new Date().toISOString().split("T")[0])

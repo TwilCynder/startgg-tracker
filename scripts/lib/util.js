@@ -4,6 +4,7 @@
  * @returns 
  */
 export function processEventSlug(slug){
+    if (!slug) return slug;
     let split = slug.split("start.gg/");
     slug = (split.length == 2) ? split[1] : split[0]
     split = slug.split(/\//)
