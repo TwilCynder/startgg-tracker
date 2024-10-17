@@ -21,6 +21,18 @@ export class Request {
         return params.toString();
     }
 
+    getDate(){
+        if (this.date){
+            return new Date(this.date);
+        } else {
+            let weeks = parseInt(this.duration);
+            if (!Number.isInteger(weeks)) weeks = 1;
+            let d = new Date();
+            d.setDate(d.getDate() - weeks * 7);
+            return d;
+        }
+    }
+
     static fromURL(string){
         let params = new URLSearchParams(string);
         let slug = params.get("event");
@@ -57,7 +69,7 @@ function getRequest(){
         if (!dateString){  
             throw new RequestValidityError("Please select a date.");
         }
-        timePeriod.date = new Date(dateString);
+        timePeriod.date = dateString;
         console.log(timePeriod.date)
     }
 
