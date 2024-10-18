@@ -1,4 +1,4 @@
-import { SGGHelperClient, StartGGDelayQueryLimiter } from "./lib/api/sgg-helper.js";
+import { RateLimitingSGGHelperClient, SGGHelperClient, StartGGDelayQueryLimiter } from "./lib/api/sgg-helper.js";
 import { get_rematches } from "./lib/check_rematches.js";
 import { Request } from "./rematchbuster-common.js";
 
@@ -23,7 +23,7 @@ if (!token){
     window.location.href = "./index.html"
 }
 
-let client = new SGGHelperClient("Bearer " + token);
+let client = new RateLimitingSGGHelperClient("Bearer " + token);
 let limiter = new StartGGDelayQueryLimiter();
 
 let request = Request.fromURL(window.location.search);
