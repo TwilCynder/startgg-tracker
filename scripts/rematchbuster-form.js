@@ -1,4 +1,4 @@
-import { init } from "./rematchbuster-common.js";
+import { handleRadioButtons, init } from "./rematchbuster-common.js";
 
 init(req => {
     window.location.assign("./rematchbuster.html?" + req.getURL());

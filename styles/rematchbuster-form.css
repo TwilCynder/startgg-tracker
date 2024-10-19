@@ -8,10 +8,15 @@
     width: 65%;
     max-width: 960px;
     min-width: 500px;
+
 }
 
 .content-center {
     height: 100%;
+}
+
+.content-top {
+    gap:12px;
 }
 
 .title {

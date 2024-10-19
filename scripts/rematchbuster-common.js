@@ -94,7 +94,7 @@ function radioButtonOnChanged(element){
     handleRadioButtons(element.id);
 }
 
-function handleRadioButtons(selected){
+export function handleRadioButtons(selected){
     document.querySelectorAll(".time-inputs-container .timeInput").forEach(el => el.disabled = true);
     document.querySelector(`#${selected}-container .timeInput`).disabled = false;
 }
