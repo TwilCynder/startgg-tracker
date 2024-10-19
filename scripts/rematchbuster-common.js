@@ -99,6 +99,13 @@ function handleRadioButtons(selected){
     document.querySelector(`#${selected}-container .timeInput`).disabled = false;
 }
 
+export function handleSelectedRadioButton(){
+    let selected = getSelectedRadioButton();
+    if (selected){
+        handleRadioButtons(selected.id);
+    }
+}
+
 function getSelectedRadioButton(){
     return document.querySelector('input[name="periodMode"]:checked');
 }
@@ -111,13 +118,7 @@ export function init(goCallback){
     window.numberInputOnChange = numberInputOnChange;
     window.radioButtonOnChanged = radioButtonOnChanged;
 
-    let selected = getSelectedRadioButton();
-    if (selected){
-        handleRadioButtons(selected.id);
-    } else {
-        document.querySelector(".time-inputs-container #duration-mode").checked = true;
-        handleRadioButtons("duration-mode");
-    }
+    handleSelectedRadioButton();
 
     document.querySelector("#GO").addEventListener("click", () => {
         let req;
@@ -133,5 +134,5 @@ export function init(goCallback){
         
     });
 
-    document.querySelectorAll(".dateInput").forEach(el => el.max = new Date().toISOString().split("T")[0])
+    document.querySelectorAll(".dateInput").forEach(el => el.max = new Date().toISOString().split("T")[0]);
 }

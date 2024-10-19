@@ -5,10 +5,13 @@
     align-items: center;
     gap: 20px;
 
-    height: 100%;
     width: 65%;
     max-width: 960px;
     min-width: 500px;
+}
+
+.content-center {
+    height: 100%;
 }
 
 .title {

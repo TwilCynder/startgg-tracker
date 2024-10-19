@@ -1,0 +1,30 @@
+<html>
+    <head>
+        <title>SGGT - RematchBuster</title>
+        <link rel="icon" href="../icon/startggtracker256.png">
+        <link rel="stylesheet" href="../../styles/main.css">
+        <link rel="stylesheet" href="../../styles/forms.css">
+        <link rel="stylesheet" href="../../styles/rematchbuster.css">
+        <link rel="stylesheet" href="../../styles/rematchbuster-form.css">
+    </head>
+    <body>
+        <center>
+            <div class = "content-column">
+                <input class = "input" id="event" type="text">
+<div class = "time-inputs-container">
+    <div id="duration-mode-container">
+        <input type="radio" name="periodMode" id="duration-mode" onchange="radioButtonOnChanged(this)"/>
+        <label for="duration-mode">Check matches in the last <input disabled type="number" name="weeks" value=1 min="1" class="numberInput weeksInput timeInput" onchange="numberInputOnChange(this)"/> weeks</label>
+    </div>
+    
+    <div id="date-mode-container">
+        <input type="radio" name="periodMode" id="date-mode" onchange="radioButtonOnChanged(this)"/>
+        <label for="date-mode">Check matches since <input type="date" class ="dateInput timeInput"></label>
+    </div>
+</div>
+<input type="button" id="GO" value="GO !" class="button"/>
+            </div>
+        </center>
+        <script src="../../scripts/rematchbuster.js" type="module"></script>
+    </body>
+</html>

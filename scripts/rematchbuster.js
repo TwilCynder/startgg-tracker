@@ -1,6 +1,6 @@
 import { RateLimitingSGGHelperClient, SGGHelperClient, StartGGDelayQueryLimiter } from "./lib/api/sgg-helper.js";
 import { get_rematches } from "./lib/check_rematches.js";
-import { Request } from "./rematchbuster-common.js";
+import { handleSelectedRadioButton, Request } from "./rematchbuster-common.js";
 
 //------ LIB --------
 
@@ -29,10 +29,20 @@ let limiter = new StartGGDelayQueryLimiter();
 let request = Request.fromURL(window.location.search);
 console.log(request);
 if (request){
+    document.querySelector("#event").value = request.slug;
+    if (request.date){
+        document.querySelector("#date-mode").checked = true;
+        document.querySelector(".dateInput.timeInput").value = request.date;
+    } else {
+        document.querySelector("#duration-mode").checked = true;
+        document.querySelector(".weeksInput.timeInput").value = request.duration;
+    }
+    handleSelectedRadioButton();
     console.log(await loadFromRequest(client, request, limiter));
+} else {
+    document.querySelector(".time-inputs-container #duration-mode").checked = true;
+    handleRadioButtons("duration-mode");
 }
-
-
 
 /*
 let res = [] //await get_rematches(client, "tournament/tls-mad-ness-33/event/1v1-ultimate", 1722513915, limiter);

@@ -58,6 +58,7 @@ function buildMatchesMatrix(playersLists){
         
         for (let set of playerData.sets){
             
+            console.log(set.event, set.id)
             if (eventFilters.some(filter => set.event.slug.includes(filter))) continue;
 
             let currentPlayerSlotIndex = null;
