@@ -41,6 +41,8 @@ export async function get_rematches(client, slug, after, limiter){
     return getRematchesList(buildMatchesMatrix(sets));
 }
 
+const unknown_event = {slug: "unknown_event", name: "Unknown Event", tournament: {name: "Unknown Tournament"}}
+
 /**
  * 
  * @param {string[]} slugs 
@@ -58,7 +60,7 @@ function buildMatchesMatrix(playersLists){
         
         for (let set of playerData.sets){
             
-            console.log(set.event, set.id)
+            if (!set.event) continue;
             if (eventFilters.some(filter => set.event.slug.includes(filter))) continue;
 
             let currentPlayerSlotIndex = null;
