@@ -1,4 +1,4 @@
-.content-column {
+.form-column {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -11,11 +11,11 @@
 
 }
 
-.content-center {
+.form-center {
     height: 100%;
 }
 
-.content-top {
+.form-top {
     gap:12px;
 }
 

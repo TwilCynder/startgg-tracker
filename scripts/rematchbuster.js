@@ -1,5 +1,6 @@
 import { RateLimitingSGGHelperClient, SGGHelperClient, StartGGDelayQueryLimiter } from "./lib/api/sgg-helper.js";
 import { get_rematches } from "./lib/check_rematches.js";
+import { show, hide } from "./lib/DOMUtil.js";
 import { handleSelectedRadioButton, Request } from "./rematchbuster-common.js";
 
 //------ LIB --------
@@ -10,9 +11,20 @@ import { handleSelectedRadioButton, Request } from "./rematchbuster-common.js";
 async function loadFromRequest(client, request, limiter){
     let date = request.getDate();
     console.log(date.getTime());
-    return await get_rematches(client, request.slug, Math.floor(date.getTime() / 1000), limiter);
+    showLoader();
+    let res = await get_rematches(client, request.slug, Math.floor(date.getTime() / 1000), limiter);
+    showResult();
 }
 
+function showLoader(){
+    show(".loading-container");
+    hide(".result");
+}
+
+function showResult(){
+    hide(".loading-container");
+    show(".result");
+}
 
 //------ SCRIPT -----
 
