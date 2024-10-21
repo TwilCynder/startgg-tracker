@@ -12,8 +12,8 @@ async function loadFromRequest(client, request, limiter){
     let date = request.getDate();
     console.log(date.getTime());
     showLoader();
-    //let res = await get_rematches(client, request.slug, Math.floor(date.getTime() / 1000), limiter);
-    //console.log(res);
+    let res = await get_rematches(client, request.slug, Math.floor(date.getTime() / 1000), limiter);
+    makeResultHTML(res);
     showResult();
 }
 
@@ -39,8 +39,17 @@ function showResult(){
     show(".result");
 }
 
-function makeResultHTML(){
-
+function makeResultHTML(result){
+    let html = ""
+    for (let entry of result){
+        html += `
+            <div class = "entry">
+                ${entry.players[0].name} vs ${entry.players[1].name} - ${entry.matches.length} matches    
+            </div>
+            <br>
+        `
+    }
+    document.querySelector(".result").innerHTML = html;
 }
 
 //------ SCRIPT -----
@@ -63,6 +72,7 @@ init(request => {
         console.log(window.location.pathname + url)
         window.history.pushState(request, "", window.location.pathname + url);
     }
+    loadFromRequest(client, request, limiter);
 
 })
 

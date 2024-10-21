@@ -42,3 +42,12 @@
     min-width: 400px;
     max-width: 600px;
 }
+
+.result {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    align-items: flex-start;
+    border: 1px solid grey;
+    padding: 10px;
+}
