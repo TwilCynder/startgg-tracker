@@ -1,7 +1,7 @@
 import { RateLimitingSGGHelperClient, SGGHelperClient, StartGGDelayQueryLimiter } from "./lib/api/sgg-helper.js";
 import { get_rematches } from "./lib/check_rematches.js";
 import { show, hide } from "./lib/DOMUtil.js";
-import { handleSelectedRadioButton, Request } from "./rematchbuster-common.js";
+import { handleSelectedRadioButton, init, Request } from "./rematchbuster-common.js";
 
 //------ LIB --------
 
@@ -12,8 +12,21 @@ async function loadFromRequest(client, request, limiter){
     let date = request.getDate();
     console.log(date.getTime());
     showLoader();
-    let res = await get_rematches(client, request.slug, Math.floor(date.getTime() / 1000), limiter);
+    //let res = await get_rematches(client, request.slug, Math.floor(date.getTime() / 1000), limiter);
+    //console.log(res);
     showResult();
+}
+
+function updateFormFromRequest(request){
+    document.querySelector("#event").value = request.slug;
+    if (request.date){
+        document.querySelector("#date-mode").checked = true;
+        document.querySelector(".dateInput.timeInput").value = request.date;
+    } else {
+        document.querySelector("#duration-mode").checked = true;
+        document.querySelector(".weeksInput.timeInput").value = request.duration;
+    }
+    handleSelectedRadioButton();
 }
 
 function showLoader(){
@@ -26,9 +39,13 @@ function showResult(){
     show(".result");
 }
 
+function makeResultHTML(){
+
+}
+
 //------ SCRIPT -----
 
-
+//-- Various init
 let token = localStorage.getItem("token");
 if (!token){
     console.error("No token. Going back to homepage");
@@ -38,18 +55,38 @@ if (!token){
 let client = new RateLimitingSGGHelperClient("Bearer " + token);
 let limiter = new StartGGDelayQueryLimiter();
 
-let request = Request.fromURL(window.location.search);
-console.log(request);
-if (request){
-    document.querySelector("#event").value = request.slug;
-    if (request.date){
-        document.querySelector("#date-mode").checked = true;
-        document.querySelector(".dateInput.timeInput").value = request.date;
-    } else {
-        document.querySelector("#duration-mode").checked = true;
-        document.querySelector(".weeksInput.timeInput").value = request.duration;
+//-- Page init
+init(request => {
+    let url = request.getURL();
+    console.log(url, window.location.search);
+    if (url != window.location.search){
+        console.log(window.location.pathname + url)
+        window.history.pushState(request, "", window.location.pathname + url);
     }
-    handleSelectedRadioButton();
+
+})
+
+window.addEventListener("popstate", (ev) => {
+    let state = ev.state;
+    let request;
+    if (!state){
+        try {
+            request = Request.fromURL(window.location.search)
+        } catch (err) {
+            console.error("Tried to make request from stateless popstate event, but failed :", err);
+        }
+    } else {
+        request = state;
+    }
+
+    updateFormFromRequest(request);
+})
+
+//-- Starting query
+let request = Request.fromURL(window.location.search);
+
+if (request){
+    updateFormFromRequest(request);
     console.log(await loadFromRequest(client, request, limiter));
 } else {
     document.querySelector(".time-inputs-container #duration-mode").checked = true;

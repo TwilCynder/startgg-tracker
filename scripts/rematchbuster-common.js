@@ -18,7 +18,7 @@ export class Request {
             params.set("duration", this.duration);
         }
 
-        return params.toString();
+        return "?" + params.toString();
     }
 
     getDate(){
