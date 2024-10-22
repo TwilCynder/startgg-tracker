@@ -6,9 +6,10 @@
 export function processEventSlug(slug){
     if (!slug) return slug;
     let split = slug.split("start.gg/");
+    console.log(split)
     slug = (split.length == 2) ? split[1] : split[0]
     split = slug.split(/\//)
-    if (split[0] != "tournament" || split[2] != "event" || split.length < 4){
+    if (split[0] != "tournament" || (split[2] != "event" && split[2] != "events") || split.length < 4){
         return false;
     }
 

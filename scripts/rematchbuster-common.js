@@ -1,3 +1,4 @@
+import { hide, show } from "./lib/DOMUtil.js";
 import { processEventSlug } from "./lib/util.js";
 
 export class RequestValidityError extends Error {}
@@ -55,7 +56,9 @@ export class Request {
 
 function getRequest(){
     let slug = document.querySelector("#event").value;
+    console.log(slug)
     slug = processEventSlug(slug);
+    console.log(slug);
     if (!slug){
         throw new RequestValidityError("Please enter a valid event URL. Go to the page of your event on start.gg and copy the content of the URL bar.");
     }
@@ -110,6 +113,11 @@ function getSelectedRadioButton(){
     return document.querySelector('input[name="periodMode"]:checked');
 }
 
+function auto_grow(element) {
+    element.style.height = "5px";
+    element.style.height = (element.scrollHeight) + "px";
+}
+
 /**
  * 
  * @param {(req: Request) => void} goCallback 
@@ -117,8 +125,24 @@ function getSelectedRadioButton(){
 export function init(goCallback){
     window.numberInputOnChange = numberInputOnChange;
     window.radioButtonOnChanged = radioButtonOnChanged;
+    window.auto_grow = auto_grow;
 
     handleSelectedRadioButton();
+
+    let isEventFilterContainerDisplayed = false;
+    hide(".event-filters-container-inner");
+    document.querySelector(".event-filters-container .dropdown_button_container").addEventListener("click", function() {
+        console.log(this.classList);
+        if (isEventFilterContainerDisplayed){
+            isEventFilterContainerDisplayed = false;
+            hide(".event-filters-container-inner");
+            this.classList.remove("open")
+        } else {
+            isEventFilterContainerDisplayed = true;
+            show(".event-filters-container-inner");
+            this.classList.add("open")
+        }
+    })
 
     document.querySelector("#GO").addEventListener("click", () => {
         let req;

@@ -29,6 +29,39 @@
     max-width: 600px;
 }
 
+.dropdown_button_container {
+    display: inline-block;
+    background-color: transparent;
+}
+
+.dropdown_button_container:hover {
+    cursor: pointer;
+}
+
+.dropdown_button {
+    transition: all 0.3s ease;
+}
+
+.open .dropdown_button {
+    transform: rotate(180deg);
+}
+
+.event-filters-container {
+    width: 100%;
+    max-width: 600px;
+}
+
+.event-filters-container-inner {
+    font-size: 12px;
+    display: flex;
+    flex-direction: column;
+}
+
+.event-filters {
+    width: 100%;
+    resize: vertical;
+}
+
 .time-inputs-container {
     display: flex;
     gap: 5px;

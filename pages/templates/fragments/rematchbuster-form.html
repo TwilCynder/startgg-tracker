@@ -10,4 +10,12 @@
         <label for="date-mode">Check matches since <input type="date" class ="dateInput timeInput"></label>
     </div>
 </div>
+<div class ="event-filters-container">
+    <div>Event filters <span class = "dropdown_button_container"><div class = "dropdown_button">▼</div></span></div>
+    <div class ="event-filters-container-inner">
+        Filtered keywords, separated by commas. Events with any of these keywords in their URL will be ignored
+        <textarea class ="input event-filters" oninput="auto_grow(this)"></textarea>
+    </div>
+    
+</div>
 <input type="button" id="GO" value="GO !" class="button"/>
