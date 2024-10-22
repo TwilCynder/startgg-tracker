@@ -4,10 +4,11 @@ import { processEventSlug } from "./lib/util.js";
 export class RequestValidityError extends Error {}
 
 export class Request {
-    constructor(slug, timePeriod = {}){
+    constructor(slug, timePeriod = {}, filters){
         this.slug = slug;
         this.date = timePeriod.date;
         this.duration = timePeriod.duration;
+        this.eventFilters = filters;
     }
 
     getURL(){
@@ -18,6 +19,7 @@ export class Request {
         } else {
             params.set("duration", this.duration);
         }
+        params.set("filters", this.eventFilters);
 
         return "?" + params.toString();
     }
@@ -49,20 +51,20 @@ export class Request {
         if (!timePeriod.date && !timePeriod.duration){
             throw new RequestValidityError("Please specify a time period (either a starting date or a duration)");
         }
-    
-        return new Request(slug, timePeriod);
+        let filters = params.get("filters");
+        return new Request(slug, timePeriod, filters);
     }
 }
 
 function getRequest(){
     let slug = document.querySelector("#event").value;
-    console.log(slug)
+
     slug = processEventSlug(slug);
-    console.log(slug);
+
     if (!slug){
         throw new RequestValidityError("Please enter a valid event URL. Go to the page of your event on start.gg and copy the content of the URL bar.");
     }
-    console.log(slug);
+
     let timePeriod = {};
     if (document.querySelector(".time-inputs-container #duration-mode").checked){
         timePeriod.duration = document.querySelector(".time-inputs-container .weeksInput").value;
@@ -76,7 +78,8 @@ function getRequest(){
         console.log(timePeriod.date)
     }
 
-    return new Request(slug, timePeriod);
+    let filters = document.querySelector(".input.event-filters").value;
+    return new Request(slug, timePeriod, filters);
 }
 
 //TODO : add more precise error messages for invalid event slug
@@ -152,6 +155,8 @@ export function init(goCallback){
         } catch (err){
             if (err instanceof RequestValidityError){
                 alert(err.message);
+            } else {
+                throw err;
             }
         }
         

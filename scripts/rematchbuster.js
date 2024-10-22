@@ -13,7 +13,9 @@ async function loadFromRequest(client, request, limiter){
     console.log(date.getTime());
     showLoader();
     try {
+        console.log(request.eventFilters);
         let res = await get_rematches(client, request.slug, Math.floor(date.getTime() / 1000), limiter);
+        
         makeResultHTML(res);
         showResult();
     } catch (err){
