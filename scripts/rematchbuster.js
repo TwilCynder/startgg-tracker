@@ -12,9 +12,16 @@ async function loadFromRequest(client, request, limiter){
     let date = request.getDate();
     console.log(date.getTime());
     showLoader();
-    let res = await get_rematches(client, request.slug, Math.floor(date.getTime() / 1000), limiter);
-    makeResultHTML(res);
-    showResult();
+    try {
+        let res = await get_rematches(client, request.slug, Math.floor(date.getTime() / 1000), limiter);
+        makeResultHTML(res);
+        showResult();
+    } catch (err){
+        console.error(err);
+        alert("There was a problem fetching data from the start.gg API. Please check that the event URL is correct, and try again")
+        hide(".loading-container");
+    }
+
 }
 
 function updateFormFromRequest(request){
