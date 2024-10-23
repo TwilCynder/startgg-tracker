@@ -79,12 +79,14 @@ init(request => {
     console.log(url, window.location.search);
     if (url != window.location.search){
         console.log(window.location.pathname + url)
-        window.history.pushState(request, "", window.location.pathname + url);
+        //window.history.pushState(request, "", window.location.pathname + url);
+        window.location.href = window.location.pathname + url;
     }
     loadFromRequest(client, request, limiter);
 
 })
 
+/*
 window.addEventListener("popstate", (ev) => {
     let state = ev.state;
     let request;
@@ -100,6 +102,7 @@ window.addEventListener("popstate", (ev) => {
 
     updateFormFromRequest(request);
 })
+*/
 
 //-- Starting query
 let request = Request.fromURL(window.location.search);
