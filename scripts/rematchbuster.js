@@ -16,7 +16,8 @@ async function loadFromRequest(client, request, limiter){
     try {
         console.log(request.eventFilters);
         let res = await get_rematches(client, request.slug, Math.floor(date.getTime() / 1000), limiter);
-        filterResult(res, getFiltersArray(request.eventFilters));
+        res = filterResult(res, getFiltersArray(request.eventFilters));
+        console.log(res);
         makeResultHTML(res);
         showResult();
     } catch (err){
@@ -75,6 +76,7 @@ function filterResult(result, filters = []){
             return true;
         })
     }
+    console.log(result)
     return result.sort((a, b) => b.matches.length - a.matches.length);
 }
 
