@@ -39,6 +39,19 @@ export function show(elementName){
     showElement(element);
 }
 
+/**
+ * @param {HTMLElement} element 
+ * @param {string} className 
+ */
+export function toggleClass(element, className){
+    let classList = element.classList;
+    if (classList.contains(className)){
+        classList.remove(className);
+    } else {
+        classList.add(className);
+    }
+}
+
 /** @type {NodeJS.Timeout}*/
 let notif_timer = null;
 function reset_notif_timer(){
