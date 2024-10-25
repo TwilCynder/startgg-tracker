@@ -1,6 +1,7 @@
 import { RateLimitingSGGHelperClient, SGGHelperClient, StartGGDelayQueryLimiter } from "./lib/api/sgg-helper.js";
 import { get_rematches } from "./lib/check_rematches.js";
 import { show, hide } from "./lib/DOMUtil.js";
+import { deep_get } from "./lib/util.js";
 import { handleSelectedRadioButton, init, Request } from "./rematchbuster-common.js";
 
 //------ LIB --------
@@ -15,7 +16,7 @@ async function loadFromRequest(client, request, limiter){
     try {
         console.log(request.eventFilters);
         let res = await get_rematches(client, request.slug, Math.floor(date.getTime() / 1000), limiter);
-        
+        filterResult(res, getFiltersArray(request.eventFilters));
         makeResultHTML(res);
         showResult();
     } catch (err){
@@ -36,6 +37,9 @@ function updateFormFromRequest(request){
         document.querySelector(".weeksInput.timeInput").value = request.duration;
     }
     handleSelectedRadioButton();
+    if (!!request.eventFilters){
+        document.querySelector(".input.event-filters").value = request.eventFilters
+    }
 }
 
 function showLoader(){
@@ -46,6 +50,32 @@ function showLoader(){
 function showResult(){
     hide(".loading-container");
     show(".result");
+}
+
+/**
+ * @param {string} filtersString 
+ * @returns 
+ */
+function getFiltersArray(filtersString){
+    let res = filtersString.split(/,/g)
+    return res.map(filter => filter.trim());
+}
+
+function filterResult(result, filters = []){
+    for (let entry of result){
+        entry.matches = entry.matches.filter(match => {
+            let slug = deep_get(match, "event.slug");
+            if (!slug) console.warn("No event slug for match", match);
+            for (let filter of filters){
+                if (slug.includes(filter)){
+                    console.log("Event removed for containing the filter", filter);
+                    return false;        
+                }
+            }
+            return true;
+        })
+    }
+    return result.sort((a, b) => b.matches.length - a.matches.length);
 }
 
 function makeResultHTML(result){
