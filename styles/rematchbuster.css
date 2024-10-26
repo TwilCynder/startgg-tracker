@@ -51,3 +51,33 @@
     border: 1px solid grey;
     padding: 10px;
 }
+
+.closed {
+    display: none;
+}
+
+.entry-title {
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.entry-details {
+    display: none;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+}
+
+.entry-details.open {
+    display: flex;
+}
+
+.dropdown-button-sideways {
+    display: inline-block;
+    margin-right: 5px;
+    transition: all 0.3s ease;
+}
+
+.open .dropdown-button-sideways {
+    transform: rotate(90deg);
+}

@@ -1,6 +1,6 @@
 import { RateLimitingSGGHelperClient, SGGHelperClient, StartGGDelayQueryLimiter } from "./lib/api/sgg-helper.js";
 import { get_rematches } from "./lib/check_rematches.js";
-import { show, hide } from "./lib/DOMUtil.js";
+import { show, hide, toggleClass } from "./lib/DOMUtil.js";
 import { deep_get } from "./lib/util.js";
 import { handleSelectedRadioButton, init, Request } from "./rematchbuster-common.js";
 
@@ -84,14 +84,31 @@ function makeResultHTML(result){
     let html = ""
     for (let entry of result){
         html += `
-            <div class = "entry">
-                ${entry.players[0].name} vs ${entry.players[1].name} - ${entry.matches.length} matches    
+            <div class = "entry-title" onclick="entryTitleOnClick(this)">
+                <span class ="dropdown-button-sideways">►</span>${entry.players[0].name} vs ${entry.players[1].name} - ${entry.matches.length} matches    
             </div>
-            <br>
+            <div class ="entry-details">
+            ${
+                entry.matches.map(match => 
+                    `
+                        ${match.event.tournament.name} - ${match.event.name} - ${match.fullRoundText} <br>
+                    `
+                ).join("")  
+            }
+            </div>
         `
     }
     document.querySelector(".result").innerHTML = html;
 }
+
+/**
+ * @param {HTMLElement} element 
+ */
+function entryTitleOnClick(element){
+    toggleClass(element, "open");
+    toggleClass(element.nextElementSibling, "open");
+}
+window.entryTitleOnClick = entryTitleOnClick;
 
 //------ SCRIPT -----
 

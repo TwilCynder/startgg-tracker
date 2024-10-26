@@ -8,6 +8,7 @@ query UserSets($id: ID!, $page: Int, $perPage: Int, $after: Timestamp) {
           totalPages
         }
         nodes {
+          fullRoundText
           completedAt
           id
           event {
