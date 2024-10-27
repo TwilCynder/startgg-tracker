@@ -77,7 +77,7 @@ function filterResult(result, filters = []){
         })
     }
     console.log(result)
-    return result.sort((a, b) => b.matches.length - a.matches.length);
+    return result.sort((a, b) => b.matches.length - a.matches.length).filter(entry => entry.matches.length > 0);
 }
 
 function makeResultHTML(result){
@@ -89,10 +89,14 @@ function makeResultHTML(result){
             </div>
             <div class ="entry-details">
             ${
-                entry.matches.map(match => 
+                entry.matches.map(match => {
+                    const date = new Date(match.completedAt * 1000);
+                    console.log(date, match.completedAt);
+                    return `
+                        ${match.event.tournament.name} - ${match.event.name} (${date.getFullYear()}/${date.getMonth()}/${date.getDate()}) - ${match.fullRoundText} <br>
                     `
-                        ${match.event.tournament.name} - ${match.event.name} - ${match.fullRoundText} <br>
-                    `
+                }
+
                 ).join("")  
             }
             </div>
@@ -131,7 +135,7 @@ init(request => {
         //window.history.pushState(request, "", window.location.pathname + url);
         window.location.href = window.location.pathname + url;
     }
-    loadFromRequest(client, request, limiter);
+    //loadFromRequest(client, request, limiter);
 
 })
 
