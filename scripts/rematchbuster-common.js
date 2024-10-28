@@ -54,6 +54,18 @@ export class Request {
         let filters = params.get("filters");
         return new Request(slug, timePeriod, filters);
     }
+
+    /**
+     * @param {Request} other 
+     */
+    compare(other){
+        if (this.slug != other.slug || (this.date ? (this.date != other.date) : (this.duration != other.duration))){
+            return false;
+        } else if (this.eventFilters != other.eventFilters){
+            return 1
+        }
+        return true;
+    }
 }
 
 function getRequest(){

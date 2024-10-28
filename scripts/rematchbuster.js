@@ -6,6 +6,9 @@ import { handleSelectedRadioButton, init, Request } from "./rematchbuster-common
 
 //------ LIB --------
 
+let currentData = null;
+let currentRequest = null;
+
 /**
  * @param {Request} request 
  */
@@ -16,6 +19,8 @@ async function loadFromRequest(client, request, limiter){
     try {
         console.log(request.eventFilters);
         let res = await get_rematches(client, request.slug, Math.floor(date.getTime() / 1000), limiter);
+        currentData = res;
+        currentRequest = request;
         res = filterResult(res, getFiltersArray(request.eventFilters));
         console.log(res);
         makeResultHTML(res);
@@ -53,6 +58,17 @@ function showResult(){
     show(".result");
 }
 
+function copyResult(result){
+    let out = [];
+    for (let entry of result){
+        out.push({
+            matches: Array.from(entry.matches),
+            players: entry.players
+        })
+    }
+    return out;
+}
+
 /**
  * @param {string} filtersString 
  * @returns 
@@ -63,6 +79,7 @@ function getFiltersArray(filtersString){
 }
 
 function filterResult(result, filters = []){
+    result = copyResult(result);
     for (let entry of result){
         entry.matches = entry.matches.filter(match => {
             let slug = deep_get(match, "event.slug");
@@ -76,11 +93,11 @@ function filterResult(result, filters = []){
             return true;
         })
     }
-    console.log(result)
     return result.sort((a, b) => b.matches.length - a.matches.length).filter(entry => entry.matches.length > 0);
 }
 
 function makeResultHTML(result){
+    console.log(result);
     let html = ""
     for (let entry of result){
         html += `
@@ -91,7 +108,6 @@ function makeResultHTML(result){
             ${
                 entry.matches.map(match => {
                     const date = new Date(match.completedAt * 1000);
-                    console.log(date, match.completedAt);
                     return `
                         ${match.event.tournament.name} - ${match.event.name} (${date.getFullYear()}/${date.getMonth()}/${date.getDate()}) - ${match.fullRoundText} <br>
                     `
@@ -102,6 +118,7 @@ function makeResultHTML(result){
             </div>
         `
     }
+    console.log(html.length);
     document.querySelector(".result").innerHTML = html;
 }
 
@@ -128,18 +145,39 @@ let limiter = new StartGGDelayQueryLimiter();
 
 //-- Page init
 init(request => {
+    let isSame = currentRequest ? request.compare(currentRequest) : false;
+
+    if (isSame === true){
+        return;
+    } else if (isSame === 1){
+        console.log("AAAA", request.eventFilters)
+        console.log(currentData);
+        let res = filterResult(currentData, getFiltersArray(request.eventFilters));
+        console.log(res);
+        makeResultHTML(res);
+        showResult();
+        console.log("PUSH STATE")
+        window.history.pushState(request, "", window.location.pathname + request.getURL());
+        currentRequest = request;
+    } else {
+        window.location.href = window.location.pathname + request.getURL();
+    }
+
+    /*
     let url = request.getURL();
     console.log(url, window.location.search);
     if (url != window.location.search){
         console.log(window.location.pathname + url)
         //window.history.pushState(request, "", window.location.pathname + url);
         window.location.href = window.location.pathname + url;
+    } else {
+
     }
-    //loadFromRequest(client, request, limiter);
+    */
 
 })
 
-/*
+
 window.addEventListener("popstate", (ev) => {
     let state = ev.state;
     let request;
@@ -154,8 +192,12 @@ window.addEventListener("popstate", (ev) => {
     }
 
     updateFormFromRequest(request);
+    let res = filterResult(currentData, getFiltersArray(request.eventFilters));
+    console.log(res);
+    makeResultHTML(res);
+    showResult();
 })
-*/
+
 
 //-- Starting query
 let request = Request.fromURL(window.location.search);
