@@ -39,3 +39,12 @@ body {
     justify-content: space-evenly;
     align-items: center;
 }
+
+.ninja-link {
+    text-decoration: none;
+    color: black;
+}
+
+.ninja-link:hover {
+    text-decoration: underline;
+}

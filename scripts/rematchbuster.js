@@ -97,7 +97,6 @@ function filterResult(result, filters = []){
 }
 
 function makeResultHTML(result){
-    console.log(result);
     let html = ""
     for (let entry of result){
         html += `
@@ -109,7 +108,7 @@ function makeResultHTML(result){
                 entry.matches.map(match => {
                     const date = new Date(match.completedAt * 1000);
                     return `
-                        ${match.event.tournament.name} - ${match.event.name} (${date.getFullYear()}/${date.getMonth()}/${date.getDate()}) - ${match.fullRoundText} <br>
+                        <a class = "ninja-link" href = "https://start.gg/${match.event.slug}">${match.event.tournament.name} - ${match.event.name} (${date.getFullYear()}/${date.getMonth()}/${date.getDate()}) - ${match.fullRoundText} </a><br>
                     `
                 }
 
@@ -118,7 +117,6 @@ function makeResultHTML(result){
             </div>
         `
     }
-    console.log(html.length);
     document.querySelector(".result").innerHTML = html;
 }
 
@@ -156,7 +154,6 @@ init(request => {
         console.log(res);
         makeResultHTML(res);
         showResult();
-        console.log("PUSH STATE")
         window.history.pushState(request, "", window.location.pathname + request.getURL());
         currentRequest = request;
     } else {
