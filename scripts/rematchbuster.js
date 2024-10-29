@@ -75,7 +75,7 @@ function copyResult(result){
  */
 function getFiltersArray(filtersString){
     let res = filtersString.split(/,/g)
-    return res.map(filter => filter.trim());
+    return res.map(filter => filter.trim()).filter(filter => !!filter);
 }
 
 function filterResult(result, filters = []){
