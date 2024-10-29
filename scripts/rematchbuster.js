@@ -108,7 +108,7 @@ function makeResultHTML(result){
                 entry.matches.map(match => {
                     const date = new Date(match.completedAt * 1000);
                     return `
-                        <a class = "ninja-link" href = "https://start.gg/${match.event.slug}">${match.event.tournament.name} - ${match.event.name} (${date.getFullYear()}/${date.getMonth()}/${date.getDate()}) - ${match.fullRoundText} </a><br>
+                        <a target="_blank" class = "ninja-link" title="Event : ${match.event.slug}" href = "https://start.gg/${match.event.slug}">${match.event.tournament.name} - ${match.event.name} (${date.getFullYear()}/${date.getMonth()}/${date.getDate()}) - ${match.fullRoundText} </a><br>
                     `
                 }
 
