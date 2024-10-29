@@ -8,4 +8,6 @@ async function renderFile(template){
 }
 
 let lines = fs.readFileSync(new URL(`./templates.txt`, import.meta.url)).toString('utf-8').replaceAll(/\r/g, '').split('\n');
+console.log("Rendering EJs templates :", ...lines);
 lines.forEach(line => renderFile(line));
+console.log("Finished rendering");
