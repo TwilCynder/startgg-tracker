@@ -108,7 +108,7 @@ function makeResultHTML(result){
                 entry.matches.map(match => {
                     const date = new Date(match.completedAt * 1000);
                     return `
-                        <div><a target="_blank" class = "ninja-link" title="Event : ${match.event.slug}" href = "https://start.gg/${match.event.slug}">${match.event.tournament.name} - ${match.event.name} (${date.getFullYear()}/${date.getMonth()}/${date.getDate()}) - ${match.fullRoundText} </a><span class="cross-button" onclick="onCrossClicked(this)" title="Remove this event from everyone's results">❌</span></div><br>
+                        <div data-event-slug="${match.event.slug}"><a target="_blank" class = "ninja-link" title="Event : ${match.event.slug}" href = "https://start.gg/${match.event.slug}">${match.event.tournament.name} - ${match.event.name} (${date.getFullYear()}/${date.getMonth()}/${date.getDate()}) - ${match.fullRoundText} </a><span class="cross-button" onclick="onCrossClicked(this)" title="Remove this event from everyone's results">❌</span></div><br>
                     `
                 }
 
@@ -129,6 +129,35 @@ function entryTitleOnClick(element){
 }
 window.entryTitleOnClick = entryTitleOnClick;
 
+/**
+ * 
+ * @param {HTMLElement} element 
+ */
+function redCrossOnClick(element){
+    console.log(element);
+    console.log(element.parentElement.dataset.eventSlug);
+    let slug = element.parentElement.dataset.eventSlug;
+    let elt = document.querySelector(".input.event-filters");
+    elt.value += (elt.value.trim() ? "," : "") + slug;
+    let req = new Request(currentRequest.slug, currentRequest.timePeriod, elt.value);
+    refreshResult(req);
+}
+window.onCrossClicked = redCrossOnClick;
+
+/**
+ * Use when only the filters changed
+ * @param {Request} request 
+ */
+function refreshResult(request){
+    console.log(currentData);
+    let res = filterResult(currentData, getFiltersArray(request.eventFilters));
+    console.log(res);
+    makeResultHTML(res);
+    showResult();
+    window.history.pushState(request, "", window.location.pathname + request.getURL());
+    currentRequest = request;
+}
+
 //------ SCRIPT -----
 
 //-- Various init
@@ -148,14 +177,7 @@ init(request => {
     if (isSame === true){
         return;
     } else if (isSame === 1){
-        console.log("AAAA", request.eventFilters)
-        console.log(currentData);
-        let res = filterResult(currentData, getFiltersArray(request.eventFilters));
-        console.log(res);
-        makeResultHTML(res);
-        showResult();
-        window.history.pushState(request, "", window.location.pathname + request.getURL());
-        currentRequest = request;
+        refreshResult(request);
     } else {
         window.location.href = window.location.pathname + request.getURL();
     }
