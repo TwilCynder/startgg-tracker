@@ -7,7 +7,7 @@ export async function getUserSetsFactory(){
 
     return async function getUserSets(id, after, client, limiter){
         let sets = await query.executePaginated(client, {id, after}, "user.player.sets", limiter, {
-            perPage: 90
+            perPage: 80
         });
 
         if (!sets){

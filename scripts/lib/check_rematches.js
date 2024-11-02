@@ -32,10 +32,11 @@ export async function get_rematches(client, slug, after, limiter){
         let user = p.user;
         let player = p.player;
         if (!user){
-            console.warn("Participant with no user :", player.gamerTag);
+            console.warn("Participant with no user :", player.gamerTag, "(skipping)");
+            return null;
         }
         return new Player(user, player);
-    }).filter(slug => !!slug);
+    }).filter(player => !!player);
     let sets = await Promise.all(players.map( async player => ({sets: await getUserSets(player.id, after, client, limiter), player})));
     
     return getRematchesList(buildMatchesMatrix(sets));
