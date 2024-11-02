@@ -64,6 +64,7 @@ function buildMatchesMatrix(playersLists){
             if (eventFilters.some(filter => set.event.slug.includes(filter))) continue;
 
             let currentPlayerSlotIndex = null;
+            if (!set.completedAt) continue; //match pas fini
             if (set.slots[0].entrant.participants.length > 1) continue; //2v2
             for (let i = 0; i < 2; i++){
                 let p = set.slots[i].entrant.participants[0]
