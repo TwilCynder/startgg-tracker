@@ -99,7 +99,7 @@
 
 .sggt {
     font-size: 40px;
-    font-weight: bold;
+    font-weight: 700;
     color: black;
     text-decoration: none;
 }
@@ -110,4 +110,8 @@
 
 .pub {
     font-size: 20px;
+}
+
+.cross-button {
+    cursor: pointer;
 }

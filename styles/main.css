@@ -42,9 +42,14 @@ body {
 
 .ninja-link {
     text-decoration: none;
+    cursor: pointer;
     color: black;
 }
 
 .ninja-link:hover {
     text-decoration: underline;
+}
+
+.sggt {
+    font-family: Kanit;
 }
