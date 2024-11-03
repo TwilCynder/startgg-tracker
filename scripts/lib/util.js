@@ -43,3 +43,12 @@ export function deep_get(obj, path, def = null){
     };
     return obj;
 };
+
+/**
+ * @param {string[]} arr1 
+ * @param {string[]} arr2 
+ * @returns 
+ */
+export function compareStrArray(arr1, arr2){
+    return arr1.length == arr2.length && arr1.every((elt, index) => elt == arr2[index]);
+}
