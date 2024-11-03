@@ -21,7 +21,7 @@ async function loadFromRequest(client, request, limiter){
         let res = await get_rematches(client, request.slug, Math.floor(date.getTime() / 1000), limiter);
         currentData = res;
         currentRequest = request;
-        res = filterResult(res, getFiltersArray(request.eventFilters));
+        res = filterResult(res, getFiltersArray(request));
         console.log(res);
         makeResultHTML(res);
         showResult();
@@ -70,20 +70,23 @@ function copyResult(result){
 }
 
 /**
- * @param {string} filtersString 
+ * @param {Request} request 
  * @returns 
  */
-function getFiltersArray(filtersString){
-    let res = filtersString.split(/,/g)
+function getFiltersArray(request){
+    let filtersString = request.eventFilters;
+    let res = filtersString.split(/,/g).concat(request.ignoredEvents);
     return res.map(filter => filter.trim()).filter(filter => !!filter);
 }
 
 function filterResult(result, filters = []){
     result = copyResult(result);
+    console.log(filters);
     for (let entry of result){
         entry.matches = entry.matches.filter(match => {
             let slug = deep_get(match, "event.slug");
             if (!slug) console.warn("No event slug for match", match);
+            console.log(slug, filters);
             for (let filter of filters){
                 if (slug.includes(filter)){
                     console.log("Event removed for containing the filter", filter);
@@ -120,6 +123,15 @@ function makeResultHTML(result){
     document.querySelector(".result").innerHTML = html;
 }
 
+function makeIgnoredEventsHTML(list){
+    if (list.length < 1) return "";
+    let html = "Ignored Events";
+    for (let slug of list){
+        html += `<div data-slug="${slug}">${slug}<span class="cross-button" onclick="onCrossClicked2(this)" title="Remove this event from ignored events">❌</span></div>` 
+    }
+    document.querySelector(".ignored-events").innerHTML = html;
+}
+
 /**
  * @param {HTMLElement} element 
  */
@@ -136,11 +148,15 @@ window.entryTitleOnClick = entryTitleOnClick;
 function redCrossOnClick(element){
     console.log(element);
     console.log(element.parentElement.dataset.eventSlug);
-    let slug = element.parentElement.dataset.eventSlug;
-    let elt = document.querySelector(".input.event-filters");
-    elt.value += (elt.value.trim() ? "," : "") + slug;
-    let req = new Request(currentRequest.slug, currentRequest.timePeriod, elt.value);
-    refreshResult(req);
+    let slug = element.parentElement.dataset.eventSlug ?? "";
+    //let elt = document.querySelector(".input.event-filters");
+    //elt.value += (elt.value.trim() ? "," : "") + slug;
+    if (slug){
+        window.currentIgnoredEvents.push(slug);
+        makeIgnoredEventsHTML(window.currentIgnoredEvents);
+        let req = new Request(currentRequest.slug, currentRequest.timePeriod, currentRequest.eventFilters, window.currentIgnoredEvents);
+        refreshResult(req);
+    }
 }
 window.onCrossClicked = redCrossOnClick;
 
@@ -150,7 +166,7 @@ window.onCrossClicked = redCrossOnClick;
  */
 function refreshResult(request){
     console.log(currentData);
-    let res = filterResult(currentData, getFiltersArray(request.eventFilters));
+    let res = filterResult(currentData, getFiltersArray(request));
     console.log(res);
     makeResultHTML(res);
     showResult();
@@ -196,7 +212,6 @@ init(request => {
 
 })
 
-
 window.addEventListener("popstate", (ev) => {
     let state = ev.state;
     let request;
@@ -211,7 +226,7 @@ window.addEventListener("popstate", (ev) => {
     }
 
     updateFormFromRequest(request);
-    let res = filterResult(currentData, getFiltersArray(request.eventFilters));
+    let res = filterResult(currentData, getFiltersArray(request));
     console.log(res);
     makeResultHTML(res);
     showResult();
@@ -220,6 +235,9 @@ window.addEventListener("popstate", (ev) => {
 
 //-- Starting query
 let request = Request.fromURL(window.location.search);
+
+window.currentIgnoredEvents = request.ignoredEvents ?? [];
+makeIgnoredEventsHTML(window.currentIgnoredEvents);
 
 if (request){
     updateFormFromRequest(request);

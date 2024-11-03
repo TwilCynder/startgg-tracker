@@ -24,7 +24,7 @@ export class Request {
         if (this.date){
             params.set("date", this.date);
         } else {
-            params.set("duration", this.duration);
+            params.set("duration", this.duratio n);
         }
         params.set("filters", this.eventFilters);
         params.set("ignoredEvents", this.ignoredEvents.join(","));
