@@ -1,14 +1,21 @@
 import { hide, show } from "./lib/DOMUtil.js";
-import { processEventSlug } from "./lib/util.js";
+import { compareStrArray, processEventSlug } from "./lib/util.js";
 
 export class RequestValidityError extends Error {}
 
 export class Request {
-    constructor(slug, timePeriod = {}, filters){
+    /**
+     * @param {string} slug 
+     * @param {{date?: number, duration?: number}} timePeriod 
+     * @param {string} filters 
+     * @param {string[]} ignoredEvents 
+     */
+    constructor(slug, timePeriod = {}, filters, ignoredEvents = []){
         this.slug = slug;
         this.date = timePeriod.date;
         this.duration = timePeriod.duration;
         this.eventFilters = filters;
+        this.ignoredEvents = ignoredEvents;
     }
 
     getURL(){
@@ -20,6 +27,7 @@ export class Request {
             params.set("duration", this.duration);
         }
         params.set("filters", this.eventFilters);
+        params.set("ignoredEvents", this.ignoredEvents.join(","));
 
         return "?" + params.toString();
     }
@@ -52,7 +60,11 @@ export class Request {
             throw new RequestValidityError("Please specify a time period (either a starting date or a duration)");
         }
         let filters = params.get("filters");
-        return new Request(slug, timePeriod, filters);
+        let ignoredEventsStr = params.get("ignoredEvents");
+
+        return new Request(slug, timePeriod, filters, 
+            ignoredEventsStr ? ignoredEventsStr.split(/,/g).map(str => str.trim()).filter(str => !!str) : null
+        );
     }
 
     /**
@@ -61,7 +73,7 @@ export class Request {
     compare(other){
         if (this.slug != other.slug || (this.date ? (this.date != other.date) : (this.duration != other.duration))){
             return false;
-        } else if (this.eventFilters != other.eventFilters){
+        } else if (this.eventFilters != other.eventFilters || compareStrArray(this.ignoredEvents, other.ignoredEvents)){
             return 1
         }
         return true;
@@ -91,7 +103,8 @@ function getRequest(){
     }
 
     let filters = document.querySelector(".input.event-filters").value;
-    return new Request(slug, timePeriod, filters);
+    let ignoredEvents = window.currentIgnoredEvents;
+    return new Request(slug, timePeriod, filters, ignoredEvents);
 }
 
 //TODO : add more precise error messages for invalid event slug
