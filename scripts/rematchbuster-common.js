@@ -24,7 +24,7 @@ export class Request {
         if (this.date){
             params.set("date", this.date);
         } else {
-            params.set("duration", this.duratio n);
+            params.set("duration", this.duration);
         }
         params.set("filters", this.eventFilters);
         params.set("ignoredEvents", this.ignoredEvents.join(","));
@@ -63,7 +63,7 @@ export class Request {
         let ignoredEventsStr = params.get("ignoredEvents");
 
         return new Request(slug, timePeriod, filters, 
-            ignoredEventsStr ? ignoredEventsStr.split(/,/g).map(str => str.trim()).filter(str => !!str) : null
+            ignoredEventsStr ? ignoredEventsStr.split(/,/g).map(str => str.trim()).filter(str => !!str) : []
         );
     }
 
