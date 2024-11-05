@@ -51,7 +51,6 @@ export class Request {
         if (!slug){
             throw new RequestValidityError("Please specify a valid event URL. Go to the page of your event on start.gg and copy the content of the URL bar.");
         }
-        console.log(slug);
         let timePeriod = {
             date: params.get("date"),
             duration: params.get("duration")

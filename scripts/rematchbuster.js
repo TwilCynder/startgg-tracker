@@ -10,7 +10,7 @@ let currentData = null;
 let currentRequest = null;
 
 /**
- * @param {Request} request 
+ * @param {Request} request
  */
 async function loadFromRequest(client, request, limiter){
     let date = request.getDate();
@@ -126,10 +126,14 @@ function makeResultHTML(result){
 function makeIgnoredEventsHTML(list){
     if (list.length < 1) return "";
     let html = "Ignored Events";
-    for (let slug of list){
-        html += `<div data-slug="${slug}">${slug}<span class="cross-button" onclick="onCrossClicked2(this)" title="Remove this event from ignored events">❌</span></div>` 
-    }
-    document.querySelector(".ignored-events").innerHTML = html;
+    list.forEach((slug, i) =>{
+        html += `<div data-slug="${slug}" data-i=${i}>${slug}<span class="cross-button" onclick="onCrossClicked2(this)" title="Remove this event from ignored events">❌</span></div>`
+    })
+    return html;
+}
+
+function updateIgnoredEventsHTML(list){
+    document.querySelector(".ignored-events").innerHTML = makeIgnoredEventsHTML(list);
 }
 
 /**
@@ -142,23 +146,34 @@ function entryTitleOnClick(element){
 window.entryTitleOnClick = entryTitleOnClick;
 
 /**
- * 
  * @param {HTMLElement} element 
  */
 function redCrossOnClick(element){
-    console.log(element);
     console.log(element.parentElement.dataset.eventSlug);
     let slug = element.parentElement.dataset.eventSlug ?? "";
     //let elt = document.querySelector(".input.event-filters");
     //elt.value += (elt.value.trim() ? "," : "") + slug;
     if (slug){
         window.currentIgnoredEvents.push(slug);
-        makeIgnoredEventsHTML(window.currentIgnoredEvents);
-        let req = new Request(currentRequest.slug, currentRequest.timePeriod, currentRequest.eventFilters, window.currentIgnoredEvents);
-        refreshResult(req);
+        updateIgnoredEventsHTML(window.currentIgnoredEvents);
+        currentRequest.ignoredEvents = window.currentIgnoredEvents
+        refreshResult(currentRequest);
     }
 }
 window.onCrossClicked = redCrossOnClick;
+
+/**
+ * @param {HTMLElement} element 
+ */
+function onCrossClicked2(element){
+    let index = Number.parseInt(element.parentElement.dataset.i);
+    window.currentIgnoredEvents.splice(index, 1);
+    console.log(window.currentIgnoredEvents);
+    updateIgnoredEventsHTML(window.currentIgnoredEvents);
+    currentRequest.ignoredEvents = window.currentIgnoredEvents
+    refreshResult(currentRequest);
+}
+window.onCrossClicked2 = onCrossClicked2; //HORRIBLE NAMING PLEASE DIE
 
 /**
  * Use when only the filters changed
@@ -194,6 +209,7 @@ init(request => {
         return;
     } else if (isSame === 1){
         refreshResult(request);
+        currentRequest = request;
     } else {
         window.location.href = window.location.pathname + request.getURL();
     }
@@ -237,7 +253,7 @@ window.addEventListener("popstate", (ev) => {
 let request = Request.fromURL(window.location.search);
 
 window.currentIgnoredEvents = request.ignoredEvents ?? [];
-makeIgnoredEventsHTML(window.currentIgnoredEvents);
+updateIgnoredEventsHTML(window.currentIgnoredEvents);
 
 if (request){
     updateFormFromRequest(request);
