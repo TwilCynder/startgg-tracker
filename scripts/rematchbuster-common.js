@@ -145,6 +145,20 @@ function auto_grow(element) {
     element.style.height = (element.scrollHeight) + "px";
 }
 
+function GO(goCallback){
+    let req;
+    try {
+        req = getRequest();
+        goCallback(req);
+    } catch (err){
+        if (err instanceof RequestValidityError){
+            alert(err.message);
+        } else {
+            throw err;
+        }
+    }
+}
+
 /**
  * 
  * @param {(req: Request) => void} goCallback 
@@ -172,20 +186,14 @@ export function init(goCallback){
     })
 
     document.querySelector("#GO").addEventListener("click", () => {
-        let req;
-        try {
-            req = getRequest();
-            goCallback(req);
-        } catch (err){
-            if (err instanceof RequestValidityError){
-                alert(err.message);
-            } else {
-                throw err;
-            }
-        }
-        
-        
+        GO(goCallback);
     });
+    document.querySelector(".form-column").addEventListener("keydown", function(event){
+        if (event.key == "Enter"){
+            event.preventDefault();
+            GO(goCallback);
+        }
+    })
 
     document.querySelectorAll(".dateInput").forEach(el => el.max = new Date().toISOString().split("T")[0]);
 }
