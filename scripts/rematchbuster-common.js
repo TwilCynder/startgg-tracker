@@ -91,14 +91,12 @@ function getRequest(){
     let timePeriod = {};
     if (document.querySelector(".time-inputs-container #duration-mode").checked){
         timePeriod.duration = document.querySelector(".time-inputs-container .weeksInput").value;
-        console.log(timePeriod.duration);
     } else {
         let dateString = document.querySelector(".time-inputs-container .dateInput").value;
         if (!dateString){  
             throw new RequestValidityError("Please select a date.");
         }
         timePeriod.date = dateString;
-        console.log(timePeriod.date)
     }
 
     let filters = document.querySelector(".input.event-filters").value;
@@ -173,7 +171,6 @@ export function init(goCallback){
     let isEventFilterContainerDisplayed = false;
     hide(".event-filters-container-inner");
     document.querySelector(".event-filters-container .dropdown_button_container").addEventListener("click", function() {
-        console.log(this.classList);
         if (isEventFilterContainerDisplayed){
             isEventFilterContainerDisplayed = false;
             hide(".event-filters-container-inner");

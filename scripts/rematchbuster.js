@@ -14,15 +14,13 @@ let currentRequest = null;
  */
 async function loadFromRequest(client, request, limiter){
     let date = request.getDate();
-    console.log(date.getTime());
     showLoader();
     try {
-        console.log(request.eventFilters);
+        console.log(request);
         let res = await get_rematches(client, request.slug, Math.floor(date.getTime() / 1000), limiter);
         currentData = res;
         currentRequest = request;
         res = filterResult(res, getFiltersArray(request));
-        console.log(res);
         makeResultHTML(res);
         showResult();
     } catch (err){
@@ -81,12 +79,10 @@ function getFiltersArray(request){
 
 function filterResult(result, filters = []){
     result = copyResult(result);
-    console.log(filters);
     for (let entry of result){
         entry.matches = entry.matches.filter(match => {
             let slug = deep_get(match, "event.slug");
             if (!slug) console.warn("No event slug for match", match);
-            console.log(slug, filters);
             for (let filter of filters){
                 if (slug.includes(filter)){
                     console.log("Event removed for containing the filter", filter);
@@ -149,7 +145,6 @@ window.entryTitleOnClick = entryTitleOnClick;
  * @param {HTMLElement} element 
  */
 function redCrossOnClick(element){
-    console.log(element.parentElement.dataset.eventSlug);
     let slug = element.parentElement.dataset.eventSlug ?? "";
     //let elt = document.querySelector(".input.event-filters");
     //elt.value += (elt.value.trim() ? "," : "") + slug;
@@ -168,7 +163,6 @@ window.onCrossClicked = redCrossOnClick;
 function onCrossClicked2(element){
     let index = Number.parseInt(element.parentElement.dataset.i);
     window.currentIgnoredEvents.splice(index, 1);
-    console.log(window.currentIgnoredEvents);
     updateIgnoredEventsHTML(window.currentIgnoredEvents);
     currentRequest.ignoredEvents = window.currentIgnoredEvents
     refreshResult(currentRequest);
@@ -180,9 +174,7 @@ window.onCrossClicked2 = onCrossClicked2; //HORRIBLE NAMING PLEASE DIE
  * @param {Request} request 
  */
 function refreshResult(request){
-    console.log(currentData);
     let res = filterResult(currentData, getFiltersArray(request));
-    console.log(res);
     makeResultHTML(res);
     showResult();
     window.history.pushState(request, "", window.location.pathname + request.getURL());
@@ -243,7 +235,6 @@ window.addEventListener("popstate", (ev) => {
 
     updateFormFromRequest(request);
     let res = filterResult(currentData, getFiltersArray(request));
-    console.log(res);
     makeResultHTML(res);
     showResult();
 })
@@ -257,7 +248,7 @@ updateIgnoredEventsHTML(window.currentIgnoredEvents);
 
 if (request){
     updateFormFromRequest(request);
-    console.log(await loadFromRequest(client, request, limiter));
+    await loadFromRequest(client, request, limiter);
 } else {
     document.querySelector(".time-inputs-container #duration-mode").checked = true;
     handleRadioButtons("duration-mode");
