@@ -1,3 +1,8 @@
+@font-face {
+    font-family: Neuropolitical;
+    src: url("../assets/neuropolitical.otf");
+}
+
 .result-content {
     margin-top: 50px;
 
@@ -101,6 +106,7 @@
 
 .sggt {
     font-size: 40px;
+    font-family: Neuropolitical;
     font-weight: 600;
     color: black;
     text-decoration: none;
