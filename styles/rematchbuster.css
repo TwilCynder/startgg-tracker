@@ -3,8 +3,18 @@
     src: url("../assets/neuropolitical.otf");
 }
 
+body {
+    background-color: #E7E9EC;
+    margin: 0;
+    padding: 0;
+}
+
+.content {
+    background-color: white;
+}
+
 .result-content {
-    margin-top: 50px;
+    padding-top: 50px;
 
     display: flex;
     flex-direction: column;
@@ -12,10 +22,7 @@
     align-items: center;
     gap: 20px;
 
-    width: 65%;
-    max-width: 960px;
-    min-width: 500px;
-
+    width: 100%;
 }
 
 .loading-container {

@@ -1,3 +1,17 @@
+.content {
+    width: 65%;
+    max-width: 960px;
+    min-width: 500px;
+}
+
+.content-center {
+    height: 100%;
+}
+
+.content-top {
+    padding-top: 20px;
+}
+
 .form-column {
     display: flex;
     flex-direction: column;
@@ -5,14 +19,7 @@
     align-items: center;
     gap: 20px;
 
-    width: 65%;
-    max-width: 960px;
-    min-width: 500px;
-
-}
-
-.form-center {
-    height: 100%;
+    width: 100%;
 }
 
 .form-top {

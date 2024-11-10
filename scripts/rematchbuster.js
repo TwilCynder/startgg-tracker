@@ -184,6 +184,26 @@ function refreshResult(request){
 //------ SCRIPT -----
 
 //-- Various init
+
+window.addEventListener("popstate", (ev) => {
+    let state = ev.state;
+    let request;
+    if (!state){
+        try {
+            request = Request.fromURL(window.location.search)
+        } catch (err) {
+            console.error("Tried to make request from stateless popstate event, but failed :", err);
+        }
+    } else {
+        request = state;
+    }
+
+    updateFormFromRequest(request);
+    let res = filterResult(currentData, getFiltersArray(request));
+    makeResultHTML(res);
+    showResult();
+})
+
 let token = localStorage.getItem("token");
 if (!token){
     console.error("No token. Going back to homepage");
@@ -194,6 +214,7 @@ let client = new RateLimitingSGGHelperClient("Bearer " + token);
 let limiter = new StartGGDelayQueryLimiter();
 
 //-- Page init
+
 init(request => {
     let isSame = currentRequest ? request.compare(currentRequest) : false;
 
@@ -220,25 +241,6 @@ init(request => {
 
 })
 
-window.addEventListener("popstate", (ev) => {
-    let state = ev.state;
-    let request;
-    if (!state){
-        try {
-            request = Request.fromURL(window.location.search)
-        } catch (err) {
-            console.error("Tried to make request from stateless popstate event, but failed :", err);
-        }
-    } else {
-        request = state;
-    }
-
-    updateFormFromRequest(request);
-    let res = filterResult(currentData, getFiltersArray(request));
-    makeResultHTML(res);
-    showResult();
-})
-
 
 //-- Starting query
 let request = Request.fromURL(window.location.search);
@@ -253,6 +255,7 @@ if (request){
     document.querySelector(".time-inputs-container #duration-mode").checked = true;
     handleRadioButtons("duration-mode");
 }
+
 
 /*
 let res = [] //await get_rematches(client, "tournament/tls-mad-ness-33/event/1v1-ultimate", 1722513915, limiter);
