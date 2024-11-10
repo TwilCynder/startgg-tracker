@@ -24,6 +24,7 @@ jobs:
             -   name: Build
                 run: |
                     chmod a+x ./build.sh
+                    chmod a+x ./render.sh
                     ./build.sh 
             -   name: Upload artifact
                 uses: actions/upload-pages-artifact@v3
