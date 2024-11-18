@@ -26,10 +26,21 @@ jobs:
                     chmod a+x ./build.sh
                     chmod a+x ./render.sh
                     ./build.sh 
+            -   name: "Copy content into _site directory"
+                run: |
+                    mkdir _site
+                    mkdir _site/pages
+                    cp -r ./assets/ _site/
+                    cp -r ./scripts/ _site/
+                    cp -r ./pages/rendered _site/pages
+                    cp -r ./styles/ _site/
+                    cp *.html _site/
+                    cp config.json _site/
+
             -   name: Upload artifact
                 uses: actions/upload-pages-artifact@v3
                 with:
-                    path: "."
+                    path: "_site"
 
                 
                 
