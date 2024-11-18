@@ -1,0 +1,49 @@
+name: Deploy Site
+
+on: 
+    push: 
+        branches: rematchbuster-beta
+    #schedule:
+    #    - cron:  '47 12 * * *'
+    workflow_dispatch:
+
+
+jobs:
+
+    build:
+        name: Build
+        runs-on: ubuntu-latest
+
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@v4
+                with: 
+                    ref: "rematchbuster-beta"
+            -   name: Install Node
+                uses: actions/setup-node@v4
+            -   name: Build
+                run: |
+                    chmod a+x ./build.sh
+                    chmod a+x ./render.sh
+                    ./build.sh 
+            -   name: Upload artifact
+                uses: actions/upload-pages-artifact@v3
+                with:
+                    path: "."
+
+                
+                
+    deploy:
+        name: Deploy Sites
+        environment:
+            name: github-pages
+            url: ${{ steps.deployment.outputs.page_url }}
+        runs-on: ubuntu-latest
+        needs: build
+        permissions:
+            pages: write
+            id-token: write
+        steps:
+            -   name: Deploy to GitHub Pages
+                id: deployment
+                uses: actions/deploy-pages@v4
