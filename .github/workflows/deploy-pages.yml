@@ -2,7 +2,7 @@ name: Deploy Site
 
 on: 
     push: 
-        branches: rematchbuster-beta
+        branches: main
     #schedule:
     #    - cron:  '47 12 * * *'
     workflow_dispatch:
