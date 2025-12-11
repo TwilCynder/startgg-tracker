@@ -40,11 +40,10 @@ function displayMainMenu(){
     show("#disconnect");
 }
 
-document.getElementById("start-button").addEventListener("click", async (element) => {
-    
+async function startButton(){ 
     let token = document.getElementById("apikey").value;
 
-    let res = 0
+    let res = await testToken(token);
 
     switch (res){
         case 0:
@@ -59,6 +58,15 @@ document.getElementById("start-button").addEventListener("click", async (element
 
     localStorage.setItem('token', token);
     displayMainMenu();
+}
+
+document.getElementById("start-button").addEventListener("click", async (element) => {
+    await startButton();
+})
+document.getElementById("apikey").addEventListener("keypress", async (event) => {
+    if (event.key == "Enter"){
+        await startButton();
+    }
 })
 
 function eventModeGOCallback(){
