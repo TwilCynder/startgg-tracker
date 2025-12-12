@@ -27,41 +27,58 @@
                     <input type="button" id="start-button" class = "button" value="Start" >
                 </div>
                 <div class = "content" id = "mode-select">
-                    <a href = "pages/rendered/rematchbuster-form.html" class = "mode-column rematchbuster-mode">
-                        <div id = "rematchbuster" class = "mode-area mode-area-clickable">
-                            <div class = "mode-area-title"> RematchBuster </div>
-                            <div class = "paragraph">
-                                Seeding an event ? See which match already happened recently between your entrants, so you can avoid repeats.<br>
-                            </div>
-                            
-                        </div>
-                    </a>
+                    <div class = "mode-line">
+                        <div class = "mode-column rematchbuster-column">
+                            <a href = "pages/rendered/rematchbuster-form.html" class = "rematchbuster-mode mode-area">
+                                <div class = "mode-area-title"> RematchBuster </div>
+                                <div class = "paragraph">
+                                    Seeding an event ? See which match already happened recently between your entrants, so you can avoid repeats.<br>
+                                </div>
+                                    
+                            </a>
 
-                    <div class = "mode-column tracker-modes">
-                        <div class = "tracker-modes-header">
-                            <div class = "center mode-area-title">Sets tracker</div>
-                            <div class = "center" id = "tracker-modes-title">Displays currently running/called sets for an event or player</div>
                         </div>
-                        <div id = "event-mode" class = "mode-area">
-                            <div class = "mode-area-title"> Track an event</div>
-                            Enter a event's URL <br>
-                            <div class = "mode-area-inputs-container">
-                                <input class = "input mode-area-input " type="text">
-                                <input class = "mode-area-button button" type="button" value="GO !">
+
+                        <div class = "mode-column tracker-modes">
+                            <div class = "tracker-modes-header">
+                                <div class = "center mode-area-title">Sets tracker</div>
+                                <div class = "center" id = "tracker-modes-title">Displays currently running/called sets for an event or player</div>
                             </div>
-                        </div>
-                        <div id = "player-mode" class = "mode-area">
-                            <div class = "mode-area-title"> Track a player</div>
-                            Enter a player's user slug. (Not implemented yet) <br>
-                            <div class = "mode-area-inputs-container">
-                                <input class = "input mode-area-input " type="text">
-                                <input class = "mode-area-input-button button" type="button" value="GO !">
+                            <div id = "event-mode" class = "mode-area">
+                                <div class = "mode-area-title"> Track an event</div>
+                                Enter a event's URL <br>
+                                <div class = "mode-area-inputs-container">
+                                    <input name = "event-sets-event-slug" class = "input mode-area-input " type="text">
+                                    <input class = "mode-area-button button" type="button" value="GO !">
+                                </div>
                             </div>
-                            
+                            <div id = "player-mode" class = "mode-area">
+                                <div class = "mode-area-title"> Track a player</div>
+                                Enter a player's user slug. (Not implemented yet) <br>
+                                <div class = "mode-area-inputs-container">
+                                    <input class = "input mode-area-input " type="text">
+                                    <input class = "mode-area-input-button button" type="button" value="GO !">
+                                </div>
+                                
+                            </div>
                         </div>
                     </div>
-
-                    
+                    <div class = "mode-line">
+                        <div class = "station-mode mode-area">
+                            <div class = "mode-area-title"> Station matches </div>
+                            <div class = "station-mode-content">
+                                <div class = "station-desc">
+                                    See what matches were played on what station. 
+                                </div>
+                                
+                                <div class = "station-area-inputs-container">
+                                    <div class = "">Enter a event's URL</div>
+                                    <input class = "input station-area-input " type="text">
+                                    <input class = "mode-area-input-button button" type="button" value="GO !">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class = "disconnect" id="disconnect">

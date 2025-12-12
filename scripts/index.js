@@ -108,7 +108,7 @@ document.querySelector("#disconnect").addEventListener("click", () => {
 let token = localStorage.getItem("token");
 if (token){
     showNotif("Saved token found, verifying ...")
-    let res = await testToken(token);
+    let res = 0//await testToken(token);
     switch (res){
         case 0:
             hideNotif();
