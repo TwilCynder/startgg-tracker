@@ -46,7 +46,7 @@ body {
 
 .disclaimer {
     width: 600px;
-    max-width: 80%;
+    max-width: 100%;
 }
 
 #mode-select{
@@ -78,6 +78,22 @@ body {
 
 .tracker-modes {
     flex-shrink: 1;
+
+    border: solid 3px grey;
+    border-radius: 10px;
+    box-sizing: border-box;
+    padding: 10px;
+
+    background-color: grey;
+    color: white;
+}
+
+.tracker-modes .mode-area {
+    color: black;
+}
+
+.tracker-modes-header {
+
 }
 
 .mode-area {
