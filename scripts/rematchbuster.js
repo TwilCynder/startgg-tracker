@@ -16,8 +16,22 @@ async function loadFromRequest(client, request, limiter){
     let date = request.getDate();
     showLoader();
     try {
-        console.log(request);
-        let res = await get_rematches(client, request.slug, Math.floor(date.getTime() / 1000), limiter);
+        
+        console.log("Request : ", request);
+
+        let progressElt = document.getElementById("loading-progress");
+        let entrantsCount = "?";
+
+        let res = await get_rematches(client, request.slug, Math.floor(date.getTime() / 1000), limiter, 
+            (currentCount) => {
+                console.log("Loaded", currentCount);
+                progressElt.innerHTML = `(${currentCount}/${entrantsCount})`
+            },
+            (totalCount) => {
+                entrantsCount = totalCount;
+                progressElt.innerHTML = `(0/${totalCount})`;
+            }
+        );
         currentData = res;
         currentRequest = request;
         res = filterResult(res, getFiltersArray(request));

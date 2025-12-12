@@ -48,6 +48,13 @@ body {
     100% { transform: rotate(360deg); }
 }
 
+.loading-progress-line {
+    margin-top: 20px;
+    width: 50%;
+    min-width: 400px;
+    max-width: 600px;
+}
+
 .loading-text {
     margin-top: 20px;
     width: 50%;
@@ -62,6 +69,7 @@ body {
     align-items: flex-start;
     border: 1px solid grey;
     padding: 10px;
+    margin-bottom: 50px;
 }
 
 .closed {

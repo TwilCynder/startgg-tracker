@@ -22,9 +22,10 @@ class Player {
  * @param {string[]} past_slugs 
  * @param {TimedQuerySemaphore} limiter 
  */
-export async function get_rematches(client, slug, after, limiter){
+export async function get_rematches(client, slug, after, limiter, statusCallback, countCallback){
     let entrantsList = await getEventEntrants(slug, client, limiter);
-    console.log(entrantsList.length)
+    console.log(entrantsList.length);
+    if (countCallback) countCallback(entrantsList.length);
     let players = entrantsList.map(entrant => {
         let p = entrant.participants;
         if (!p || p.length != 1) return;
@@ -37,7 +38,13 @@ export async function get_rematches(client, slug, after, limiter){
         }
         return new Player(user, player);
     }).filter(player => !!player);
-    let sets = await Promise.all(players.map( async player => ({sets: await getUserSets(player.id, after, client, limiter), player})));
+    let count = 0;
+    let sets = await Promise.all(players.map( async player => {
+        const sets = await getUserSets(player.id, after, client, limiter);
+        count++;
+        if (statusCallback) statusCallback(count)
+        return {sets, player};
+    }));
     
     return getRematchesList(buildMatchesMatrix(sets));
 }
