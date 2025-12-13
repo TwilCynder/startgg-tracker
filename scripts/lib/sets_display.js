@@ -1,7 +1,4 @@
 import { FitText } from "./DOMUtil.js";
-import { getCalledSetsFactory } from "./api/getCalledSets.js";
-
-const getCalledSets = await getCalledSetsFactory();
 
 export function initLayout(columns){
     $("#content").empty();
@@ -13,7 +10,7 @@ export function initLayout(columns){
 }
 
 
-function resetContent(){
+export function resetContent(){
     $(".content").empty();
 }
 
@@ -81,44 +78,15 @@ function makeSetHTML(set, index){
     `
 }
 
-function addSet(set, index, config){
+export function addSet(set, index, config){
     let html = makeSetHTML(set, index);
     $(".content").append(html);
 }
 
-function fitTexts(totalSets){
+export function fitTexts(totalSets){
     for (let i = 0; i < totalSets; i++){
         FitText($(`.s${i} .p1 .playerName`));
         FitText($(`.s${i} .p2 .playerName`));
     }
 }
 
-export async function loadSets(client, slug, config){
-    let event = await getCalledSets(slug, client);
-
-    console.log(event);
-
-    resetContent();
-
-    //test
-    //event.sets.nodes = Array(5).fill(event.sets.nodes).flat()
-
-    let colsN = Math.ceil(Math.sqrt(event.sets.nodes.length));
-    console.log("colsn", colsN);
-
-    if (window.screen.width > window.screen.height){
-        document.querySelector(".content").style.setProperty("grid-template-columns", "1fr ".repeat(colsN))
-    } else {
-        document.querySelector(".content").style.setProperty("grid-template-columns", "1fr " + (event.sets.nodes.length > 4 ? "1fr" : ""))
-    }
-    
-
-    let i = 0;
-    for (let set of event.sets.nodes){
-        console.log(set.state == 2 ? "Started" : "Called", set.slots[0].entrant.name, set.slots[1].entrant.name)
-        addSet(set, i, config);
-        i++;
-    }
-    fitTexts(i);
-
-}

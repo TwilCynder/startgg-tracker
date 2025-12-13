@@ -79,9 +79,8 @@ function eventModeGOCallback(){
         return;
     }
 
-    window.location.href = "./event_sets.html?event=" + slug 
+    window.location.href = "./pages/event_sets.html?event=" + slug 
 }
-
 document.querySelector("#event-mode .button").addEventListener("click", eventModeGOCallback)
 document.querySelector("#event-mode .mode-area-input").addEventListener("keydown", (event) => {
     if (event.code == "Enter"){
@@ -89,12 +88,32 @@ document.querySelector("#event-mode .mode-area-input").addEventListener("keydown
     }
 })
 
+function stationModeGOCallback(){
+    /**@type {string} */
+    let slug = document.querySelector(".station-mode .input").value;
+
+    slug = processEventSlug(slug);
+    if (!slug){
+        alert("Please enter a valid event URL. Go to the page of your event on start.gg and copy the content of the URL bar.");
+        return;
+    }
+
+    window.location.href = "./pages/station_sets.html?event=" + slug;
+}
+document.querySelector(".station-mode .button").addEventListener("click", stationModeGOCallback);
+document.querySelector(".station-mode .input").addEventListener("keypress", (event) => {
+    console.log(event);
+    if (event.key == "Enter"){
+        stationModeGOCallback()
+    }
+});
+
 function playerModeGOCallback(){
     alert("Ce mode n'est pas encore impémenté ! désooooooo")
 }
-
 document.querySelector("#player-mode .button").addEventListener("click", playerModeGOCallback);
 document.querySelector("#player-mode .mode-area-input").addEventListener("keydown", (event) => {
+    console.log(event);
     if (event.code == "Enter"){
         playerModeGOCallback()
     }

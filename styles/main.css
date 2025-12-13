@@ -8,8 +8,6 @@ body {
     font-family: Roboto, Helvetica, sans-serif;
 }
 
-
-
 .notif-bar {
     position: absolute;
     top: 15px;
@@ -45,4 +43,42 @@ body {
 
 .center {
     text-align: center;
+}
+
+/* ----- FORMS ------ */
+
+.button {
+    background-color: #1460f7;
+    border: none;
+
+    border-radius: 10px;
+
+    font-family: Roboto, Helvetica;
+    font-weight: bold;
+    color: white;
+    min-width: 45px;
+    font-size: 100%;
+}
+
+.big-button {
+    width: 50%;
+    max-width: 20vw;
+
+    height: 5vh;
+
+    font-size: 2.5vh;
+}
+
+.button:hover {
+    background-color: #6F90FF;
+    cursor: pointer;
+}
+
+.input {
+    border: solid 1px gray;
+    border-radius: 10px;
+    background-color: white;
+    font-size: 100%;
+    
+    font-family: Consolas, 'Courier New', Courier, monospace;
 }
