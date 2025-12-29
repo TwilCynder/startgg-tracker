@@ -1,3 +1,4 @@
+import { PresentableError } from "../error.js";
 import queryManager from "../queryManager.js";
 
 const schema_filename = "./schemas/GetCalledSets.graphql"
@@ -9,7 +10,7 @@ export async function getCalledSetsFactory(){
         let response = await query.execute(client, {slug})
 
         if (!response || !response.event){
-            throw new Error("Couldn't fetch sets from " + slug + " ; invalid response (might indicate non-existent event ; check the URL)");
+            throw new PresentableError("Couldn't fetch sets from " + slug + " ; invalid response (might indicate non-existent event ; check the URL)");
         }
 
         return response.event;

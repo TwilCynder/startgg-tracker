@@ -4,13 +4,12 @@ import { initLayout } from "./lib/sets_display.js";
 import { processEventSlug } from "./lib/util.js";
 import { getCalledSetsFactory } from "./lib/api/getCalledSets.js";
 import { resetContent, fitTexts, addSet } from "./lib/sets_display.js";
+import { presentError } from "./lib/error.js";
 const getCalledSets = await getCalledSetsFactory();
 
 export async function loadEventSets(client, slug, config){
 
     let event = await getCalledSets(slug, client);
-
-    if (!event);
 
     resetContent();
 
@@ -56,8 +55,7 @@ async function update(){
     try {
         await loadEventSets(client, event, config);
     } catch (err){
-        alert(err);
-        console.error(err);
+        presentError(err);
     }
 }
 
@@ -91,4 +89,4 @@ initLayout();
 update();
 setInterval(() => {
     update();
-}, 50000);
+}, 5000);
