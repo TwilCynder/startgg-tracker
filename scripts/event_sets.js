@@ -3,7 +3,7 @@ import { SGGHelperClient } from "./lib/api/sgg-helper.js";
 import { initLayout } from "./lib/sets_display.js";
 import { processEventSlug } from "./lib/util.js";
 import { getCalledSetsFactory } from "./lib/api/getCalledSets.js";
-import { resetContent, fitTexts, addSet } from "./lib/tracker_pages.js";
+import { resetContent, addSets } from "./lib/tracker_pages.js";
 import { presentError } from "./lib/error.js";
 const getCalledSets = await getCalledSetsFactory();
 
@@ -20,19 +20,12 @@ export async function loadEventSets(client, slug, config){
     console.log("colsn", colsN);
 
     if (window.screen.width > window.screen.height){
-        document.querySelector(".content").style.setProperty("grid-template-columns", "1fr ".repeat(colsN))
+        document.querySelector(".content").style.setProperty("grid-template-columns", "1fr ".repeat(colsN > 0 ? colsN : 1))
     } else {
         document.querySelector(".content").style.setProperty("grid-template-columns", "1fr " + (event.sets.nodes.length > 4 ? "1fr" : ""))
     }
     
-
-    let i = 0;
-    for (let set of event.sets.nodes){
-        console.log(set.state == 2 ? "Started" : "Called", set.slots[0].entrant.name, set.slots[1].entrant.name)
-        addSet(set, i, config);
-        i++;
-    }
-    fitTexts(i);
+    addSets(event.sets.nodes);
 
 }
 
