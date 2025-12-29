@@ -5,6 +5,7 @@ import { getStationSetsFactory } from "./lib/api/getStationSets.js";
 import { initLayout, makeSetHTML, resetContent } from "./lib/sets_display.js";
 import { presentError } from "./lib/error.js";
 import { fitTexts } from "./lib/tracker_pages.js";
+import { show, hide } from "./lib/DOMUtil.js";
 const getStationSets = await getStationSetsFactory();
 
 let content = {
@@ -38,6 +39,8 @@ function displayList(list){
 }
 
 function updateContent(){
+    hide(".loading-container");
+    show(".stations-content");
     if (mode_checkbox.checked){
         displayList(content.streams);
     } else {

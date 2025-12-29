@@ -101,7 +101,7 @@ body {
     font-size: 30px;
     font-weight: bold;
     
-    height: calc(100vh - (var(--header-height) * 2) - 10px);
+    height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: center;

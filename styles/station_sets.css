@@ -1,5 +1,11 @@
+.content-container {
+    height: 100%;
+}
+
 .stations-content {
-    display: flex;
+    height: 100%;
+
+    display: none;
     flex-direction: row;
     overflow: auto;
     flex-wrap: wrap;
@@ -61,4 +67,9 @@
 .stream-title {
     background-color: rgb(227, 85, 255);
     color: black;
+}
+
+.loading-container {
+    height: 100%;
+    justify-content: center;
 }

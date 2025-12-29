@@ -25,43 +25,6 @@ body {
     width: 100%;
 }
 
-.loading-container {
-    display: flex;
-    flex-direction: column;
-    height: 800px;
-    align-items: center;
-}
-
-.loader {
-    border-radius: 50%;
-    border-top: 13px solid black;
-    border-bottom: 13px solid transparent;
-    border-left: 13px solid black;
-    border-right: 13px solid black;
-    width: 50px;
-    height: 50px;
-    animation: spinner 2s linear infinite;
-}
-  
-@keyframes spinner {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-.loading-progress-line {
-    margin-top: 20px;
-    width: 50%;
-    min-width: 400px;
-    max-width: 600px;
-}
-
-.loading-text {
-    margin-top: 20px;
-    width: 50%;
-    min-width: 400px;
-    max-width: 600px;
-}
-
 .result {
     display: flex;
     flex-direction: column;
@@ -137,4 +100,8 @@ body {
 
 .cross-button {
     cursor: pointer;
+}
+
+.loading-container {
+    height: 800px;
 }

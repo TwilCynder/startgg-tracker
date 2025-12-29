@@ -8,6 +8,7 @@
         <link rel="stylesheet" href="../styles/sets-display.css">
         <link rel="stylesheet" href="../styles/set-tracking-pages.css">
         <link rel="stylesheet" href="../styles/station_sets.css">
+        <link rel="stylesheet" href="../styles/loading.css">
     </head>
     <body>
         <div class = "header">
@@ -20,7 +21,16 @@
                 <input class = "mode-checkbox" type="checkbox" id="mode_checkbox"><label for="mode_checkbox">streams</label>
             </div>
         </div>
-        <div class = "content stations-content"></div>
+        <div class = "content-container">
+            <div class ="loading-container">
+                <div class="loader"></div>
+                <div class = "loading-progress-line">Loading matches <span id="loading-progress">...</span></div>
+                <div class="loading-text">
+                    This should take a few seconds
+                </div>
+            </div>
+            <div class = "content stations-content"></div>
+        </div>
         <script src = "../scripts/station_sets.js" type="module"></script>
     </body>
 </html>
