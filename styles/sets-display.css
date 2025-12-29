@@ -1,24 +1,25 @@
 
 .set {
     border: solid 5px;
-    width: 15vmax;
-    height: 5vmax;
+    width: 300px;
+    height: 100px;
     background-color: var(--set-bg-color);
 
     display: flex;
     flex-direction: row;
+    box-sizing: border-box;
 }
 
 .set-infobox {
-    height: 5vmax;
-    width: 4vmax;
-    min-width: 5vmax;
+    height: 100px;
+    width: 80px;
+    min-width: 100px;
 
     display: flex;
     align-items: center;
     justify-content: center;
 
-    font-size: 1vmax;
+    font-size: 20px;
 }
 
 .set-infobox-started {
@@ -30,7 +31,7 @@
 }
 
 .players-container {
-    min-width: 10vmax;
+    min-width: 200px;
     display: flex;
     flex-direction: column;
     width: 100%;
@@ -39,12 +40,17 @@
 .player {
     height: 50%;
     width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .playerName {
-    font-size: 1.5vmax;
-    padding: 0.5vmax;
-    white-space: nowrap;
+    font-size: 20px;
+    padding-left: 10px;
+    padding-right: 10px;
+
+    overflow: hidden;
 }
 
 .p2 {

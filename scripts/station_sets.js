@@ -1,18 +1,32 @@
 
 import { SGGHelperClient } from "./lib/api/sgg-helper.js";
-import { initLayout } from "./lib/sets_display.js";
 import { processEventSlug } from "./lib/util.js";
 import { getStationSetsFactory } from "./lib/api/getStationSets.js";
-import { resetContent, fitTexts, addSet } from "./lib/sets_display.js";
+import { initLayout, makeSetHTML, resetContent } from "./lib/sets_display.js";
 import { presentError } from "./lib/error.js";
+import { fitTexts } from "./lib/tracker_pages.js";
 const getStationSets = await getStationSetsFactory();
 
 export async function loadStationSets(client, slug, config){
 
-    let event = await getStationSets(slug, client);
+    let stations = await getStationSets(slug, client);
 
-    console.log(event);
+    console.log(stations);
 
+    resetContent();
+
+    let html = ""; let index = 0;
+    for (const station_id in stations){
+        const station = stations[station_id];
+        let sets_html = "";
+        for (const set of station){
+            sets_html += makeSetHTML(set, index++);
+        }
+        html += `<div class = "station"><div class = "station-title">Station ${station_id}</div>${sets_html}</div>`
+    }
+    $(".content").html(html);
+    
+    fitTexts(index);
     
 }
 

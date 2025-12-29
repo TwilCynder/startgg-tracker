@@ -1,11 +1,9 @@
-import { FitText } from "./DOMUtil.js";
+
 
 export function initLayout(columns){
     $("#content").empty();
     let html = ""
-    /*for (let i = 0; i < (columns || 2) ; i++){
-        html += `<div class = "column col${i}"></div>`
-    }*/
+
     $(".content").html(html);
 }
 
@@ -35,7 +33,9 @@ function getTimeString(time){
 }
 
 const state_names = {
+    1: "waiting",
     2: "started",
+    3: "finished",
     6: "called"
 }
 function getStateName(state){
@@ -53,7 +53,7 @@ function setInfoBoxHTML(set){
     `
 }
 
-function makeSetHTML(set, index){
+export function makeSetHTML(set, index){
     return `
         <div class = "set s${index} ${set.state == 6 ? "called" : "started"}">
             <div class = "players-container">
@@ -77,16 +77,3 @@ function makeSetHTML(set, index){
 
     `
 }
-
-export function addSet(set, index, config){
-    let html = makeSetHTML(set, index);
-    $(".content").append(html);
-}
-
-export function fitTexts(totalSets){
-    for (let i = 0; i < totalSets; i++){
-        FitText($(`.s${i} .p1 .playerName`));
-        FitText($(`.s${i} .p2 .playerName`));
-    }
-}
-

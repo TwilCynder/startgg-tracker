@@ -3,7 +3,7 @@ import { SGGHelperClient } from "./lib/api/sgg-helper.js";
 import { initLayout } from "./lib/sets_display.js";
 import { processEventSlug } from "./lib/util.js";
 import { getCalledSetsFactory } from "./lib/api/getCalledSets.js";
-import { resetContent, fitTexts, addSet } from "./lib/sets_display.js";
+import { resetContent, fitTexts, addSet } from "./lib/tracker_pages.js";
 import { presentError } from "./lib/error.js";
 const getCalledSets = await getCalledSetsFactory();
 

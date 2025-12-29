@@ -1,3 +1,9 @@
+@font-face {
+    font-family: Neuropolitical;
+    src: url("../assets/neuropolitical.otf");
+}
+
+
 :root {
     --bg-color: #eeeeee;
     --set-border-color: #E6E6E6;
@@ -38,7 +44,7 @@ body {
 }
 
 .sggt {
-    font-family: Kanit;
+    font-family: Neuropolitical;
 }
 
 .center {

@@ -4,18 +4,12 @@ query Test($slug: String, $page: Int, $perPage: Int){
             nodes {
                 id
                 station {
-                    identifier
-                    numSetups
                     number
-                    prefix
                 }
                 slots {
                     entrant {
-                        participants {
-                            user {
-                                id
-                            }
-                        }
+                        name
+
                     }
                 }
             }
