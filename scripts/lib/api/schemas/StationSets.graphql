@@ -6,10 +6,12 @@ query Test($slug: String, $page: Int, $perPage: Int){
                 station {
                     number
                 }
+                stream {
+                    streamName
+                }
                 slots {
                     entrant {
                         name
-
                     }
                 }
             }

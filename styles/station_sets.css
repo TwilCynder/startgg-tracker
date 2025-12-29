@@ -31,7 +31,15 @@
     font-size: 15px;
 }
 
-.station-title {
+.setlist {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5vmax;
+
+    flex-wrap: wrap;
+}
+
+.setlist-title {
     width: 300px;
     height: 60px;
 
@@ -40,16 +48,17 @@
     padding: 4px;
     box-sizing: border-box;
 
-    background-color: rgb(96, 107, 255);
-    color: black;
-
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-.station {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5vmax;
+.station-title {
+    background-color: rgb(96, 107, 255);
+    color: black;
+}
+
+.stream-title {
+    background-color: rgb(227, 85, 255);
+    color: black;
 }

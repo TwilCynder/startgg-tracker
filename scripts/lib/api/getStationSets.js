@@ -6,7 +6,7 @@ export async function getStationSetsFactory(){
     let query = await queryManager.tryQuery("stationSets", new URL(schema_filename, import.meta.url));
 
     return async function getStationSets(slug, client){
-        let sets = await query.executePaginated(client, {slug}, "event.sets", null, {}, false)
+        let sets = await query.executePaginated(client, {slug, perPage: 50}, "event.sets", null, {}, false)
 
         if (!sets){
             throw new Error("Couldn't fetch sets from " + slug + " ; invalid response (might indicate non-existent event ; check the URL)");
@@ -26,6 +26,18 @@ export async function getStationSetsFactory(){
             }
         }
 
-        return stations;
+        let streams = {}
+        for (const set of sets){
+            if (set.stream && set.stream.streamName){
+                const id = set.stream.streamName;
+                if (streams[id]){
+                    streams[id].push(set);
+                } else {
+                    streams[id] = [set];
+                }
+            }
+        }
+
+        return {stations, streams};
     }
 }

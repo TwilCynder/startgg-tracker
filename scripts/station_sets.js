@@ -7,28 +7,57 @@ import { presentError } from "./lib/error.js";
 import { fitTexts } from "./lib/tracker_pages.js";
 const getStationSets = await getStationSetsFactory();
 
-export async function loadStationSets(client, slug, config){
+let content = {
+    stations: null,
+    streams: null
+}
 
-    let stations = await getStationSets(slug, client);
+// -------- Content update functions
 
-    console.log(stations);
-
-    resetContent();
-
+function makeSetLists(lists, className, titlePrefix = ""){
     let html = ""; let index = 0;
-    for (const station_id in stations){
-        const station = stations[station_id];
+    for (const list_id in lists){
+        const station = lists[list_id];
         let sets_html = "";
         for (const set of station){
             sets_html += makeSetHTML(set, index++);
         }
-        html += `<div class = "station"><div class = "station-title">Station ${station_id}</div>${sets_html}</div>`
+        html += `<div class = "setlist ${className}"><div class = "setlist-title ${className}-title">${titlePrefix}${list_id}</div>${sets_html}</div>`
     }
-    $(".content").html(html);
-    
-    fitTexts(index);
-    
+    return {html, count: index};
 }
+
+function displayList(list){
+    resetContent();
+    if (list && list.count){
+        $(".content").html(list.html);
+        fitTexts(list.count);
+    } else {
+        $(".content").html('<div class = "no-matches">No matches</div>'); //TODO 
+    }
+}
+
+function updateContent(){
+    if (mode_checkbox.checked){
+        displayList(content.streams);
+    } else {
+        displayList(content.stations);
+    }
+}
+
+async function loadStationSets(client, slug, config){
+
+    let res = await getStationSets(slug, client);
+
+    console.log(res);
+
+    content.stations = makeSetLists(res.stations, "station", "Station ");
+    content.streams = makeSetLists(res.streams, "stream");
+
+    updateContent();
+}
+
+// -------- Loading
 
 let config = await fetch("../config.json")
     .then(response => response.json())
@@ -44,6 +73,8 @@ let searchParameters = new URLSearchParams(window.location.search);
 let event = searchParameters.get("event");
 
 let client = new SGGHelperClient("Bearer " + token);
+
+// -------- Callbacks
 
 async function update(){
     try {
@@ -63,7 +94,7 @@ function GOCallback(input){
         return;
     }
 
-    window.location.href = "./event_sets.html?event=" + slug 
+    window.location.href = "./station_sets.html?event=" + slug 
 }
 
 const inputElement = document.querySelector(".event-input");
@@ -76,6 +107,9 @@ inputElement.addEventListener("keydown", (event) => {
 })
 document.querySelector(".event-input-container .button").addEventListener("click", () => {
     GOCallback(inputElement)
+})
+mode_checkbox.addEventListener("change", () => {
+    updateContent();
 })
 
 
