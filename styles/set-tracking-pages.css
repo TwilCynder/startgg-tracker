@@ -23,13 +23,13 @@ body {
 .text {
     white-space: nowrap;
     display: flex;
-    min-width: 100%;
+    width: 100%;
     width: fit-content;
     place-items: center;
     place-content: center;
     height: 100%;
     gap: inherit;
-    transform-origin: left;
+    transform-origin: center;
 }
 
 .double-column {

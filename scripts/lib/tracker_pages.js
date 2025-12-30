@@ -2,11 +2,7 @@ import { FitText } from "./DOMUtil.js";
 import { makeSetHTML } from "./sets_display.js";
 export * from "./sets_display.js"
 
-function addSet(set, index){
-
-}
-
-export function fitTexts(totalSets){
+export function fitPlayerNames(totalSets){
     for (let i = 0; i < totalSets; i++){
         FitText($(`.s${i} .p1 .playerName`));
         FitText($(`.s${i} .p2 .playerName`));
@@ -24,7 +20,7 @@ export function addSets(sets){
     }
 
     $(".content").html(i ? html : '<div class = "no-matches">No matches</div>')
-    fitTexts(i);
+    fitPlayerNames(i);
 }
 
 

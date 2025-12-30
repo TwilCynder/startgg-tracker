@@ -17,7 +17,6 @@ export async function loadEventSets(client, slug, config){
     //event.sets.nodes = Array(5).fill(event.sets.nodes).flat()
 
     let colsN = Math.ceil(Math.sqrt(event.sets.nodes.length));
-    console.log("colsn", colsN);
 
     if (window.screen.width > window.screen.height){
         document.querySelector(".content").style.setProperty("grid-template-columns", "1fr ".repeat(colsN > 0 ? colsN : 1))

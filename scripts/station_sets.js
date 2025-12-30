@@ -4,7 +4,8 @@ import { processEventSlug } from "./lib/util.js";
 import { getStationSetsFactory } from "./lib/api/getStationSets.js";
 import { initLayout, makeSetHTML, resetContent } from "./lib/sets_display.js";
 import { presentError } from "./lib/error.js";
-import { fitTexts } from "./lib/tracker_pages.js";
+import { FitText } from "./lib/DOMUtil.js";
+import { fitPlayerNames } from "./lib/tracker_pages.js";
 import { show, hide } from "./lib/DOMUtil.js";
 const getStationSets = await getStationSetsFactory();
 
@@ -15,24 +16,35 @@ let content = {
 
 // -------- Content update functions
 
+
 function makeSetLists(lists, className, titlePrefix = ""){
-    let html = ""; let index = 0;
+    let single = Object.keys(lists).length < 2;
+
+    let html = ""; let index = 0; let list_index = 0;
     for (const list_id in lists){
         const station = lists[list_id];
         let sets_html = "";
         for (const set of station){
             sets_html += makeSetHTML(set, index++);
         }
-        html += `<div class = "setlist ${className}"><div class = "setlist-title ${className}-title">${titlePrefix}${list_id}</div>${sets_html}</div>`
+        html += `<div class = "setlist-container ${className} ${single ? "setlist-wrap" : ""}"><div class = "t${list_index++} setlist-title ${className}-title"><div class = "text">${titlePrefix}${list_id}</div></div><div class = "setlist">${sets_html}</div></div>`
     }
-    return {html, count: index};
+    return {html, count: index, listsCount: list_index};
+}
+
+function fitTitles(count){
+    for (let i = 0; i < count; i++){
+        FitText($(`.t${i}`));
+    } 
 }
 
 function displayList(list){
     resetContent();
     if (list && list.count){
         $(".content").html(list.html);
-        fitTexts(list.count);
+        fitPlayerNames(list.count);
+        console.log($(".t0 .text")[0].scrollWidth)
+        fitTitles(list.listsCount);
     } else {
         $(".content").html('<div class = "no-matches">No matches</div>'); //TODO 
     }
