@@ -1,0 +1,70 @@
+.switch-container {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+
+    width: 100px;
+    height: 50px;
+    align-items: center;
+
+    cursor: pointer;
+    font-weight: normal;
+}
+
+.switch-texts {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    line-height: 10px;
+    justify-content: space-around;
+}
+
+.switch-text-top {
+    font-weight: bold;
+}
+
+.switch-checked .switch-text-top {
+    font-weight: normal;
+    color: grey;
+}
+
+.switch-text-bot {
+    font-weight: normal;
+    color: grey;
+}
+
+.switch-checked .switch-text-bot {
+    font-weight: bold;
+    color: black;
+}
+
+.switch-button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    height: 90%;
+    width: 20px;
+    border-radius: 10px;
+
+    background-color: grey;
+
+    box-sizing: border-box;
+    padding-top: 2px;
+    padding-bottom: 2px;
+
+    transition: padding-top 0.35s;
+}
+
+.switch-checked .switch-button {
+    padding-top: calc(45px - 16px - 2px);
+}
+
+.switch-button-circle {
+
+    width: 16px;
+    height: 16px;
+    border-radius: 8px;
+
+    background-color: white;
+}

@@ -9,6 +9,7 @@
         <link rel="stylesheet" href="../styles/set-tracking-pages.css">
         <link rel="stylesheet" href="../styles/station_sets.css">
         <link rel="stylesheet" href="../styles/loading.css">
+        <link rel="stylesheet" href="../styles/switchElement.css">
     </head>
     <body>
         <div class = "header">
@@ -18,7 +19,13 @@
                 Event : 
                 <input class = "input event-input" type="text">
                 <div class ="button">GO</div>
-                <input class = "mode-checkbox" type="checkbox" id="mode_checkbox"><label for="mode_checkbox">streams</label>
+                <div class = "switch-container">
+                    <div class = "switch-button"><div class = "switch-button-circle"></div></div>
+                    <div class = "switch-texts">
+                        <div class = "switch-text-top">Stations</div>
+                        <div class = "switch-text-bot">Streams</div>
+                    </div>
+                </div>
             </div>
         </div>
         <div class = "content-container">

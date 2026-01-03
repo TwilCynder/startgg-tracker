@@ -7,6 +7,7 @@ import { presentError } from "./lib/error.js";
 import { FitText } from "./lib/DOMUtil.js";
 import { fitPlayerNames } from "./lib/tracker_pages.js";
 import { show, hide } from "./lib/DOMUtil.js";
+import { SwitchElement } from "./lib/switchElement.js";
 const getStationSets = await getStationSetsFactory();
 
 let content = {
@@ -16,6 +17,7 @@ let content = {
 
 // -------- Content update functions
 
+const switchElement = new SwitchElement(document.querySelector(".switch-container"));
 
 function makeSetLists(lists, className, titlePrefix = ""){
     let single = Object.keys(lists).length < 2;
@@ -50,14 +52,18 @@ function displayList(list){
     }
 }
 
-function updateContent(){
+function updateContent(streams){
     hide(".loading-container");
     show(".stations-content");
-    if (mode_checkbox.checked){
+    if (streams){
         displayList(content.streams);
     } else {
         displayList(content.stations);
     }
+}
+
+function updateContentCheck(){
+    updateContent(switchElement.isChecked());
 }
 
 async function loadStationSets(client, slug, config){
@@ -69,7 +75,7 @@ async function loadStationSets(client, slug, config){
     content.stations = makeSetLists(res.stations, "station", "Station ");
     content.streams = makeSetLists(res.streams, "stream");
 
-    updateContent();
+    updateContentCheck();
 }
 
 // -------- Loading
@@ -123,10 +129,8 @@ inputElement.addEventListener("keydown", (event) => {
 document.querySelector(".event-input-container .button").addEventListener("click", () => {
     GOCallback(inputElement)
 })
-mode_checkbox.addEventListener("change", () => {
-    updateContent();
-})
 
+switchElement.init(updateContent);
 
 initLayout();
 update();
