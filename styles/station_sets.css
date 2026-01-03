@@ -50,6 +50,7 @@
     gap: 10px;
 
     flex-wrap: wrap;
+    width: fit-content;
 }
 
 .setlist-wrap {
@@ -59,6 +60,16 @@
 .setlist-wrap .setlist {
     height: 100%;
     flex-wrap: wrap;
+}
+
+@-moz-document url-prefix() {
+    .setlist-container.setlist-wrap {
+        width: 90%;
+    }
+    .setlist-wrap .setlist {
+        width: 100%; 
+        flex-direction: row;  
+    }
 }
 
 .setlist-title {
