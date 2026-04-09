@@ -15,6 +15,25 @@ class Player {
     }
 }
 
+export class LoadError {
+    getMessage(){return "Unknown Error"}
+    consoleMessage(){return "WHAT THE FUCK"}
+}
+
+export class NoPlayerDataError {
+    constructor(player){
+        this.player = player;
+    }
+
+    getMessage(){
+        return `Coulnd't fetch data for player ${this.player.name} (ID : ${this.player.id})`
+    }
+
+    getConsoleMessage(){
+        return this.getMessage();
+    }
+}
+
 /**
  * 
  * @param {SGGHelperClient} client 
@@ -22,7 +41,7 @@ class Player {
  * @param {string[]} past_slugs 
  * @param {TimedQuerySemaphore} limiter 
  */
-export async function get_rematches(client, slug, after, limiter, statusCallback, countCallback){
+export async function get_rematches(client, slug, after, limiter, statusCallback, countCallback, errorCallback){
     console.log("Fetching event entrants")
     let entrantsList = await getEventEntrants(slug, client, limiter);
     console.log(entrantsList.length);
@@ -42,6 +61,9 @@ export async function get_rematches(client, slug, after, limiter, statusCallback
     let count = 0;
     let sets = await Promise.all(players.map( async player => {
         const sets = await getUserSets(player.id, after, client, limiter);
+        if (!sets){
+            errorCallback(new NoPlayerDataError(player));
+        }
         count++;
         if (statusCallback) statusCallback(count)
         return {sets, player};
