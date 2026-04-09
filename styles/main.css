@@ -3,6 +3,11 @@
     src: url("../assets/neuropolitical.otf");
 }
 
+@font-face {
+    font-family: Saira;
+    src: url("../assets/Saira-VariableFont_wdth\,wght.ttf");
+}
+
 
 :root {
     --bg-color: #eeeeee;
@@ -11,7 +16,7 @@
 }
 
 body {
-    font-family: Roboto, Helvetica, sans-serif;
+    font-family: Saira, oboto, Helvetica, sans-serif;
 }
 
 .notif-bar {
