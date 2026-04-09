@@ -10,7 +10,7 @@ const eventFilters = ["ladder", "2v2"]
 class Player {
     constructor(user, player){
         this.slug = user.slug;
-        this.id = user.id;
+        this.id = player.id;
         this.name = player.gamerTag;
     }
 }
@@ -23,6 +23,7 @@ class Player {
  * @param {TimedQuerySemaphore} limiter 
  */
 export async function get_rematches(client, slug, after, limiter, statusCallback, countCallback){
+    console.log("Fetching event entrants")
     let entrantsList = await getEventEntrants(slug, client, limiter);
     console.log(entrantsList.length);
     if (countCallback) countCallback(entrantsList.length);
@@ -33,11 +34,11 @@ export async function get_rematches(client, slug, after, limiter, statusCallback
         let user = p.user;
         let player = p.player;
         if (!user){
-            console.warn("Participant with no user :", player.gamerTag, "(skipping)");
-            return null;
+            console.warn("Participant with no user :", player.gamerTag, player.id);
         }
         return new Player(user, player);
     }).filter(player => !!player);
+
     let count = 0;
     let sets = await Promise.all(players.map( async player => {
         const sets = await getUserSets(player.id, after, client, limiter);
@@ -76,8 +77,8 @@ function buildMatchesMatrix(playersLists){
             if (set.slots[0].entrant.participants.length > 1) continue; //2v2
             for (let i = 0; i < 2; i++){
                 let p = set.slots[i].entrant.participants[0]
-                if (!p.user) continue;
-                if (p.user.id == id){
+                if (!p.player) continue;
+                if (p.player.id == id){
                     currentPlayerSlotIndex = i;
                 }
             }
@@ -85,9 +86,9 @@ function buildMatchesMatrix(playersLists){
                 console.error("PLAYER NOT FOUND IN OWN SET", set, id, playerData.player.slug);
                 continue;
             }
-            let otherPlayerID = deep_get(set, `slots.${1 - currentPlayerSlotIndex}.entrant.participants.0.user.id`);
+            let otherPlayerID = deep_get(set, `slots.${1 - currentPlayerSlotIndex}.entrant.participants.0.player.id`);
             if (otherPlayerID === null){
-                console.warn("Other play doesn't have a user ID", set, id, playerData.player.slug);
+                console.warn("Other player doesn't have a user ID", set, id, playerData.player.slug);
                 continue;
             }
             let otherPlayerEntrantIndex = indexes[otherPlayerID];
