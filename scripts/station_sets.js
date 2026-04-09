@@ -14,6 +14,7 @@ let content = {
     stations: null,
     streams: null
 }
+let loaded = false;
 
 // -------- Content update functions
 
@@ -53,6 +54,7 @@ function displayList(list){
 }
 
 function updateContent(streams){
+    if (!loaded) return;
     hide(".loading-container");
     show(".stations-content");
     if (streams){
@@ -74,6 +76,7 @@ async function loadStationSets(client, slug, config){
 
     content.stations = makeSetLists(res.stations, "station", "Station ");
     content.streams = makeSetLists(res.streams, "stream");
+    loaded = true;
 
     updateContentCheck();
 }

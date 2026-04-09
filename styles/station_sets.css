@@ -1,5 +1,5 @@
 .content-container {
-    height: 100%;
+    height: calc(100% - var(--header-height) - 10px);
 }
 
 .stations-content {
