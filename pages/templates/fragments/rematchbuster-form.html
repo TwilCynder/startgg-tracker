@@ -19,4 +19,20 @@
     </div>
 
 </div>
+<div class = "display-options-container">
+    <div>Display Options <span class = "dropdown_button_container"><div class = "dropdown_button">▼</div></span></div>
+    <div class = "display-options-container-inner">
+        <div class = "stream-mode-container">
+            Display mode : <select name="stream-mode" class="stream-mode">
+                <option value="none">Most sets played together</option>
+                <option value="stream-pairs">Most sets played together on stream</option>
+                <option value="stream-individual">Most sets played on stream (individual)</option>
+            </select>
+        </div>
+        <div class = "invert-mode-container">
+            <input type="checkbox" name="invert-mode" class = "invert-mode" >
+            <label for="invert-mode"> Show least played sets instead </label>
+        </div>
+    </div>
+</div>
 <input type="button" id="GO" value="GO !" class="button"/>

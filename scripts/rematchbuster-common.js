@@ -9,13 +9,17 @@ export class Request {
      * @param {{date?: number, duration?: number}} timePeriod 
      * @param {string} filters 
      * @param {string[]} ignoredEvents 
+     * @param {string} streamMode
+     * @param {boolean} invert 
      */
-    constructor(slug, timePeriod = {}, filters, ignoredEvents = []){
+    constructor(slug, timePeriod = {}, filters, ignoredEvents = [], streamMode, invert){
         this.slug = slug;
         this.date = timePeriod.date;
         this.duration = timePeriod.duration;
         this.eventFilters = filters;
         this.ignoredEvents = ignoredEvents;
+        this.streamMode = streamMode;
+        this.invert = invert;
     }
 
     getURL(){
@@ -28,6 +32,8 @@ export class Request {
         }
         params.set("filters", this.eventFilters);
         params.set("ignoredEvents", this.ignoredEvents.join(","));
+        params.set("streamMode", this.streamMode);
+        if (this.invert) params.set("invert", "1");
 
         return "?" + params.toString();
     }
@@ -58,11 +64,13 @@ export class Request {
         if (!timePeriod.date && !timePeriod.duration){
             throw new RequestValidityError("Please specify a time period (either a starting date or a duration)");
         }
-        let filters = params.get("filters");
         let ignoredEventsStr = params.get("ignoredEvents");
-
-        return new Request(slug, timePeriod, filters, 
-            ignoredEventsStr ? ignoredEventsStr.split(/,/g).map(str => str.trim()).filter(str => !!str) : []
+        
+        return new Request(slug, timePeriod,
+            params.get("filters"),
+            ignoredEventsStr ? ignoredEventsStr.split(/,/g).map(str => str.trim()).filter(str => !!str) : [],
+            params.get("streamMode"),
+            params.get("invert") ? true : false
         );
     }
 
@@ -101,6 +109,7 @@ function getRequest(){
 
     let filters = document.querySelector(".input.event-filters").value;
     let ignoredEvents = window.currentIgnoredEvents;
+
     return new Request(slug, timePeriod, filters, ignoredEvents);
 }
 
@@ -139,8 +148,12 @@ function getSelectedRadioButton(){
 }
 
 function auto_grow(element) {
+    if (!element.base_height){
+        element.base_height = element.clientHeight;
+    }
+
     element.style.height = "5px";
-    element.style.height = (element.scrollHeight) + "px";
+    element.style.height = (Math.max(element.scrollHeight, element.base_height)) + "px";
 }
 
 function GO(goCallback){
@@ -157,6 +170,23 @@ function GO(goCallback){
     }
 }
 
+export function initDropdownSection(className){
+    let innerClassName = `.${className}-inner`;
+    hide(innerClassName);
+    let isDisplayed = false;
+    document.querySelector(`.${className} .dropdown_button_container`).addEventListener("click", function() {
+        if (isDisplayed){
+            isDisplayed = false;
+            hide(innerClassName);
+            this.classList.remove("open")
+        } else {
+            isDisplayed = true;
+            show(innerClassName);
+            this.classList.add("open")
+        }
+    })
+}
+
 /**
  * 
  * @param {(req: Request) => void} goCallback 
@@ -168,19 +198,8 @@ export function init(goCallback){
 
     handleSelectedRadioButton();
 
-    let isEventFilterContainerDisplayed = false;
-    hide(".event-filters-container-inner");
-    document.querySelector(".event-filters-container .dropdown_button_container").addEventListener("click", function() {
-        if (isEventFilterContainerDisplayed){
-            isEventFilterContainerDisplayed = false;
-            hide(".event-filters-container-inner");
-            this.classList.remove("open")
-        } else {
-            isEventFilterContainerDisplayed = true;
-            show(".event-filters-container-inner");
-            this.classList.add("open")
-        }
-    })
+    initDropdownSection("event-filters-container");
+    initDropdownSection("display-options-container");
 
     document.querySelector("#GO").addEventListener("click", () => {
         GO(goCallback);

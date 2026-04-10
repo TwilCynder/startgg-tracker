@@ -67,7 +67,22 @@
 .event-filters {
     width: 100%;
     resize: vertical;
+    box-sizing: content-box;
 }
+
+.display-options-container {
+    width: 100%;
+    max-width: 600px;
+}
+
+.display-options-container-inner {
+    font-size: 12px;
+    display: flex;
+    flex-direction: row;
+    gap: 15px;
+}
+
+
 
 .time-inputs-container {
     display: flex;
