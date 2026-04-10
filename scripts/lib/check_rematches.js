@@ -34,17 +34,10 @@ export class NoPlayerDataError {
     }
 }
 
-/**
- * 
- * @param {SGGHelperClient} client 
- * @param {string} current_slug 
- * @param {string[]} past_slugs 
- * @param {TimedQuerySemaphore} limiter 
- */
-export async function get_rematches(client, slug, after, limiter, statusCallback, countCallback, errorCallback){
+export async function getSets(client, slug, after, limiter, statusCallback, countCallback, errorCallback){
     console.log("Fetching event entrants")
     let entrantsList = await getEventEntrants(slug, client, limiter);
-    console.log(entrantsList.length);
+    console.log(entrantsList.length, "entrants");
     if (countCallback) countCallback(entrantsList.length);
     let players = entrantsList.map(entrant => {
         let p = entrant.participants;
@@ -68,7 +61,18 @@ export async function get_rematches(client, slug, after, limiter, statusCallback
         if (statusCallback) statusCallback(count)
         return {sets, player};
     }));
-    
+
+    return sets;
+}
+
+/**
+ * 
+ * @param {SGGHelperClient} client 
+ * @param {string} current_slug 
+ * @param {string[]} past_slugs 
+ * @param {TimedQuerySemaphore} limiter 
+ */
+export function get_rematches(sets){
     return getRematchesList(buildMatchesMatrix(sets));
 }
 

@@ -10,6 +10,9 @@ query PlayerSets($id: ID!, $page: Int, $perPage: Int, $after: Timestamp) {
         fullRoundText
         completedAt
         id
+        stream {
+          streamName
+        }
         event {
           slug 
           name 

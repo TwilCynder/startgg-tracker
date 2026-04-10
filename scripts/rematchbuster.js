@@ -1,5 +1,5 @@
 import { RateLimitingSGGHelperClient, SGGHelperClient, StartGGDelayQueryLimiter } from "./lib/api/sgg-helper.js";
-import { get_rematches } from "./lib/check_rematches.js";
+import { get_rematches, getSets } from "./lib/check_rematches.js";
 import { show, hide, toggleClass } from "./lib/DOMUtil.js";
 import { deep_get } from "./lib/util.js";
 import { handleSelectedRadioButton, init, Request } from "./rematchbuster-common.js";
@@ -9,57 +9,7 @@ import { handleSelectedRadioButton, init, Request } from "./rematchbuster-common
 let currentData = null;
 let currentRequest = null;
 
-/**
- * @param {Request} request
- */
-async function loadFromRequest(client, request, limiter){
-    let date = request.getDate();
-    showLoader();
-
-    console.log("Loading ...");
-    try {
-        
-        console.log("Request : ", request);
-
-        let progressElt = document.getElementById("loading-progress");
-        let entrantsCount = "?";
-
-        let errors = [];
-
-        let res = await get_rematches(client, request.slug, Math.floor(date.getTime() / 1000), limiter, 
-            (currentCount) => {
-                console.log("Loaded", currentCount);
-                progressElt.innerHTML = `(${currentCount}/${entrantsCount})`
-            },
-            (totalCount) => {
-                entrantsCount = totalCount;
-                progressElt.innerHTML = `(0/${totalCount})`;
-            },
-            (error) => {
-                errors.push(error.getConsoleMessage());
-            }
-        );
-        if (errors.length > 1){
-            console.warn("Errors :")
-            for (const err of errors){
-                console.warn("-", err);
-            }
-        }
-
-        currentData = res;
-        currentRequest = request;
-        res = filterResult(res, getFiltersArray(request));
-        makeResultHTML(res);
-        showResult();
-    } catch (err){
-        console.error(err);
-        alert("There was a problem fetching data from the start.gg API. Please check that the event URL is correct, and try again")
-        hide(".loading-container");
-    }
-
-}
-
-function updateFormFromRequest(request){
+function updateUIFromRequest(request){
     document.querySelector("#event").value = request.slug;
     if (request.date){
         document.querySelector("#date-mode").checked = true;
@@ -120,10 +70,62 @@ function filterResult(result, filters = []){
             return true;
         })
     }
-    return result.sort((a, b) => b.matches.length - a.matches.length).filter(entry => entry.matches.length > 0);
+    result = result.sort((a, b) => b.matches.length - a.matches.length).filter(entry => entry.matches.length > 0);
+    return result;
 }
 
-function makeResultHTML(result){
+
+/**
+ * @param {Request} request
+ */
+async function loadFromRequest(client, request, limiter){
+    let date = request.getDate();
+    showLoader();
+
+    console.log("Loading ...");
+    try {
+        
+        console.log("Request : ", request);
+
+        let progressElt = document.getElementById("loading-progress");
+        let entrantsCount = "?";
+
+        let errors = [];
+
+        let sets = await getSets(client, request.slug, Math.floor(date.getTime() / 1000), limiter, 
+            (currentCount) => {
+                console.log("Loaded", currentCount);
+                progressElt.innerHTML = `(${currentCount}/${entrantsCount})`
+            },
+            (totalCount) => {
+                entrantsCount = totalCount;
+                progressElt.innerHTML = `(0/${totalCount})`;
+            },
+            (error) => {
+                errors.push(error.getConsoleMessage());
+            }
+        );
+        if (errors.length > 1){
+            console.warn("Errors :")
+            for (const err of errors){
+                console.warn("-", err);
+            }
+        }
+
+        
+        currentData = sets;
+        currentRequest = request;
+
+        updateResultHTML(sets, request);
+    } catch (err){
+        console.error(err);
+        alert("There was a problem fetching data from the start.gg API. Please check that the event URL is correct, and try again")
+        hide(".loading-container");
+    }
+
+}
+
+function makePairsRankingHTML(result){
     let html = ""
     for (let entry of result){
         html += `
@@ -144,8 +146,29 @@ function makeResultHTML(result){
             </div>
         `
     }
-    document.querySelector(".result").innerHTML = html;
+    return html;
 }
+
+const resultFunctions = {
+    "none": (sets) => {
+        
+    },
+    "stream-pairs": (sets) => {
+
+    },
+    "stream-individual": (sets) => {
+
+    }
+}
+
+function updateResultHTML(sets, request){
+    let rematches = get_rematches(sets);
+    rematches = filterResult(rematches, getFiltersArray(request));
+    const html = makePairsRankingHTML(rematches);
+    document.querySelector(".result").innerHTML = html;
+    showResult();
+}
+
 
 function makeIgnoredEventsHTML(list){
     if (list.length < 1) return "";
@@ -202,9 +225,7 @@ window.onCrossClicked2 = onCrossClicked2; //HORRIBLE NAMING PLEASE DIE
  * @param {Request} request 
  */
 function refreshResult(request){
-    let res = filterResult(currentData, getFiltersArray(request));
-    makeResultHTML(res);
-    showResult();
+    updateResultHTML(currentData, request);
     window.history.pushState(request, "", window.location.pathname + request.getURL());
     currentRequest = request;
 }
@@ -226,10 +247,8 @@ window.addEventListener("popstate", (ev) => {
         request = state;
     }
 
-    updateFormFromRequest(request);
-    let res = filterResult(currentData, getFiltersArray(request));
-    makeResultHTML(res);
-    showResult();
+    updateUIFromRequest(request);
+    updateResultHTML(currentData, request);
 })
 
 let token = localStorage.getItem("token");
@@ -273,11 +292,11 @@ init(request => {
 //-- Starting query
 let request = Request.fromURL(window.location.search);
 
-window.currentIgnoredEvents = request.ignoredEvents ?? [];
-updateIgnoredEventsHTML(window.currentIgnoredEvents);
 
 if (request){
-    updateFormFromRequest(request);
+    updateUIFromRequest(request);
+    window.currentIgnoredEvents = request.ignoredEvents ?? [];
+    updateIgnoredEventsHTML(window.currentIgnoredEvents);
     console.log("Request :", request);
     await loadFromRequest(client, request, limiter);
 } else {

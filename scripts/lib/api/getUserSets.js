@@ -6,6 +6,7 @@ export async function getUserSetsFactory(){
     let query = await queryManager.tryQuery("playerSets", new URL(schema_filename, import.meta.url));
 
     return async function getUserSets(id, after, client, limiter){
+        /** @type {Object[]} */
         let sets = await query.executePaginated(client, {id, after}, "player.sets", limiter, {
             perPage: 80
         });
