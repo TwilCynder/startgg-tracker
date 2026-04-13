@@ -22,20 +22,21 @@
     <div>Display Options <span class = "dropdown_button_container"><div class = "dropdown_button">▼</div></span></div>
     <div class = "display-options-container-inner">
         <div class = "stream-mode-container">
-            Display mode : <select name="stream-mode" class="stream-mode">
+            <label for="stream-mode">Display mode</label> : <select name="stream-mode" id="stream-mode">
                 <option value="none">Most sets played together</option>
                 <option value="stream-pairs">Most sets played together on stream</option>
                 <option value="stream-individual">Most sets played on stream (individual)</option>
             </select>
         </div>
         <div class = "invert-mode-container">
-            <input type="checkbox" name="invert-mode" class = "invert-mode" >
+            <input type="checkbox" name="invert-mode" id = "invert-mode"/>
             <label for="invert-mode"> Show least played sets instead </label>
         </div>
         <div class = "event-count-mode-container">
-            <input type="checkbox" name="event-count-mode" class="event-count-mode">
-            <label for="event-count-mode"> Count events instead of sets </label>
+            <input type="checkbox" name="event-count-mode" id="event-count-mode">
+            <label for="event-count-mode" title="Different sets at the same event will onyle count for one"> Count events instead of sets </label>
         </div>
+
     </div>
 </div>
 <input type="button" id="GO" value="GO !" class="button"/>

@@ -27,9 +27,9 @@ function updateUIFromRequest(request){
     if (!!request.eventFilters){
         document.querySelector(".input.event-filters").value = request.eventFilters
     }
-    document.querySelector(".stream-mode").value = request.streamMode ?? "none";
-    document.querySelector(".invert-mode").checked = request.invert
-
+    document.querySelector("#stream-mode").value = request.streamMode ?? "none";
+    document.querySelector("#invert-mode").checked = request.invert
+    document.querySelector("#event-count-mode")
 }
 
 function showLoader(){
@@ -363,9 +363,9 @@ function onEventCountModeChanged(event){
 //-- Page init
 
 
-document.querySelector(".stream-mode").addEventListener("change", onStreamModeChanged);
-document.querySelector(".invert-mode").addEventListener("change", onInvertModeChanged);
-document.querySelector(".event-count-mode").addEventListener("change", onEventCountModeChanged);
+document.querySelector("#stream-mode").addEventListener("change", onStreamModeChanged);
+document.querySelector("#invert-mode").addEventListener("change", onInvertModeChanged);
+document.querySelector("#event-count-mode").addEventListener("change", onEventCountModeChanged);
 
 window.addEventListener("popstate", onPopstate);
 

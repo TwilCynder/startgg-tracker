@@ -119,9 +119,9 @@ export function getRequest(){
     return new Request(slug, timePeriod, 
         document.querySelector(".input.event-filters").value, 
         window.currentIgnoredEvents,
-        document.querySelector(".stream-mode").value,
-        document.querySelector(".invert-mode").checked,
-        document.querySelector(".event-count-mode").checked
+        document.querySelector("#stream-mode").value,
+        document.querySelector("#invert-mode").checked,
+        document.querySelector("#event-count-mode").checked
     );
 }
 window.getRequest = getRequest;
