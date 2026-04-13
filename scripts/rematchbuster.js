@@ -1,5 +1,5 @@
 import { RateLimitingSGGHelperClient, StartGGDelayQueryLimiter } from "./lib/api/sgg-helper.js";
-import { get_rematches, getSets } from "./lib/check_rematches.js";
+import { get_rematches, getSets, getStreamedMatchesForPlayer } from "./lib/check_rematches.js";
 import { show, hide, toggleClass } from "./lib/DOMUtil.js";
 import { deep_get } from "./lib/util.js";
 import { handleSelectedRadioButton, init, Request } from "./rematchbuster-common.js";
@@ -147,15 +147,29 @@ function makeStreamHTML(match){
     return `<br > <a class="stream ninja-link" href="https://twitch.tv/${match.stream.streamName}" target="_blank">streamed on <span class="stream-name">${match.stream.streamName}</span></a>`
 }
 
-function makePairsRankingHTML(result, stream){
-    stream = true;
+function makePairsListHTML(result, stream){
+    return makeResultHTML(result, (entry) => `${entry.players[0].name} vs ${entry.players[1].name}`, stream);
+}
 
+function makePlayersListHTML(result, stream){
+    console.log(result);
+    return makeResultHTML(result, (entry) => entry.player.name, stream);
+}
+
+/**
+ * @template T
+ * @param {T[]} result 
+ * @param {(entry: T) => string} entryNameFunction 
+ * @param {boolean} stream 
+ * @returns 
+ */
+function makeResultHTML(result, entryNameFunction, stream){
     let html = ""
     for (let entry of result){
         const n = result.n ?? entry.matches.length;
         html += `
             <div class = "entry-title" onclick="entryTitleOnClick(this)">
-                <span class ="dropdown-button-sideways">►</span>${entry.players[0].name} vs ${entry.players[1].name} - ${n} matches    
+                <span class ="dropdown-button-sideways">►</span>${entryNameFunction(entry)} - ${n} matches    
             </div>
             <div class ="entry-details">
             ${
@@ -175,30 +189,34 @@ function makePairsRankingHTML(result, stream){
 }
 
 const resultFunctions = {
-    "none": (players, request) => {
+    "none": (players) => {
         let result = get_rematches(players, getFiltersArray(request));
+        result = sortResultList(result);
         //result = applyFilters(result, request);
-        return makePairsRankingHTML(result, false);
+        return makePairsListHTML(result, false);
     },
-    "stream-pairs": (players, _request) => {
-        let result = get_rematches(players);
+    "stream-pairs": (players, request) => {
+        let result = get_rematches(players, getFiltersArray(request));
         //result = applyFilters(result, request)
         for (const entry of result){
             entry.matches = entry.matches ? entry.matches.filter(set => !!set.stream) : [];
         }
         result = sortResultList(result);
         let html = '<h3 class="result-title">Steamed sets only</h3>'
-        html += makePairsRankingHTML(result, true);
+        html += makePairsListHTML(result, true);
         return html;
     },
-    "stream-individual": {
-        result: (players) => {
-
-        }
+    "stream-individual": (players, request) => {
+        let result = getStreamedMatchesForPlayer(players, getFiltersArray(request));
+        result = sortResultList(result);
+        let html = '<h3 class="result-title">Stream appearances</h3>'
+        html += makePlayersListHTML(result, false);
+        return html;
     }
 }
 
 function updateResultHTML(players, request){
+    console.log(request)
     const mode = request.streamMode ?? "none";
     const f = resultFunctions[mode];
     if (!f){
@@ -207,7 +225,6 @@ function updateResultHTML(players, request){
     }
     let html = f(players, request);
 
-    console.log(html)
     document.querySelector(".result").innerHTML = html;
     showResult();
 }

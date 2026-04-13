@@ -77,6 +77,19 @@ export function get_rematches(players, eventFilters = [], streamed = false){
 const unknown_event = {slug: "unknown_event", name: "Unknown Event", tournament: {name: "Unknown Tournament"}}
 
 /**
+ * @param {string[]} filters 
+ * @param {Object} set 
+ */
+function isEventFiltered(filters, set){
+    let slug = deep_get(set, "event.slug");
+    if (!slug) {
+        console.warn("No event slug for match", set);
+        return true;
+    }
+    return filters.some(filter => slug.includes(filter));
+}
+
+/**
  * 
  * @param {Array<{sets: Array<{}>, player: Player}>} playersLists 
  * @param {string | boolean} streamed 
@@ -96,7 +109,7 @@ function buildMatchesMatrix(playersLists, eventFilters, streamed){
         for (let set of playerData.sets){
             
             if (!set.event) continue;
-            if (eventFilters.some(filter => set.event.slug.includes(filter))) continue;
+            if (isEventFiltered(eventFilters, set)) continue;
             if (streamed && !set.stream || (typeof streamed == "string") && set.stream.streamName != streamed) continue;
 
             let currentPlayerSlotIndex = null;
@@ -144,5 +157,22 @@ function getRematchesList(matrix){
         })
     })
 
-    return res.sort((a, b) => b.matches.length - a.matches.length);
+    return res;
+}
+
+/**
+ * 
+ * @param {Array<{sets: Array<{}>, player: Player}>} players 
+ * @param {string[]} eventFilters 
+ * 
+ */
+export function getStreamedMatchesForPlayer(players, eventFilters = []){
+    return players.map(player => {
+        const matches = player.sets.filter(set => (
+            !isEventFiltered(eventFilters, set) &&
+            set.stream
+        ));
+
+        return {player: player.player, matches};
+    });
 }
