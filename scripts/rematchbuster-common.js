@@ -80,7 +80,7 @@ export class Request {
     compare(other){
         if (this.slug != other.slug || (this.date ? (this.date != other.date) : (this.duration != other.duration))){
             return false;
-        } else if (this.eventFilters != other.eventFilters || compareStrArray(this.ignoredEvents, other.ignoredEvents)){
+        } else if (this.eventFilters != other.eventFilters || compareStrArray(this.ignoredEvents, other.ignoredEvents) || this.streamMode != other.streamMode || this.invert != other.invert){
             return 1
         }
         return true;
@@ -106,8 +106,6 @@ export function getRequest(){
         }
         timePeriod.date = dateString;
     }
-
-    console.log(document.querySelector(".invert-mode").value)
 
     return new Request(slug, timePeriod, 
         document.querySelector(".input.event-filters").value, 

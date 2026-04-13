@@ -150,10 +150,8 @@ function getRematchesList(matrix){
     let res = [];
     matrix.forEach((playerData, lineIndex) => {
         playerData.h2h.forEach((matches, colIndex) => {
-            if (matches.length > 0){
-                let otherPlayerData = matrix[lineIndex + colIndex + 1];
-                res.push({players: [playerData.player, otherPlayerData.player], matches});
-            }
+            let otherPlayerData = matrix[lineIndex + colIndex + 1];
+            res.push({players: [playerData.player, otherPlayerData.player], matches});
         })
     })
 

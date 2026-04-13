@@ -6,8 +6,10 @@ import { handleSelectedRadioButton, init, Request } from "./rematchbuster-common
 
 //------ LIB --------
 
-let currentData = null;
+/** @type {Request} */
 let currentRequest = null;
+let currentData = null;
+
 
 /**
  * @param {Request} request 
@@ -61,11 +63,15 @@ function getFiltersArray(request){
     return res.map(filter => filter.trim()).filter(filter => !!filter);
 }
 
-function sortResultList(result){
+function sortResultList(result, request){
+    return request.invert ? sortResultListAscending(result) : sortResultListDescending(result);
+}
+
+function sortResultListDescending(result){
     return result.sort((a, b) => b.matches.length - a.matches.length).filter(entry => entry.matches.length > 0);
 }
 
-function sortResultListReverse(result){
+function sortResultListAscending(result){
     return result.sort((a, b) => a.matches.length - b.matches.length);
 }
 
@@ -189,9 +195,9 @@ function makeResultHTML(result, entryNameFunction, stream){
 }
 
 const resultFunctions = {
-    "none": (players) => {
+    "none": (players, request) => {
         let result = get_rematches(players, getFiltersArray(request));
-        result = sortResultList(result);
+        result = sortResultList(result, request);
         //result = applyFilters(result, request);
         return makePairsListHTML(result, false);
     },
@@ -201,14 +207,14 @@ const resultFunctions = {
         for (const entry of result){
             entry.matches = entry.matches ? entry.matches.filter(set => !!set.stream) : [];
         }
-        result = sortResultList(result);
+        result = sortResultList(result, request);
         let html = '<h3 class="result-title">Steamed sets only</h3>'
         html += makePairsListHTML(result, true);
         return html;
     },
     "stream-individual": (players, request) => {
         let result = getStreamedMatchesForPlayer(players, getFiltersArray(request));
-        result = sortResultList(result);
+        result = sortResultList(result, request);
         let html = '<h3 class="result-title">Stream appearances</h3>'
         html += makePlayersListHTML(result, false);
         return html;
@@ -280,6 +286,22 @@ function onCrossClicked2(element){
 }
 window.onCrossClicked2 = onCrossClicked2; //HORRIBLE NAMING PLEASE DIE
 
+function onStreamModeChanged(event){
+    const newValue = event.target.value;
+    if (!resultFunctions[newValue]){
+        console.error("New value for stream mode selector is invalid");
+        return;
+    }
+    currentRequest.streamMode = newValue;
+
+    refreshResult(currentRequest);
+}
+
+function onInvertModeChanged(event){
+    currentRequest.invert = event.target.checked;
+    refreshResult(currentRequest);
+}
+
 /**
  * Use when only the filters changed
  * @param {Request} request 
@@ -321,6 +343,9 @@ let client = new RateLimitingSGGHelperClient("Bearer " + token);
 let limiter = new StartGGDelayQueryLimiter();
 
 //-- Page init
+
+document.querySelector(".stream-mode").addEventListener("change", onStreamModeChanged)
+document.querySelector(".invert-mode").addEventListener("change", onInvertModeChanged)
 
 init(request => {
     let isSame = currentRequest ? request.compare(currentRequest) : false;
