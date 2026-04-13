@@ -75,23 +75,30 @@ function makeResultHTML(result, entryNameFunction, stream){
     let html = ""
     for (let entry of result){
         const n = result.n ?? entry.matches.length;
-        html += `
-            <div class = "entry-title" onclick="entryTitleOnClick(this)">
-                <span class ="dropdown-button-sideways">►</span>${entryNameFunction(entry)} - ${n} matches    
-            </div>
-            <div class ="entry-details">
-            ${
-                entry.matches.map(match => {
-                    const date = new Date(match.completedAt * 1000);
-                    return `
-                        <div data-event-slug="${match.event.slug}"><a target="_blank" class = "ninja-link" title="Event : ${match.event.slug}" href = "https://start.gg/${match.event.slug}/set/${match.id}">${match.event.tournament.name} - ${match.event.name} (${date.getFullYear()}/${date.getMonth()}/${date.getDate()}) - ${match.fullRoundText} </a><span class="cross-button" onclick="onCrossClicked(this)" title="Remove this event from everyone's results">❌</span> ${stream && match.stream ? makeStreamHTML(match) : ""}</div><br>
-                    `
-                }
+        if (n < 1){
+            html += `
+                <div class = "entry-title">${entryNameFunction(entry)} - ${n} matches</div>
+            `
+        } else {
+            html += `
+                <div class = "entry-title" onclick="entryTitleOnClick(this)">
+                    <span class ="dropdown-button-sideways">►</span>${entryNameFunction(entry)} - ${n} matches    
+                </div>
+                <div class ="entry-details">
+                ${
+                    entry.matches.map(match => {
+                        const date = new Date(match.completedAt * 1000);
+                        return `
+                            <div data-event-slug="${match.event.slug}"><a target="_blank" class = "ninja-link" title="Event : ${match.event.slug}" href = "https://start.gg/${match.event.slug}/set/${match.id}">${match.event.tournament.name} - ${match.event.name} (${date.getFullYear()}/${date.getMonth()}/${date.getDate()}) - ${match.fullRoundText} </a><span class="cross-button" onclick="onCrossClicked(this)" title="Remove this event from everyone's results">❌</span> ${stream && match.stream ? makeStreamHTML(match) : ""}</div><br>
+                        `
+                    }
 
-                ).join("")
-            }
-            </div>
-        `
+                    ).join("")
+                }
+                </div>
+            `
+        }
+        
     }
     return html;
 }
@@ -263,7 +270,17 @@ function goCallback(request){
  */
 function entryTitleOnClick(element){
     toggleClass(element, "open");
-    toggleClass(element.nextElementSibling, "open");
+    let elt = element.nextElementSibling
+    //toggleClass(elt, "open");
+    if (elt.classList.contains("open")){
+        elt.style.height = "0px";
+        //elt.style.width = "0px"
+        elt.classList.remove("open")
+    } else {
+        elt.style.height = elt.scrollHeight + "px";
+        //elt.style.width = elt.scrollWidth + "px"
+        elt.classList.add("open");
+    }
 }
 window.entryTitleOnClick = entryTitleOnClick;
 
