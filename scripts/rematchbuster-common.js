@@ -87,7 +87,7 @@ export class Request {
     }
 }
 
-function getRequest(){
+export function getRequest(){
     let slug = document.querySelector("#event").value;
 
     slug = processEventSlug(slug);
@@ -107,11 +107,16 @@ function getRequest(){
         timePeriod.date = dateString;
     }
 
-    let filters = document.querySelector(".input.event-filters").value;
-    let ignoredEvents = window.currentIgnoredEvents;
+    console.log(document.querySelector(".invert-mode").value)
 
-    return new Request(slug, timePeriod, filters, ignoredEvents);
+    return new Request(slug, timePeriod, 
+        document.querySelector(".input.event-filters").value, 
+        window.currentIgnoredEvents,
+        document.querySelector(".stream-mode").value,
+        document.querySelector(".invert-mode").checked
+    );
 }
+window.getRequest = getRequest;
 
 //TODO : add more precise error messages for invalid event slug
 

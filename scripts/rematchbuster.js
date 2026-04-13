@@ -1,4 +1,4 @@
-import { RateLimitingSGGHelperClient, SGGHelperClient, StartGGDelayQueryLimiter } from "./lib/api/sgg-helper.js";
+import { RateLimitingSGGHelperClient, StartGGDelayQueryLimiter } from "./lib/api/sgg-helper.js";
 import { get_rematches, getSets } from "./lib/check_rematches.js";
 import { show, hide, toggleClass } from "./lib/DOMUtil.js";
 import { deep_get } from "./lib/util.js";
@@ -9,6 +9,9 @@ import { handleSelectedRadioButton, init, Request } from "./rematchbuster-common
 let currentData = null;
 let currentRequest = null;
 
+/**
+ * @param {Request} request 
+ */
 function updateUIFromRequest(request){
     document.querySelector("#event").value = request.slug;
     if (request.date){
@@ -22,6 +25,9 @@ function updateUIFromRequest(request){
     if (!!request.eventFilters){
         document.querySelector(".input.event-filters").value = request.eventFilters
     }
+    document.querySelector(".stream-mode").value = request.streamMode ?? "none";
+    document.querySelector(".invert-mode").checked = request.invert
+
 }
 
 function showLoader(){
@@ -55,6 +61,14 @@ function getFiltersArray(request){
     return res.map(filter => filter.trim()).filter(filter => !!filter);
 }
 
+function sortResultList(result){
+    return result.sort((a, b) => b.matches.length - a.matches.length).filter(entry => entry.matches.length > 0);
+}
+
+function sortResultListReverse(result){
+    return result.sort((a, b) => a.matches.length - b.matches.length);
+}
+
 function filterResult(result, filters = []){
     result = copyResult(result);
     for (let entry of result){
@@ -70,7 +84,7 @@ function filterResult(result, filters = []){
             return true;
         })
     }
-    result = result.sort((a, b) => b.matches.length - a.matches.length).filter(entry => entry.matches.length > 0);
+    result = sortResultList();
     return result;
 }
 
@@ -92,7 +106,7 @@ async function loadFromRequest(client, request, limiter){
 
         let errors = [];
 
-        let sets = await getSets(client, request.slug, Math.floor(date.getTime() / 1000), limiter, 
+        let players = await getSets(client, request.slug, Math.floor(date.getTime() / 1000), limiter, 
             (currentCount) => {
                 console.log("Loaded", currentCount);
                 progressElt.innerHTML = `(${currentCount}/${entrantsCount})`
@@ -113,10 +127,10 @@ async function loadFromRequest(client, request, limiter){
         }
 
         
-        currentData = sets;
+        currentData = players;
         currentRequest = request;
 
-        updateResultHTML(sets, request);
+        updateResultHTML(players, request);
     } catch (err){
         console.error(err);
         alert("There was a problem fetching data from the start.gg API. Please check that the event URL is correct, and try again")
@@ -125,23 +139,34 @@ async function loadFromRequest(client, request, limiter){
 
 }
 
-function makePairsRankingHTML(result){
+function applyFilters(result, request){
+    return filterResult(result, getFiltersArray(request));
+}
+
+function makeStreamHTML(match){
+    return `<br > <a class="stream ninja-link" href="https://twitch.tv/${match.stream.streamName}" target="_blank">streamed on <span class="stream-name">${match.stream.streamName}</span></a>`
+}
+
+function makePairsRankingHTML(result, stream){
+    stream = true;
+
     let html = ""
     for (let entry of result){
+        const n = result.n ?? entry.matches.length;
         html += `
             <div class = "entry-title" onclick="entryTitleOnClick(this)">
-                <span class ="dropdown-button-sideways">►</span>${entry.players[0].name} vs ${entry.players[1].name} - ${entry.matches.length} matches    
+                <span class ="dropdown-button-sideways">►</span>${entry.players[0].name} vs ${entry.players[1].name} - ${n} matches    
             </div>
             <div class ="entry-details">
             ${
                 entry.matches.map(match => {
                     const date = new Date(match.completedAt * 1000);
                     return `
-                        <div data-event-slug="${match.event.slug}"><a target="_blank" class = "ninja-link" title="Event : ${match.event.slug}" href = "https://start.gg/${match.event.slug}">${match.event.tournament.name} - ${match.event.name} (${date.getFullYear()}/${date.getMonth()}/${date.getDate()}) - ${match.fullRoundText} </a><span class="cross-button" onclick="onCrossClicked(this)" title="Remove this event from everyone's results">❌</span></div><br>
+                        <div data-event-slug="${match.event.slug}"><a target="_blank" class = "ninja-link" title="Event : ${match.event.slug}" href = "https://start.gg/${match.event.slug}/set/${match.id}">${match.event.tournament.name} - ${match.event.name} (${date.getFullYear()}/${date.getMonth()}/${date.getDate()}) - ${match.fullRoundText} </a><span class="cross-button" onclick="onCrossClicked(this)" title="Remove this event from everyone's results">❌</span> ${stream && match.stream ? makeStreamHTML(match) : ""}</div><br>
                     `
                 }
 
-                ).join("")  
+                ).join("")
             }
             </div>
         `
@@ -150,21 +175,39 @@ function makePairsRankingHTML(result){
 }
 
 const resultFunctions = {
-    "none": (sets) => {
-        
+    "none": (players, request) => {
+        let result = get_rematches(players, getFiltersArray(request));
+        //result = applyFilters(result, request);
+        return makePairsRankingHTML(result, false);
     },
-    "stream-pairs": (sets) => {
-
+    "stream-pairs": (players, _request) => {
+        let result = get_rematches(players);
+        //result = applyFilters(result, request)
+        for (const entry of result){
+            entry.matches = entry.matches ? entry.matches.filter(set => !!set.stream) : [];
+        }
+        result = sortResultList(result);
+        let html = '<h3 class="result-title">Steamed sets only</h3>'
+        html += makePairsRankingHTML(result, true);
+        return html;
     },
-    "stream-individual": (sets) => {
+    "stream-individual": {
+        result: (players) => {
 
+        }
     }
 }
 
-function updateResultHTML(sets, request){
-    let rematches = get_rematches(sets);
-    rematches = filterResult(rematches, getFiltersArray(request));
-    const html = makePairsRankingHTML(rematches);
+function updateResultHTML(players, request){
+    const mode = request.streamMode ?? "none";
+    const f = resultFunctions[mode];
+    if (!f){
+        console.error("Invalid stream mode :", mode);
+        f = resultFunctions.none;
+    }
+    let html = f(players, request);
+
+    console.log(html)
     document.querySelector(".result").innerHTML = html;
     showResult();
 }

@@ -66,24 +66,24 @@ export async function getSets(client, slug, after, limiter, statusCallback, coun
 }
 
 /**
- * 
- * @param {SGGHelperClient} client 
- * @param {string} current_slug 
- * @param {string[]} past_slugs 
- * @param {TimedQuerySemaphore} limiter 
+ * @param {Array<{sets: Array<{}>, player: Player}>} players  
+ * @param {boolean | string} streamed 
+ * @param {string[]} eventFilters
  */
-export function get_rematches(sets){
-    return getRematchesList(buildMatchesMatrix(sets));
+export function get_rematches(players, eventFilters = [], streamed = false){
+    return getRematchesList(buildMatchesMatrix(players, eventFilters, streamed));
 }
 
 const unknown_event = {slug: "unknown_event", name: "Unknown Event", tournament: {name: "Unknown Tournament"}}
 
 /**
  * 
- * @param {string[]} slugs 
  * @param {Array<{sets: Array<{}>, player: Player}>} playersLists 
+ * @param {string | boolean} streamed 
+ * @param {string[]} eventFilters 
+ * 
  */
-function buildMatchesMatrix(playersLists){
+function buildMatchesMatrix(playersLists, eventFilters, streamed){
     let indexes = playersLists.reduce((prev, current, index) => {
         prev[current.player.id] = index;
         return prev;
@@ -97,6 +97,7 @@ function buildMatchesMatrix(playersLists){
             
             if (!set.event) continue;
             if (eventFilters.some(filter => set.event.slug.includes(filter))) continue;
+            if (streamed && !set.stream || (typeof streamed == "string") && set.stream.streamName != streamed) continue;
 
             let currentPlayerSlotIndex = null;
             if (!set.completedAt) continue; //match pas fini

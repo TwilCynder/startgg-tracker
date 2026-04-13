@@ -35,6 +35,12 @@ body {
     margin-bottom: 50px;
 }
 
+.result-title {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 5px;
+}
+
 .closed {
     display: none;
 }
@@ -53,6 +59,15 @@ body {
 
 .entry-details.open {
     display: flex;
+}
+
+.stream {
+    font-size: 0.8em;
+}
+
+.stream-name {
+    color: purple;
+    text-decoration: underline;
 }
 
 .dropdown-button-sideways {
@@ -105,3 +120,4 @@ body {
 .loading-container {
     height: 800px;
 }
+
