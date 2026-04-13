@@ -77,12 +77,14 @@
 
 .display-options-container-inner {
     font-size: 12px;
+
     display: flex;
     flex-direction: row;
+    justify-content: center;
     gap: 15px;
+    flex-wrap: wrap;
+    row-gap: 5px;
 }
-
-
 
 .time-inputs-container {
     display: flex;

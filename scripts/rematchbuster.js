@@ -67,6 +67,7 @@ function makePlayersListHTML(result, stream){
 /**
  * @template T
  * @param {T[]} result 
+ * @
  * @param {(entry: T) => string} entryNameFunction 
  * @param {boolean} stream 
  * @returns 
@@ -74,15 +75,16 @@ function makePlayersListHTML(result, stream){
 function makeResultHTML(result, entryNameFunction, stream){
     let html = ""
     for (let entry of result){
-        const n = result.n ?? entry.matches.length;
+        const n = entry.n ?? entry.matches.length;
+        const nText = entry.nText ?? n + " matches";
         if (n < 1){
             html += `
-                <div class = "entry-title">${entryNameFunction(entry)} - ${n} matches</div>
+                <div class = "entry-title">${entryNameFunction(entry)} - ${nText}</div>
             `
         } else {
             html += `
                 <div class = "entry-title" onclick="entryTitleOnClick(this)">
-                    <span class ="dropdown-button-sideways">►</span>${entryNameFunction(entry)} - ${n} matches    
+                    <span class ="dropdown-button-sideways">►</span>${entryNameFunction(entry)} - ${nText}    
                 </div>
                 <div class ="entry-details">
                 ${
@@ -115,16 +117,35 @@ function getFiltersArray(request){
     return res.map(filter => filter.trim()).filter(filter => !!filter);
 }
 
-function sortResultList(result, request){
-    return request.invert ? sortResultListAscending(result) : sortResultListDescending(result);
-}
-
 function sortResultListDescending(result){
-    return result.sort((a, b) => b.matches.length - a.matches.length).filter(entry => entry.matches.length > 0);
+    return result.sort((a, b) => b.n - a.n).filter(entry => entry.n > 0);
 }
 
 function sortResultListAscending(result){
-    return result.sort((a, b) => a.matches.length - b.matches.length);
+    return result.sort((a, b) => a.n - b.n);
+}
+
+function updateNBasic(entry){
+    entry.n = entry.matches.length;
+    entry.nText = entry.n + " matches"
+}
+
+function updateNEventsCount(entry){
+    let seenEvents = {};
+    entry.n = 0;
+    for (const set of entry.matches){
+        if (!set.event) continue;
+        if (!seenEvents[set.event.slug]){
+            seenEvents[set.event.slug] = true;
+            entry.n++;
+        }
+    }
+    entry.nText = entry.n + " events"
+}
+
+function sortResultList(result, request){
+    result.forEach(request.countEvents ? updateNEventsCount : updateNBasic);
+    return request.invert ? sortResultListAscending(result) : sortResultListDescending(result);
 }
 
 const resultFunctions = {
@@ -332,6 +353,11 @@ function onInvertModeChanged(event){
     refreshResult(currentRequest);
 }
 
+function onEventCountModeChanged(event){
+    currentRequest.countEvents = event.target.checked;
+    refreshResult(currentRequest);
+}
+
 //------ SCRIPT -----
 
 //-- Page init
@@ -339,10 +365,11 @@ function onInvertModeChanged(event){
 
 document.querySelector(".stream-mode").addEventListener("change", onStreamModeChanged);
 document.querySelector(".invert-mode").addEventListener("change", onInvertModeChanged);
+document.querySelector(".event-count-mode").addEventListener("change", onEventCountModeChanged);
 
 window.addEventListener("popstate", onPopstate);
 
-init(request => goCallback)
+init(goCallback)
 
 //-- Various init
 let token = localStorage.getItem("token");

@@ -12,7 +12,7 @@ export class Request {
      * @param {string} streamMode
      * @param {boolean} invert 
      */
-    constructor(slug, timePeriod = {}, filters, ignoredEvents = [], streamMode, invert){
+    constructor(slug, timePeriod = {}, filters, ignoredEvents = [], streamMode, invert, countEvents){
         this.slug = slug;
         this.date = timePeriod.date;
         this.duration = timePeriod.duration;
@@ -20,6 +20,7 @@ export class Request {
         this.ignoredEvents = ignoredEvents;
         this.streamMode = streamMode;
         this.invert = invert;
+        this.countEvents = countEvents;
     }
 
     getURL(){
@@ -33,7 +34,8 @@ export class Request {
         params.set("filters", this.eventFilters);
         params.set("ignoredEvents", this.ignoredEvents.join(","));
         params.set("streamMode", this.streamMode);
-        if (this.invert) params.set("invert", "1");
+        if (this.invert) params.set("invert", "yes");
+        if (this.countEvents) params.set("countEvents", "yes");
 
         return "?" + params.toString();
     }
@@ -70,7 +72,8 @@ export class Request {
             params.get("filters"),
             ignoredEventsStr ? ignoredEventsStr.split(/,/g).map(str => str.trim()).filter(str => !!str) : [],
             params.get("streamMode"),
-            params.get("invert") ? true : false
+            !!params.get("invert"),
+            !!params.get("countEvents")
         );
     }
 
@@ -80,7 +83,13 @@ export class Request {
     compare(other){
         if (this.slug != other.slug || (this.date ? (this.date != other.date) : (this.duration != other.duration))){
             return false;
-        } else if (this.eventFilters != other.eventFilters || compareStrArray(this.ignoredEvents, other.ignoredEvents) || this.streamMode != other.streamMode || this.invert != other.invert){
+        } else if (
+            this.eventFilters != other.eventFilters || 
+            compareStrArray(this.ignoredEvents, other.ignoredEvents) || 
+            this.streamMode != other.streamMode || 
+            this.invert != other.invert ||
+            this.countEvents != other.countEvents
+        ){
             return 1
         }
         return true;
@@ -111,7 +120,8 @@ export function getRequest(){
         document.querySelector(".input.event-filters").value, 
         window.currentIgnoredEvents,
         document.querySelector(".stream-mode").value,
-        document.querySelector(".invert-mode").checked
+        document.querySelector(".invert-mode").checked,
+        document.querySelector(".event-count-mode").checked
     );
 }
 window.getRequest = getRequest;
