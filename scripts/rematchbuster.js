@@ -4,13 +4,13 @@ import { show, hide, toggleClass } from "./lib/DOMUtil.js";
 import { deep_get } from "./lib/util.js";
 import { handleSelectedRadioButton, init, Request } from "./rematchbuster-common.js";
 
-//------ LIB --------
+//------ Functions --------
 
 /** @type {Request} */
 let currentRequest = null;
 let currentData = null;
 
-
+//-- UI Update functions
 /**
  * @param {Request} request 
  */
@@ -42,16 +42,61 @@ function showResult(){
     show(".result");
 }
 
-function copyResult(result){
-    let out = [];
-    for (let entry of result){
-        out.push({
-            matches: Array.from(entry.matches),
-            players: entry.players
-        })
-    }
-    return out;
+function makeIgnoredEventsHTML(list){
+    if (list.length < 1) return "";
+    let html = "Ignored Events";
+    list.forEach((slug, i) =>{
+        html += `<div data-slug="${slug}" data-i=${i}>${slug}<span class="cross-button" onclick="onCrossClicked2(this)" title="Remove this event from ignored events">❌</span></div>`
+    })
+    return html;
 }
+
+function makeStreamHTML(match){
+    return `<br > <a class="stream ninja-link" href="https://twitch.tv/${match.stream.streamName}" target="_blank">streamed on <span class="stream-name">${match.stream.streamName}</span></a>`
+}
+
+function makePairsListHTML(result, stream){
+    return makeResultHTML(result, (entry) => `${entry.players[0].name} vs ${entry.players[1].name}`, stream);
+}
+
+function makePlayersListHTML(result, stream){
+    console.log(result);
+    return makeResultHTML(result, (entry) => entry.player.name, stream);
+}
+
+/**
+ * @template T
+ * @param {T[]} result 
+ * @param {(entry: T) => string} entryNameFunction 
+ * @param {boolean} stream 
+ * @returns 
+ */
+function makeResultHTML(result, entryNameFunction, stream){
+    let html = ""
+    for (let entry of result){
+        const n = result.n ?? entry.matches.length;
+        html += `
+            <div class = "entry-title" onclick="entryTitleOnClick(this)">
+                <span class ="dropdown-button-sideways">►</span>${entryNameFunction(entry)} - ${n} matches    
+            </div>
+            <div class ="entry-details">
+            ${
+                entry.matches.map(match => {
+                    const date = new Date(match.completedAt * 1000);
+                    return `
+                        <div data-event-slug="${match.event.slug}"><a target="_blank" class = "ninja-link" title="Event : ${match.event.slug}" href = "https://start.gg/${match.event.slug}/set/${match.id}">${match.event.tournament.name} - ${match.event.name} (${date.getFullYear()}/${date.getMonth()}/${date.getDate()}) - ${match.fullRoundText} </a><span class="cross-button" onclick="onCrossClicked(this)" title="Remove this event from everyone's results">❌</span> ${stream && match.stream ? makeStreamHTML(match) : ""}</div><br>
+                    `
+                }
+
+                ).join("")
+            }
+            </div>
+        `
+    }
+    return html;
+}
+
+//-- Result computing
 
 /**
  * @param {Request} request 
@@ -75,25 +120,48 @@ function sortResultListAscending(result){
     return result.sort((a, b) => a.matches.length - b.matches.length);
 }
 
-function filterResult(result, filters = []){
-    result = copyResult(result);
-    for (let entry of result){
-        entry.matches = entry.matches.filter(match => {
-            let slug = deep_get(match, "event.slug");
-            if (!slug) console.warn("No event slug for match", match);
-            for (let filter of filters){
-                if (slug.includes(filter)){
-                    console.log("Event removed for containing the filter", filter);
-                    return false;        
-                }
-            }
-            return true;
-        })
+const resultFunctions = {
+    "none": (players, request) => {
+        let result = get_rematches(players, getFiltersArray(request));
+        result = sortResultList(result, request);
+        //result = applyFilters(result, request);
+        return makePairsListHTML(result, false);
+    },
+    "stream-pairs": (players, request) => {
+        let result = get_rematches(players, getFiltersArray(request));
+        //result = applyFilters(result, request)
+        for (const entry of result){
+            entry.matches = entry.matches ? entry.matches.filter(set => !!set.stream) : [];
+        }
+        result = sortResultList(result, request);
+        let html = '<h3 class="result-title">Steamed sets only</h3>'
+        html += makePairsListHTML(result, true);
+        return html;
+    },
+    "stream-individual": (players, request) => {
+        let result = getStreamedMatchesForPlayer(players, getFiltersArray(request));
+        result = sortResultList(result, request);
+        let html = '<h3 class="result-title">Stream appearances</h3>'
+        html += makePlayersListHTML(result, false);
+        return html;
     }
-    result = sortResultList();
-    return result;
 }
 
+function updateResultHTML(players, request){
+    console.log(request)
+    const mode = request.streamMode ?? "none";
+    const f = resultFunctions[mode];
+    if (!f){
+        console.error("Invalid stream mode :", mode);
+        f = resultFunctions.none;
+    }
+    let html = f(players, request);
+
+    document.querySelector(".result").innerHTML = html;
+    showResult();
+}
+
+//--
 
 /**
  * @param {Request} request
@@ -145,109 +213,50 @@ async function loadFromRequest(client, request, limiter){
 
 }
 
-function applyFilters(result, request){
-    return filterResult(result, getFiltersArray(request));
-}
-
-function makeStreamHTML(match){
-    return `<br > <a class="stream ninja-link" href="https://twitch.tv/${match.stream.streamName}" target="_blank">streamed on <span class="stream-name">${match.stream.streamName}</span></a>`
-}
-
-function makePairsListHTML(result, stream){
-    return makeResultHTML(result, (entry) => `${entry.players[0].name} vs ${entry.players[1].name}`, stream);
-}
-
-function makePlayersListHTML(result, stream){
-    console.log(result);
-    return makeResultHTML(result, (entry) => entry.player.name, stream);
-}
+//-- Request and state functions
 
 /**
- * @template T
- * @param {T[]} result 
- * @param {(entry: T) => string} entryNameFunction 
- * @param {boolean} stream 
- * @returns 
+ * Use when only non-fetch-inducing options changed (filters, stream mode, etc)
+ * @param {Request} request 
  */
-function makeResultHTML(result, entryNameFunction, stream){
-    let html = ""
-    for (let entry of result){
-        const n = result.n ?? entry.matches.length;
-        html += `
-            <div class = "entry-title" onclick="entryTitleOnClick(this)">
-                <span class ="dropdown-button-sideways">►</span>${entryNameFunction(entry)} - ${n} matches    
-            </div>
-            <div class ="entry-details">
-            ${
-                entry.matches.map(match => {
-                    const date = new Date(match.completedAt * 1000);
-                    return `
-                        <div data-event-slug="${match.event.slug}"><a target="_blank" class = "ninja-link" title="Event : ${match.event.slug}" href = "https://start.gg/${match.event.slug}/set/${match.id}">${match.event.tournament.name} - ${match.event.name} (${date.getFullYear()}/${date.getMonth()}/${date.getDate()}) - ${match.fullRoundText} </a><span class="cross-button" onclick="onCrossClicked(this)" title="Remove this event from everyone's results">❌</span> ${stream && match.stream ? makeStreamHTML(match) : ""}</div><br>
-                    `
-                }
-
-                ).join("")
-            }
-            </div>
-        `
-    }
-    return html;
+function refreshResult(request){
+    updateResultHTML(currentData, request);
+    window.history.pushState(request, "", window.location.pathname + request.getURL());
+    currentRequest = request;
 }
 
-const resultFunctions = {
-    "none": (players, request) => {
-        let result = get_rematches(players, getFiltersArray(request));
-        result = sortResultList(result, request);
-        //result = applyFilters(result, request);
-        return makePairsListHTML(result, false);
-    },
-    "stream-pairs": (players, request) => {
-        let result = get_rematches(players, getFiltersArray(request));
-        //result = applyFilters(result, request)
-        for (const entry of result){
-            entry.matches = entry.matches ? entry.matches.filter(set => !!set.stream) : [];
+function onPopstate(ev){
+    let state = ev.state;
+    let request;
+    if (!state){
+        try {
+            request = Request.fromURL(window.location.search)
+        } catch (err) {
+            console.error("Tried to make request from stateless popstate event, but failed :", err);
         }
-        result = sortResultList(result, request);
-        let html = '<h3 class="result-title">Steamed sets only</h3>'
-        html += makePairsListHTML(result, true);
-        return html;
-    },
-    "stream-individual": (players, request) => {
-        let result = getStreamedMatchesForPlayer(players, getFiltersArray(request));
-        result = sortResultList(result, request);
-        let html = '<h3 class="result-title">Stream appearances</h3>'
-        html += makePlayersListHTML(result, false);
-        return html;
+    } else {
+        request = state;
     }
+
+    updateUIFromRequest(request);
+    updateResultHTML(currentData, request);
 }
 
-function updateResultHTML(players, request){
-    console.log(request)
-    const mode = request.streamMode ?? "none";
-    const f = resultFunctions[mode];
-    if (!f){
-        console.error("Invalid stream mode :", mode);
-        f = resultFunctions.none;
+function goCallback(request){
+    let isSame = currentRequest ? request.compare(currentRequest) : false;
+
+    if (isSame === true){
+        return;
+    } else if (isSame === 1){
+        refreshResult(request);
+        currentRequest = request;
+    } else {
+        window.location.href = window.location.pathname + request.getURL();
     }
-    let html = f(players, request);
 
-    document.querySelector(".result").innerHTML = html;
-    showResult();
 }
 
-
-function makeIgnoredEventsHTML(list){
-    if (list.length < 1) return "";
-    let html = "Ignored Events";
-    list.forEach((slug, i) =>{
-        html += `<div data-slug="${slug}" data-i=${i}>${slug}<span class="cross-button" onclick="onCrossClicked2(this)" title="Remove this event from ignored events">❌</span></div>`
-    })
-    return html;
-}
-
-function updateIgnoredEventsHTML(list){
-    document.querySelector(".ignored-events").innerHTML = makeIgnoredEventsHTML(list);
-}
+//-- UI callbacks
 
 /**
  * @param {HTMLElement} element 
@@ -257,6 +266,10 @@ function entryTitleOnClick(element){
     toggleClass(element.nextElementSibling, "open");
 }
 window.entryTitleOnClick = entryTitleOnClick;
+
+function updateIgnoredEventsHTML(list){
+    document.querySelector(".ignored-events").innerHTML = makeIgnoredEventsHTML(list);
+}
 
 /**
  * @param {HTMLElement} element 
@@ -302,37 +315,19 @@ function onInvertModeChanged(event){
     refreshResult(currentRequest);
 }
 
-/**
- * Use when only the filters changed
- * @param {Request} request 
- */
-function refreshResult(request){
-    updateResultHTML(currentData, request);
-    window.history.pushState(request, "", window.location.pathname + request.getURL());
-    currentRequest = request;
-}
-
 //------ SCRIPT -----
 
+//-- Page init
+
+
+document.querySelector(".stream-mode").addEventListener("change", onStreamModeChanged);
+document.querySelector(".invert-mode").addEventListener("change", onInvertModeChanged);
+
+window.addEventListener("popstate", onPopstate);
+
+init(request => goCallback)
+
 //-- Various init
-
-window.addEventListener("popstate", (ev) => {
-    let state = ev.state;
-    let request;
-    if (!state){
-        try {
-            request = Request.fromURL(window.location.search)
-        } catch (err) {
-            console.error("Tried to make request from stateless popstate event, but failed :", err);
-        }
-    } else {
-        request = state;
-    }
-
-    updateUIFromRequest(request);
-    updateResultHTML(currentData, request);
-})
-
 let token = localStorage.getItem("token");
 if (!token){
     console.error("No token. Going back to homepage");
@@ -342,41 +337,8 @@ if (!token){
 let client = new RateLimitingSGGHelperClient("Bearer " + token);
 let limiter = new StartGGDelayQueryLimiter();
 
-//-- Page init
-
-document.querySelector(".stream-mode").addEventListener("change", onStreamModeChanged)
-document.querySelector(".invert-mode").addEventListener("change", onInvertModeChanged)
-
-init(request => {
-    let isSame = currentRequest ? request.compare(currentRequest) : false;
-
-    if (isSame === true){
-        return;
-    } else if (isSame === 1){
-        refreshResult(request);
-        currentRequest = request;
-    } else {
-        window.location.href = window.location.pathname + request.getURL();
-    }
-
-    /*
-    let url = request.getURL();
-    console.log(url, window.location.search);
-    if (url != window.location.search){
-        console.log(window.location.pathname + url)
-        //window.history.pushState(request, "", window.location.pathname + url);
-        window.location.href = window.location.pathname + url;
-    } else {
-
-    }
-    */
-
-})
-
-
 //-- Starting query
 let request = Request.fromURL(window.location.search);
-
 
 if (request){
     updateUIFromRequest(request);
@@ -388,3 +350,46 @@ if (request){
     document.querySelector(".time-inputs-container #duration-mode").checked = true;
     handleRadioButtons("duration-mode");
 }
+
+
+
+//-- Graveyard
+
+/*
+function copyResult(result){
+    let out = [];
+    for (let entry of result){
+        out.push({
+            matches: Array.from(entry.matches),
+            players: entry.players
+        })
+    }
+    return out;
+}
+*/
+
+/*
+function filterResult(result, filters = []){
+    result = copyResult(result);
+    for (let entry of result){
+        entry.matches = entry.matches.filter(match => {
+            let slug = deep_get(match, "event.slug");
+            if (!slug) console.warn("No event slug for match", match);
+            for (let filter of filters){
+                if (slug.includes(filter)){
+                    console.log("Event removed for containing the filter", filter);
+                    return false;        
+                }
+            }
+            return true;
+        })
+    }
+    result = sortResultList();
+    return result;
+}*/
+
+
+/*
+function applyFilters(result, request){
+    return filterResult(result, getFiltersArray(request));
+}*/
