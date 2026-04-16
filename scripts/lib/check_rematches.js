@@ -158,18 +158,23 @@ function getRematchesList(matrix){
     return res;
 }
 
+export function getStreamedSetFilterFunction(streamName){
+    return streamName ? 
+        (set => set.stream && (set.stream.streamName == streamName)) : 
+        (set => !!set.stream)
+}
+
 /**
  * 
  * @param {Array<{sets: Array<{}>, player: Player}>} players 
  * @param {string[]} eventFilters 
  * 
  */
-export function getStreamedMatchesForPlayer(players, eventFilters = []){
+export function getStreamedMatchesForPlayer(players, eventFilters = [], streamName = null){
+    const filterFunction = getStreamedSetFilterFunction(streamName);
+
     return players.map(player => {
-        const matches = player.sets.filter(set => (
-            !isEventFiltered(eventFilters, set) &&
-            set.stream
-        ));
+        const matches = player.sets.filter(set => !isEventFiltered(eventFilters, set) && filterFunction(set));
 
         return {player: player.player, matches};
     });

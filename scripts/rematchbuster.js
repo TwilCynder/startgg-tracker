@@ -1,5 +1,5 @@
 import { RateLimitingSGGHelperClient, StartGGDelayQueryLimiter } from "./lib/api/sgg-helper.js";
-import { get_rematches, getSets, getStreamedMatchesForPlayer } from "./lib/check_rematches.js";
+import { get_rematches, getSets, getStreamedMatchesForPlayer, getStreamedSetFilterFunction } from "./lib/check_rematches.js";
 import { show, hide, toggleClass } from "./lib/DOMUtil.js";
 import { deep_get } from "./lib/util.js";
 import { handleSelectedRadioButton, init, Request } from "./rematchbuster-common.js";
@@ -27,9 +27,15 @@ function updateUIFromRequest(request){
     if (!!request.eventFilters){
         document.querySelector(".input.event-filters").value = request.eventFilters
     }
-    document.querySelector("#stream-mode").value = request.streamMode ?? "none";
     document.querySelector("#invert-mode").checked = request.invert
-    document.querySelector("#event-count-mode")
+    document.querySelector("#event-count-mode");
+    document.querySelector("#stream-mode").value = request.streamMode ?? "none";
+    if (request.streamMode.includes("stream")){
+        show(".stream-name-container");
+        document.querySelector("#stream-name").value = request.streamName;
+    } else {
+        hide(".stream-name-container");
+    }
 }
 
 function showLoader(){
@@ -157,20 +163,30 @@ const resultFunctions = {
     },
     "stream-pairs": (players, request) => {
         let result = get_rematches(players, getFiltersArray(request));
-        //result = applyFilters(result, request)
+
+        const streamFilterFunction = getStreamedSetFilterFunction(request.streamName);
         for (const entry of result){
-            entry.matches = entry.matches ? entry.matches.filter(set => !!set.stream) : [];
+            entry.matches = entry.matches ? 
+                entry.matches.filter(streamFilterFunction) : 
+                [];
         }
+
         result = sortResultList(result, request);
-        let html = '<h3 class="result-title">Steamed sets only</h3>'
-        html += makePairsListHTML(result, true);
+        
+        let html = request.streamName ?
+            `<h3 class="result-title">Sets streamed on ${request.streamName} only</h3>` + makePairsListHTML(result, false) :
+            '<h3 class="result-title">Steamed sets only</h3>' + makePairsListHTML(result, true)
+
         return html;
     },
     "stream-individual": (players, request) => {
-        let result = getStreamedMatchesForPlayer(players, getFiltersArray(request));
+        let result = getStreamedMatchesForPlayer(players, getFiltersArray(request), request.streamName);
         result = sortResultList(result, request);
-        let html = '<h3 class="result-title">Stream appearances</h3>'
-        html += makePlayersListHTML(result, false);
+        
+        let html = request.streamName ? 
+            `<h3 class="result-title">Stream appearances on ${request.streamName}</h3>` + makePlayersListHTML(result, false) : 
+            '<h3 class="result-title">Stream appearances</h3>' + makePlayersListHTML(result, true);
+
         return html;
     }
 }

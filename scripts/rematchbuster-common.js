@@ -1,4 +1,4 @@
-import { hide, show } from "./lib/DOMUtil.js";
+import { hide, hideElement, show, showElement } from "./lib/DOMUtil.js";
 import { compareStrArray, processEventSlug } from "./lib/util.js";
 
 export class RequestValidityError extends Error {}
@@ -12,13 +12,14 @@ export class Request {
      * @param {string} streamMode
      * @param {boolean} invert 
      */
-    constructor(slug, timePeriod = {}, filters, ignoredEvents = [], streamMode, invert, countEvents){
+    constructor(slug, timePeriod = {}, filters, ignoredEvents = [], streamMode, invert, countEvents, streamName){
         this.slug = slug;
         this.date = timePeriod.date;
         this.duration = timePeriod.duration;
         this.eventFilters = filters;
         this.ignoredEvents = ignoredEvents;
         this.streamMode = streamMode;
+        this.streamName = streamName;
         this.invert = invert;
         this.countEvents = countEvents;
     }
@@ -34,6 +35,7 @@ export class Request {
         params.set("filters", this.eventFilters);
         params.set("ignoredEvents", this.ignoredEvents.join(","));
         params.set("streamMode", this.streamMode);
+        params.set("streamName", this.streamName);
         if (this.invert) params.set("invert", "yes");
         if (this.countEvents) params.set("countEvents", "yes");
 
@@ -73,7 +75,8 @@ export class Request {
             ignoredEventsStr ? ignoredEventsStr.split(/,/g).map(str => str.trim()).filter(str => !!str) : [],
             params.get("streamMode"),
             !!params.get("invert"),
-            !!params.get("countEvents")
+            !!params.get("countEvents"),
+            params.get("streamName")
         );
     }
 
@@ -87,6 +90,7 @@ export class Request {
             this.eventFilters != other.eventFilters || 
             compareStrArray(this.ignoredEvents, other.ignoredEvents) || 
             this.streamMode != other.streamMode || 
+            this.streamName != other.streamName ||
             this.invert != other.invert ||
             this.countEvents != other.countEvents
         ){
@@ -115,13 +119,16 @@ export function getRequest(){
         }
         timePeriod.date = dateString;
     }
+    let streamMode = document.querySelector("#stream-mode").value;
+    let streamName = streamMode.includes("stream") ? document.querySelector("#stream-name").value : undefined;
 
     return new Request(slug, timePeriod, 
         document.querySelector(".input.event-filters").value, 
         window.currentIgnoredEvents,
-        document.querySelector("#stream-mode").value,
+        streamMode,
         document.querySelector("#invert-mode").checked,
-        document.querySelector("#event-count-mode").checked
+        document.querySelector("#event-count-mode").checked,
+        streamName
     );
 }
 window.getRequest = getRequest;
@@ -221,6 +228,16 @@ export function init(goCallback){
         if (event.key == "Enter"){
             event.preventDefault();
             GO(goCallback);
+        }
+    })
+
+    const streamNameElement = document.querySelector(".stream-name-container");
+    document.querySelector("#stream-mode").addEventListener("change", (event) => {
+        const newValue = event.target.value;
+        if (newValue.includes("stream")){
+            showElement(streamNameElement);
+        } else {
+            hideElement(streamNameElement);
         }
     })
 

@@ -93,6 +93,10 @@
     align-items: flex-start;
 }
 
+.stream-name-container {
+    display: none;
+}
+
 .weeksInput {
     width: 60px;
 }
@@ -100,4 +104,8 @@
 #GO {
     width: 75px;
     height: 30px;
+}
+
+input:nth-child(n+2){
+    margin-left: 5px;
 }

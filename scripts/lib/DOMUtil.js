@@ -23,22 +23,24 @@ export function FitText(target) {
     });
 }
 
-function showElement(element){
+export function showElement(element){
     element.style.setProperty(`display`, "flex");
     element.style.setProperty('opacity', "100%");
 }
 
-export function hide(elementName){
+export function show(elementName){
     let element = document.querySelector(elementName);
-    
+    if (element) showElement(element);
+}
+
+export function hideElement(element){
     element.style.setProperty(`display`, "none");
     element.style.setProperty('opacity', "0");
 }
 
-export function show(elementName){
+export function hide(elementName){
     let element = document.querySelector(elementName);
-
-    showElement(element);
+    if (element) hideElement(element);
 }
 
 /**

@@ -72,6 +72,8 @@ body {
 
 .stream {
     font-size: 0.8em;
+    line-height: 0.8em;
+    margin-bottom: 6px;
 }
 
 .stream-name {
