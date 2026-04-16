@@ -255,3 +255,7 @@ a {
 .text-sized-image {
     height: 1em;
 }
+
+#token-input {
+    gap: 20px;
+}

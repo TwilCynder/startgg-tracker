@@ -35,7 +35,7 @@ export class Request {
         params.set("filters", this.eventFilters);
         params.set("ignoredEvents", this.ignoredEvents.join(","));
         params.set("streamMode", this.streamMode);
-        params.set("streamName", this.streamName);
+        if (this.streamName) params.set("streamName", this.streamName);
         if (this.invert) params.set("invert", "yes");
         if (this.countEvents) params.set("countEvents", "yes");
 
@@ -70,6 +70,9 @@ export class Request {
         }
         let ignoredEventsStr = params.get("ignoredEvents");
         
+        let streamName = params.get("streamName");
+        if (streamName == "undefined" || streamName == "null" || !streamName) streamName = undefined;
+
         return new Request(slug, timePeriod,
             params.get("filters"),
             ignoredEventsStr ? ignoredEventsStr.split(/,/g).map(str => str.trim()).filter(str => !!str) : [],
