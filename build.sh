@@ -1,7 +1,10 @@
 cd build/npm
-mkdir -p dist
+echo "---- Installing dependencies ----"
 npm install
-node webpack.js $1
-cp dist/bundle.js ../../scripts/lib/api/sgg-helper.js
+echo "---- Webpack ----"
+mkdir -p dist
+node webpack.js $2
+cp dist/bundle.js ../../$1/scripts/lib/api/sgg-helper.js
 cd ../..
-./render.sh
+echo "---- EJS Rendering ----"
+./build/render.sh $1
