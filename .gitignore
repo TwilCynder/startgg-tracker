@@ -1,8 +1,12 @@
-node_modules
-
+#Built site
 build/npm/dist
 sgg-helper.js
 rendered
 _site
 
+#Node
+node_modules
+.env
+
+#I like custom folder icons
 desktop.ini
