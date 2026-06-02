@@ -4,6 +4,7 @@
         <link rel="icon" href="./assets/icon/startggtracker256.png">
         <link rel="stylesheet" href="./styles/main.css">
         <link rel="stylesheet" href="./styles/index.css">
+        <link rel="stylesheet" href="./styles/login.css">
         <script src = "./scripts/lib/jquery.js"></script>
         <title>SGGT</title>
     </head>
@@ -16,14 +17,20 @@
 
             </div>
             <div class = "">
-                <div class = "content" id = "token-input">
+                <div class = "content" id = "login">
 
                     <div class = "disclaimer">
-                        This is a closed beta with limited infrastructure ; as a result, I need your start.gg API key to work.
-                        You can learn <a href="https://developer.start.gg/docs/authentication/">here</a> how to obtain one (you just need a startgg account).
+                        Before you continue ...
                     </div>
-                    <input type = "text" id="apikey" name="apikey" required size="32" minlength="32" maxlength="32"/>
-                    <input type="button" id="start-button" class = "button" value="Start" >
+                    <a class="startgg-login-button" href="/oauth"><img src="assets/startgg.ico" class="startgg-login-icon"/><span>Log in with Start.gg</span></a>
+                    <div class = "flex-center vertical" style="gap: 10px;">
+                        <span>... or use an <a href="https://developer.start.gg/docs/authentication/">API Key</a></span>
+                        <div class = "flex-center horizontal token-container">
+                            <input type = "text" id="apikey" class = "token-input" name="apikey" required size="32" minlength="32" maxlength="32"/>
+                            <input type="button" id="start-button" class = "button api-start-button" value="Start"/>
+                        </div>
+                    </div>
+
                 </div>
                 <div class = "mode-column" id = "mode-select">
                     <div class = "mode-line">

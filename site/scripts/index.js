@@ -32,10 +32,10 @@ class ToggleManager {
 }
 
 
-new ToggleManager("#token-input", "#mode-select");
+new ToggleManager("#login", "#mode-select");
 
 function displayMainMenu(){
-    hide("#token-input");
+    hide("#login");
     show("#mode-select");
     show("#disconnect");
 }

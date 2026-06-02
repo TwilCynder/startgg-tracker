@@ -1,0 +1,35 @@
+.startgg-login-button {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    
+    height: 30px;
+    border-radius: 5px;
+    font-size: 20px;
+
+    background-color: #db1f57aa;
+    color: black;
+
+    padding: 10px;
+}
+
+.startgg-login-icon {
+    height: 100%;
+    width: auto;
+}
+
+.token-container {
+    height: 2em;
+    gap: 5px;
+}
+
+.token-input {
+    height: 100%;
+}
+
+.api-start-button {
+    height: 100%;
+    border-top-left-radius: 2px;
+    border-bottom-left-radius: 2px;
+}

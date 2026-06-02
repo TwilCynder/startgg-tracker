@@ -93,3 +93,17 @@ body {
     
     font-family: Consolas, 'Courier New', Courier, monospace;
 }
+
+.flex-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.horizontal {
+    flex-direction: row;
+}
+
+.vertical {
+    flex-direction: column;
+}
