@@ -1,38 +1,10 @@
 import { testTokenFactory } from "./lib/api/testToken.js"
+import { getAuthStatus } from "./lib/auth.js";
 import { show, hide, showNotif, hideNotif, showNotifTemp } from "./lib/DOMUtil.js";
 import { processEventSlug } from "./lib/util.js";
 
 let testToken = await testTokenFactory();
 
-class ToggleManager {
-    #ids;
-    #currentIdx = 0;
-
-    /**
-     * @param {...string} elementsIDs 
-     */
-    constructor(...elementsIDs){
-        this.#ids = elementsIDs;
-    }
-
-    #update(){
-        for (let i = 0; i < this.#ids.length; i++){
-            if (this.#currentIdx == i){
-                hide(this.#ids[i]);
-            } else {
-                show(this.#ids[i]);
-            }
-        }
-    }
-
-    setIndex(i){
-        this.#currentIdx = i;
-        this.#update();
-    }
-}
-
-
-new ToggleManager("#login", "#mode-select");
 
 function displayMainMenu(){
     hide("#login");
@@ -40,11 +12,14 @@ function displayMainMenu(){
     show("#disconnect");
 }
 
-async function startButton(){ 
-    let token = document.getElementById("apikey").value;
+function hideMainMenu(){
+    show("#login");
+    hide("#mode-select");
+    hide("#disconnect");
+}
 
+async function performTokenTest(token){
     let res = await testToken(token);
-
     switch (res){
         case 0:
             break;
@@ -58,6 +33,22 @@ async function startButton(){
 
     localStorage.setItem('token', token);
     displayMainMenu();
+}
+
+async function startButton(){
+    const inputElement = document.getElementById("apikey");
+    inputElement.disabled = true;
+    const buttonElement = document.getElementById("start-button");
+    buttonElement.value = "Checking ...";
+    
+    let token = inputElement.value;
+
+    try {
+        await performTokenTest(token);
+    } finally {
+        inputElement.disabled = false;
+        buttonElement.value = "Start";
+    }
 }
 
 document.getElementById("start-button").addEventListener("click", async (element) => {
@@ -119,25 +110,24 @@ document.querySelector("#player-mode .mode-area-input").addEventListener("keydow
     }
 });
 
-document.querySelector("#disconnect").addEventListener("click", () => {
-    localStorage.setItem("token", "");
-    window.location.reload();
+let authStatus;
+
+document.querySelector("#disconnect").addEventListener("click", async () => {
+    if (!authStatus) return;
+    if (authStatus.mode == "api-key"){
+        localStorage.setItem("token", "");
+    } else {
+        const response = await fetch("/logout", {
+            method: "POST"
+        });
+        if (response.status != 200){
+            console.error("Error while trying to log out : server returned", response.status, await response.json());
+        }
+    }
+    hideMainMenu();
 })
 
-let token = localStorage.getItem("token");
-if (token){
-    showNotif("Saved token found, verifying ...")
-    let res = 0//await testToken(token);
-    switch (res){
-        case 0:
-            hideNotif();
-            displayMainMenu();
-            break;
-        case 1: 
-            showNotif("Saved token was invalid");
-            break;
-        case 2: 
-            showNotifTemp("Coulnd't verify the saved token.", 5000)
-            break;
-    }
+authStatus = await getAuthStatus();
+if (authStatus){
+    displayMainMenu();
 }

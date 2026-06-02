@@ -89,7 +89,7 @@ export async function initOauth(app){
                         refresh_token,
                         grant_type: "refresh_token",
                         redirect_uri: process.env.REDIRECT_URI,
-                        scope
+                        scope: SCOPES
                     })
                 }).then(response => response.json());
 
@@ -102,9 +102,14 @@ export async function initOauth(app){
                 console.log("New token :", responseBody.access_token);
             }
 
-            return res.json({token: req.session.startgg.access_token});
+            return res.status(200).json({token: req.session.startgg.access_token});
         } else {
             return res.status(401).json({err: "Not authenticated"});
         }
+    });
+
+    app.post("/logout", async (req, res) => {
+        req.session.startgg = null;
+        res.sendStatus(200);
     })
 }
