@@ -6,7 +6,7 @@ echo "---- Webpack ----"
 cd build
 mkdir -p dist
 node webpack.js $2
-cp dist/bundle.js ../$SITE_PATH/scripts/lib/api/sgg-helper.js
+cp dist/api/* ../$SITE_PATH/scripts/lib/api/
 cd ../
 echo "---- EJS Rendering ----"
 ./build/render.sh $SITE_PATH

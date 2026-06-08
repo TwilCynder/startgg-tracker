@@ -1,8 +1,8 @@
 #Built site
-build/npm/dist
-sgg-helper.js
+build/dist
 rendered
 _site
+site/scripts/lib/api/sgg-helper.js
 
 #Node
 node_modules

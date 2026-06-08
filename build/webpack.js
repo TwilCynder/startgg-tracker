@@ -5,7 +5,7 @@ import webpack from "webpack"
 let compiler = webpack({
     entry: "./entries/sgg-helper.js",
     output: {
-        filename: "bundle.js",
+        filename: "api/sgg-helper.js",
         library: {
             type: "module"
         },
