@@ -49,6 +49,6 @@ export async function initLoginElements(validTokenCallback){
         console.log(window.location.pathname + window.location.search)
         const encodedURI = encodeURIComponent(window.location.pathname + window.location.search);
         console.log(encodedURI);
-        window.location.assign("/oauth?source=" + encodedURI);
+        window.location.assign("/startgg-oauth?source=" + encodedURI);
     })
 }

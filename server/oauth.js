@@ -21,14 +21,14 @@ function checkEnvironmentVariables(...names){
 export async function initOauth(app){
     checkEnvironmentVariables("SGG_OAUTH_CLIENT_ID", "SGG_OAUTH_REDIRECT_URI");
 
-    app.get("/oauth", (req, res) => {
+    app.get("/startgg-oauth", (req, res) => {
         console.log("Redirecting to startgg auth page")
         const source_page = req.query.source;
         console.log(`https://start.gg/oauth/authorize?client_id=${process.env.SGG_OAUTH_CLIENT_ID}&redirect_uri=${process.env.SGG_OAUTH_REDIRECT_URI}&response_type=code&scope=${SCOPES}${source_page ? '&state='+source_page : ''}`)
         res.redirect(`https://start.gg/oauth/authorize?client_id=${process.env.SGG_OAUTH_CLIENT_ID}&redirect_uri=${process.env.SGG_OAUTH_REDIRECT_URI}&response_type=code&scope=${SCOPES}${source_page ? '&state='+source_page : ''}`);
     });
 
-    app.get("/callback", async (req, res) => {
+    app.get("/startgg-oauth-callback", async (req, res) => {
         console.log("Redirected to the OAuth callback with query", req.query);
 
         const code = req.query.code;
