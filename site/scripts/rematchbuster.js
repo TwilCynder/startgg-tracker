@@ -391,7 +391,7 @@ init(goCallback)
 let token = localStorage.getItem("token");
 if (!token){
     console.error("No token. Going back to homepage");
-    window.location.href = "./index.html"
+    window.location.href = "/index.html"
 }
 
 let client = new RateLimitingSGGHelperClient("Bearer " + token);

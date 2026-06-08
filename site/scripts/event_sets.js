@@ -75,7 +75,7 @@ function GOCallback(input){
         return;
     }
 
-    window.location.href = "./event_sets.html?event=" + slug 
+    window.location.href = "/event_sets.html?event=" + slug 
 }
 
 const inputElement = document.querySelector(".event-input");

@@ -90,7 +90,7 @@ let token = localStorage.getItem("token")
 
 if (!token){
     console.log("No token. Going back to homepage");
-    window.location.href = "./index.html"
+    window.location.href = "/index.html"
 }
 
 let searchParameters = new URLSearchParams(window.location.search);
@@ -118,7 +118,7 @@ function GOCallback(input){
         return;
     }
 
-    window.location.href = "./station_sets.html?event=" + slug 
+    window.location.href = "/station_sets.html?event=" + slug 
 }
 
 const inputElement = document.querySelector(".event-input");

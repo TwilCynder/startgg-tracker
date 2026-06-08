@@ -14,6 +14,8 @@ server.use(session({
     resave: false, 
 }))
 server.use(express.static("site"));
+server.use(express.static("site/pages/"));
+server.use(express.static("site/pages/rendered"));
 
 initOauth(server);
 

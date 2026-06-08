@@ -27,7 +27,7 @@ function eventModeGOCallback(){
         return;
     }
 
-    window.location.href = "./pages/rendered/event_sets.html?event=" + slug 
+    window.location.href = "/event_sets.html?event=" + slug 
 }
 document.querySelector("#event-mode .button").addEventListener("click", eventModeGOCallback)
 document.querySelector("#event-mode .mode-area-input").addEventListener("keydown", (event) => {
@@ -46,7 +46,7 @@ function stationModeGOCallback(){
         return;
     }
 
-    window.location.href = "./pages/station_sets.html?event=" + slug;
+    window.location.href = "/station_sets.html?event=" + slug;
 }
 document.querySelector(".station-mode .button").addEventListener("click", stationModeGOCallback);
 document.querySelector(".station-mode .input").addEventListener("keypress", (event) => {
