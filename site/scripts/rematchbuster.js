@@ -1,6 +1,7 @@
 import { RateLimitingSGGHelperClient, StartGGDelayQueryLimiter } from "./lib/api/sgg-helper.js";
 import { get_rematches, getSets, getStreamedMatchesForPlayer, getStreamedSetFilterFunction } from "./lib/check_rematches.js";
 import { show, hide, toggleClass } from "./lib/DOMUtil.js";
+import { checkLogin } from "./lib/loginCheck.js";
 import { deep_get } from "./lib/util.js";
 import { handleSelectedRadioButton, init, Request } from "./rematchbuster-common.js";
 
@@ -388,11 +389,10 @@ window.addEventListener("popstate", onPopstate);
 init(goCallback)
 
 //-- Various init
-let token = localStorage.getItem("token");
-if (!token){
-    console.error("No token. Going back to homepage");
-    window.location.href = "/index.html"
-}
+
+let token = await checkLogin();
+
+console.log(token);
 
 let client = new RateLimitingSGGHelperClient("Bearer " + token);
 let limiter = new StartGGDelayQueryLimiter();
@@ -414,6 +414,12 @@ if (request){
 
 
 //-- Graveyard
+
+/*let token = localStorage.getItem("token");
+if (!token){
+    console.error("No token. Going back to homepage");
+    window.location.href = "/index.html"
+}*/
 
 /*
 function copyResult(result){

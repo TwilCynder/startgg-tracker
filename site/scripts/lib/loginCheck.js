@@ -30,7 +30,7 @@ function hideLoginOverlay(){
     hide(".login-overlay-container");
 }
 
-export async function checkLogin(client){
+export async function checkLogin(){
     const authStatus = await getAuthStatus();
     if (authStatus && authStatus.token){
         return authStatus.token;
@@ -50,8 +50,4 @@ export async function checkLogin(client){
         
         return token;
     }
-}
-
-export function initLoginCheck(client = null){
-    return initLoginElements(() => {});
 }

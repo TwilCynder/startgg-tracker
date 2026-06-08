@@ -83,15 +83,12 @@ async function loadStationSets(client, slug, config){
 
 // -------- Loading
 
-let config = await fetch("../config.json")
-    .then(response => response.json())
+let [config, token] = await Promise.all([
+    fetch("../config.json").then(response => response.json()),
+    checkLogin()
+]);
 
-let token = localStorage.getItem("token")
-
-if (!token){
-    console.log("No token. Going back to homepage");
-    window.location.href = "/index.html"
-}
+console.log(token);
 
 let searchParameters = new URLSearchParams(window.location.search);
 let event = searchParameters.get("event");
