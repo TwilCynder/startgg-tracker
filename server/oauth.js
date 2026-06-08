@@ -23,8 +23,9 @@ export async function initOauth(app){
 
     app.get("/oauth", (req, res) => {
         console.log("Redirecting to startgg auth page")
-        const target_page = req.query.page;
-        res.redirect(`https://start.gg/oauth/authorize?client_id=${process.env.SGG_OAUTH_CLIENT_ID}&redirect_uri=${process.env.SGG_OAUTH_REDIRECT_URI}&response_type=code&scope=${SCOPES}${target_page ? '&state='+target_page : ''}`);
+        const source_page = req.query.source;
+        console.log(`https://start.gg/oauth/authorize?client_id=${process.env.SGG_OAUTH_CLIENT_ID}&redirect_uri=${process.env.SGG_OAUTH_REDIRECT_URI}&response_type=code&scope=${SCOPES}${source_page ? '&state='+source_page : ''}`)
+        res.redirect(`https://start.gg/oauth/authorize?client_id=${process.env.SGG_OAUTH_CLIENT_ID}&redirect_uri=${process.env.SGG_OAUTH_REDIRECT_URI}&response_type=code&scope=${SCOPES}${source_page ? '&state='+source_page : ''}`);
     });
 
     app.get("/callback", async (req, res) => {
@@ -59,11 +60,12 @@ export async function initOauth(app){
             expires_in: responseBody.expires_in
         }
 
-        let target_page = req.query.state;
-        if (target_page && target_page != "undefined"){
-            target_page = decodeURIComponent(target_page);
-            console.log("Target page :", target_page);
-            res.redirect(target_page);
+        let source_page = req.query.state;
+        console.log(source_page)
+        if (source_page && source_page != "undefined"){
+            source_page = decodeURIComponent(source_page);
+            console.log("Target page :", source_page);
+            res.redirect(source_page);
         } else {
             res.redirect("/");
         }

@@ -44,4 +44,11 @@ export async function initLoginElements(validTokenCallback){
             await startButton();
         }
     });
+
+    document.querySelector(".startgg-login-button").addEventListener("click", () => {
+        console.log(window.location.pathname + window.location.search)
+        const encodedURI = encodeURIComponent(window.location.pathname + window.location.search);
+        console.log(encodedURI);
+        window.location.assign("/oauth?source=" + encodedURI);
+    })
 }
