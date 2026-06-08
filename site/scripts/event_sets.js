@@ -6,7 +6,7 @@ import { getCalledSetsFactory } from "./lib/api/getCalledSets.js";
 import { resetContent, addSets } from "./lib/tracker_pages.js";
 import { PresentableError, presentError } from "./lib/error.js";
 import { getAuthStatus } from "./lib/auth.js";
-import { checkLogin } from "./loginCheck.js";
+import { checkLogin } from "./lib/loginCheck.js";
 
 const getCalledSets = await getCalledSetsFactory();
 

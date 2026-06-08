@@ -1,6 +1,6 @@
-import { getAuthStatus } from "./lib/auth.js";
-import { hide, show } from "./lib/DOMUtil.js";
-import { initLoginElements } from "./lib/loginElements.js";
+import { getAuthStatus } from "./auth.js";
+import { hide, show } from "./DOMUtil.js";
+import { initLoginElements } from "./loginElements.js";
 
 class Lock {
     #resolve;

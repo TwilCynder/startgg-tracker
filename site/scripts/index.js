@@ -27,7 +27,7 @@ function eventModeGOCallback(){
         return;
     }
 
-    window.location.href = "./pages/event_sets.html?event=" + slug 
+    window.location.href = "./pages/rendered/event_sets.html?event=" + slug 
 }
 document.querySelector("#event-mode .button").addEventListener("click", eventModeGOCallback)
 document.querySelector("#event-mode .mode-area-input").addEventListener("keydown", (event) => {
