@@ -5,6 +5,7 @@
     gap: 10px;
     
     height: 30px;
+    width: fit-content;
     border-radius: 5px;
     font-size: 20px;
 
@@ -26,10 +27,44 @@
 
 .token-input {
     height: 100%;
+    box-sizing: border-box;
 }
 
 .api-start-button {
     height: 100%;
     border-top-left-radius: 2px;
     border-bottom-left-radius: 2px;
+}
+
+.login-overlay-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 100vw;
+
+    display: none;
+    /*display: flex; Controlled by script*/
+    justify-content: center;
+    align-items: center;
+}
+
+.login-overlay {
+    opacity: 50%;
+    background-color: black;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+}
+
+.login-container {
+    gap: 10px;
+    z-index: 10;
+    
+    opacity: 100%;
+    background-color: white;
+    border-radius: 20px;
+
+    padding: 20px;
+    
 }

@@ -1,10 +1,7 @@
-import { testTokenFactory } from "./lib/api/testToken.js"
 import { getAuthStatus } from "./lib/auth.js";
 import { show, hide, showNotif, hideNotif, showNotifTemp } from "./lib/DOMUtil.js";
+import { initLoginElements } from "./lib/loginElements.js";
 import { processEventSlug } from "./lib/util.js";
-
-let testToken = await testTokenFactory();
-
 
 function displayMainMenu(){
     hide("#login");
@@ -18,47 +15,7 @@ function hideMainMenu(){
     hide("#disconnect");
 }
 
-async function performTokenTest(token){
-    let res = await testToken(token);
-    switch (res){
-        case 0:
-            break;
-        case 1:
-            alert("There seems to be a problem with the start.gg API. Please try again later");
-            return;
-        case 2:
-            alert("The API token you provided is invalid. Please provide a valid API token")
-            return;
-    }
-
-    localStorage.setItem('token', token);
-    displayMainMenu();
-}
-
-async function startButton(){
-    const inputElement = document.getElementById("apikey");
-    inputElement.disabled = true;
-    const buttonElement = document.getElementById("start-button");
-    buttonElement.value = "Checking ...";
-    
-    let token = inputElement.value;
-
-    try {
-        await performTokenTest(token);
-    } finally {
-        inputElement.disabled = false;
-        buttonElement.value = "Start";
-    }
-}
-
-document.getElementById("start-button").addEventListener("click", async (element) => {
-    await startButton();
-})
-document.getElementById("apikey").addEventListener("keypress", async (event) => {
-    if (event.key == "Enter"){
-        await startButton();
-    }
-})
+await initLoginElements(displayMainMenu);
 
 function eventModeGOCallback(){
     /**@type {string} */

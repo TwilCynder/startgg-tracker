@@ -227,10 +227,6 @@ body {
     text-wrap: pretty;
 }
 
-a {
-    text-decoration: none;
-}
-
 .disconnect {
     position: absolute;
     top: 15px;

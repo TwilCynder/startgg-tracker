@@ -4,10 +4,16 @@ import { initLayout } from "./lib/sets_display.js";
 import { processEventSlug } from "./lib/util.js";
 import { getCalledSetsFactory } from "./lib/api/getCalledSets.js";
 import { resetContent, addSets } from "./lib/tracker_pages.js";
-import { presentError } from "./lib/error.js";
+import { PresentableError, presentError } from "./lib/error.js";
+import { getAuthStatus } from "./lib/auth.js";
+import { checkLogin } from "./loginCheck.js";
+
 const getCalledSets = await getCalledSetsFactory();
 
 export async function loadEventSets(client, slug, config){
+    if (!slug || slug == ""){
+        throw new PresentableError("Please specify an event's URL or slug")
+    }
 
     let event = await getCalledSets(slug, client);
 
@@ -28,15 +34,21 @@ export async function loadEventSets(client, slug, config){
 
 }
 
-let config = await fetch("../config.json")
-    .then(response => response.json())
+let [config, token] = await Promise.all([
+    fetch("../config.json").then(response => response.json()),
+    checkLogin()
+]);
 
+console.log(token);
+
+/*
 let token = localStorage.getItem("token")
 
 if (!token){
     console.log("No token. Going back to homepage");
-    window.location.href = "./index.html"
+    window.location.href = "../index.html"
 }
+*/
 
 let searchParameters = new URLSearchParams(window.location.search);
 let event = searchParameters.get("event");
@@ -48,7 +60,9 @@ async function update(){
         await loadEventSets(client, event, config);
     } catch (err){
         presentError(err);
+        return false;
     }
+    return true;
 }
 
 document.querySelector(".event-input").value = event;
@@ -74,11 +88,13 @@ inputElement.addEventListener("keydown", (event) => {
 })
 document.querySelector(".event-input-container .button").addEventListener("click", () => {
     GOCallback(inputElement)
-})
+});
 
+function startTimeout(){
+    setTimeout(async () => {
+        if (await update()) startTimeout();
+    }, 5000);
+}
 
 initLayout();
-update();
-setInterval(() => {
-    update();
-}, 5000);
+if (await update()) startTimeout();

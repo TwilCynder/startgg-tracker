@@ -14,7 +14,7 @@ export function addSets(sets){
     let html = "";
     for (let set of sets){
         console.log(set.state == 2 ? "Started" : "Called", set.slots[0].entrant.name, set.slots[1].entrant.name);
-        html += makeSetHTML(set, index);
+        html += makeSetHTML(set, i);
 
         i++;
     }

@@ -1,11 +1,12 @@
 import { SGGHelperClient, loadQuery } from "./sgg-helper.js";
+import queryManager from "../queryManager.js";
 
 /**
  * Tests whether a given token is valid.
  * @returns 
  */
 export async function testTokenFactory(){
-    let test_query = await loadQuery(new URL("./schemas/DummyRequest.graphql", import.meta.url));
+    let query = await queryManager.tryQuery("testToken", new URL("./schemas/DummyRequest.graphql", import.meta.url));
 
     /**
      * @param {string} token
@@ -16,7 +17,7 @@ export async function testTokenFactory(){
      */
     return (async function testToken(token){
         try {
-            let res = await test_query.execute(new SGGHelperClient("Bearer " + token));
+            let res = await query.execute(new SGGHelperClient("Bearer " + token));
             console.log(res);
             return 0;
         } catch (err){
