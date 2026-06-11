@@ -25,6 +25,7 @@
   "type": "module",
   "dependencies": {
     "express": "^5.2.1",
-    "express-session": "^1.19.0"
+    "express-session": "^1.19.0",
+    "startgg-oauth-helper": "^1.0.0"
   }
 }
