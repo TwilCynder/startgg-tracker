@@ -13,8 +13,6 @@ export function FitText(target) {
     
         textElement.css("transform", "");
         let scaleX = 1;
-    
-        console.log(textElement[0].scrollWidth);
 
         if (textElement[0].scrollWidth * scaleX > target.width()) {
             scaleX = target.width() / textElement[0].scrollWidth;

@@ -3,12 +3,12 @@ import { SGGHelperClient } from "./lib/api/sgg-helper.js";
 import { processEventSlug } from "./lib/util.js";
 import { getStationSetsFactory } from "./lib/api/getStationSets.js";
 import { initLayout, makeSetHTML, resetContent } from "./lib/sets_display.js";
-import { PresentableError, presentError } from "./lib/error.js";
+import { presentError } from "./lib/error.js";
 import { FitText } from "./lib/DOMUtil.js";
 import { fitPlayerNames } from "./lib/tracker_pages.js";
 import { SwitchElement } from "./lib/switchElement.js";
 import { checkLogin } from "./lib/loginCheck.js";
-import { ContentSwitcher, LoadingContentManager } from "./lib/contentSwitcher.js";
+import { LoadingContentManager } from "./lib/contentSwitcher.js";
 
 const contentManager = new LoadingContentManager;
 
@@ -136,9 +136,12 @@ switchElement.init(updateContent);
 initLayout();
 update();
 setInterval(() => {
-    update();
-    throw new PresentableError("This is an error happeneing inside the update function");
-}, 60000);
+    try {
+        update();
+    } catch (error){
+        presentError(error);
+    }
+}, 20000);
 
 } catch (error){
     contentManager.showError(error);

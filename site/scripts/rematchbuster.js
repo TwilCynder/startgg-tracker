@@ -1,11 +1,16 @@
 import { RateLimitingSGGHelperClient, StartGGDelayQueryLimiter } from "./lib/api/sgg-helper.js";
 import { get_rematches, getSets, getStreamedMatchesForPlayer, getStreamedSetFilterFunction } from "./lib/check_rematches.js";
+import { LoadingContentManager } from "./lib/contentSwitcher.js";
 import { show, hide, toggleClass } from "./lib/DOMUtil.js";
 import { checkLogin } from "./lib/loginCheck.js";
 import { deep_get, getDaysSinceTimestamp } from "./lib/util.js";
 import { handleSelectedRadioButton, init, Request } from "./rematchbuster-common.js";
 
+const contentManager = new LoadingContentManager;
+
 //------ Functions --------
+
+try {
 
 /** @type {Request} */
 let currentRequest = null;
@@ -433,6 +438,9 @@ if (request){
     handleRadioButtons("duration-mode");
 }
 
+} catch (err){
+    contentManager.showError(err);
+}
 
 
 //-- Graveyard
