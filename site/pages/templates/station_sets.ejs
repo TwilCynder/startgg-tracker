@@ -31,7 +31,8 @@
             </div>
         </div>
         <div class = "content-container">
-            <div class ="loading-container">
+            <%- include("./fragments/loading-error.html") %>
+            <div class ="loading-display-container loading">
                 <div class="loader"></div>
                 <div class = "loading-progress-line">Loading matches <span id="loading-progress">...</span></div>
                 <div class="loading-text">

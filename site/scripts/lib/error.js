@@ -5,8 +5,10 @@ export class PresentableError extends Error {
 }
 
 export function presentError(err){
-    if (err instanceof PresentableError){
-        alert(err);
-    }
     console.error(err);
+    if (err instanceof PresentableError){
+        alert(err.message);
+        return err.message;
+    }
+    return "Internal error"
 }

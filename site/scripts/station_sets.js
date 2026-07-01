@@ -3,11 +3,17 @@ import { SGGHelperClient } from "./lib/api/sgg-helper.js";
 import { processEventSlug } from "./lib/util.js";
 import { getStationSetsFactory } from "./lib/api/getStationSets.js";
 import { initLayout, makeSetHTML, resetContent } from "./lib/sets_display.js";
-import { presentError } from "./lib/error.js";
+import { PresentableError, presentError } from "./lib/error.js";
 import { FitText } from "./lib/DOMUtil.js";
 import { fitPlayerNames } from "./lib/tracker_pages.js";
-import { show, hide } from "./lib/DOMUtil.js";
 import { SwitchElement } from "./lib/switchElement.js";
+import { checkLogin } from "./lib/loginCheck.js";
+import { ContentSwitcher, LoadingContentManager } from "./lib/contentSwitcher.js";
+
+const contentManager = new LoadingContentManager;
+
+try {
+
 const getStationSets = await getStationSetsFactory();
 
 let content = {
@@ -55,8 +61,7 @@ function displayList(list){
 
 function updateContent(streams){
     if (!loaded) return;
-    hide(".loading-container");
-    show(".stations-content");
+    contentManager.showContent();
     if (streams){
         displayList(content.streams);
     } else {
@@ -88,7 +93,7 @@ let [config, token] = await Promise.all([
     checkLogin()
 ]);
 
-console.log(token);
+//console.log(token);
 
 let searchParameters = new URLSearchParams(window.location.search);
 let event = searchParameters.get("event");
@@ -98,11 +103,7 @@ let client = new SGGHelperClient("Bearer " + token);
 // -------- Callbacks
 
 async function update(){
-    try {
-        await loadStationSets(client, event, config);
-    } catch (err){
-        presentError(err);
-    }
+    await loadStationSets(client, event, config);
 }
 
 document.querySelector(".event-input").value = event;
@@ -136,4 +137,9 @@ initLayout();
 update();
 setInterval(() => {
     update();
+    throw new PresentableError("This is an error happeneing inside the update function");
 }, 60000);
+
+} catch (error){
+    contentManager.showError(error);
+}
