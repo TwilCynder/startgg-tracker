@@ -12,7 +12,7 @@ export class Request {
      * @param {string} streamMode
      * @param {boolean} invert 
      */
-    constructor(slug, timePeriod = {}, filters, ignoredEvents = [], streamMode, invert, countEvents, streamName){
+    constructor(slug, timePeriod = {}, filters, ignoredEvents = [], streamMode, invert, countEvents, streamName, timeSinceLast){
         this.slug = slug;
         this.date = timePeriod.date;
         this.duration = timePeriod.duration;
@@ -22,6 +22,7 @@ export class Request {
         this.streamName = streamName;
         this.invert = invert;
         this.countEvents = countEvents;
+        this.timeSinceLast = timeSinceLast;
     }
 
     getURL(){
@@ -38,6 +39,7 @@ export class Request {
         if (this.streamName) params.set("streamName", this.streamName);
         if (this.invert) params.set("invert", "yes");
         if (this.countEvents) params.set("countEvents", "yes");
+        if (this.timeSinceLast) params.set("timeSinceLast", "yes");
 
         return "?" + params.toString();
     }
@@ -79,7 +81,8 @@ export class Request {
             params.get("streamMode"),
             !!params.get("invert"),
             !!params.get("countEvents"),
-            params.get("streamName")
+            params.get("streamName"),
+            !!params.get("timeSinceLast")
         );
     }
 
@@ -95,7 +98,8 @@ export class Request {
             this.streamMode != other.streamMode || 
             this.streamName != other.streamName ||
             this.invert != other.invert ||
-            this.countEvents != other.countEvents
+            this.countEvents != other.countEvents ||
+            this.timeSinceLast != other.timeSinceLast
         ){
             return 1
         }
@@ -130,8 +134,9 @@ export function getRequest(){
         window.currentIgnoredEvents,
         streamMode,
         document.querySelector("#invert-mode").checked,
-        document.querySelector("#event-count-mode").checked,
-        streamName
+        document.querySelector("#event-count-mode").checked, 
+        streamName,
+        document.querySelector("#time-since-last").checked
     );
 }
 window.getRequest = getRequest;
@@ -148,7 +153,6 @@ function numberInputOnChange(el){
         }
       } 
 }
-
 
 function radioButtonOnChanged(element){
     handleRadioButtons(element.id);
@@ -232,7 +236,7 @@ export function init(goCallback){
             event.preventDefault();
             GO(goCallback);
         }
-    })
+    });
 
     const streamNameElement = document.querySelector(".stream-name-container");
     document.querySelector("#stream-mode").addEventListener("change", (event) => {

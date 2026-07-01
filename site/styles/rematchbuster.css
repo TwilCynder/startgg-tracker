@@ -24,7 +24,6 @@ body {
 
     width: 100%;
 }
-
 .result {
     display: flex;
     flex-direction: column;
@@ -36,6 +35,11 @@ body {
 
     transition: width 0.3 ease;
 }
+
+.low-gap.result {
+    gap: 0px;
+}
+
 
 .result-title {
     width: 100%;
@@ -50,6 +54,19 @@ body {
 .entry-title {
     font-weight: bold;
     cursor: pointer;
+    display: flex;
+    align-items: flex-start;
+}
+
+.entry-name {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.since-last {
+    font-size: 0.8em;
+    font-weight: normal;
 }
 
 .entry-details {

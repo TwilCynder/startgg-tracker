@@ -2,7 +2,7 @@ import { RateLimitingSGGHelperClient, StartGGDelayQueryLimiter } from "./lib/api
 import { get_rematches, getSets, getStreamedMatchesForPlayer, getStreamedSetFilterFunction } from "./lib/check_rematches.js";
 import { show, hide, toggleClass } from "./lib/DOMUtil.js";
 import { checkLogin } from "./lib/loginCheck.js";
-import { deep_get } from "./lib/util.js";
+import { deep_get, getDaysSinceTimestamp } from "./lib/util.js";
 import { handleSelectedRadioButton, init, Request } from "./rematchbuster-common.js";
 
 //------ Functions --------
@@ -29,7 +29,7 @@ function updateUIFromRequest(request){
         document.querySelector(".input.event-filters").value = request.eventFilters
     }
     document.querySelector("#invert-mode").checked = request.invert
-    document.querySelector("#event-count-mode");
+    document.querySelector("#event-count-mode").checked = request.countEvents;
     document.querySelector("#stream-mode").value = request.streamMode ?? "none";
     if (request.streamMode.includes("stream")){
         show(".stream-name-container");
@@ -37,6 +37,7 @@ function updateUIFromRequest(request){
     } else {
         hide(".stream-name-container");
     }
+    document.querySelector("#time-since-last").value = request.timeSinceLast;
 }
 
 function showLoader(){
@@ -62,13 +63,19 @@ function makeStreamHTML(match){
     return `<br > <a class="stream ninja-link" href="https://twitch.tv/${match.stream.streamName}" target="_blank">streamed on <span class="stream-name">${match.stream.streamName}</span></a>`
 }
 
-function makePairsListHTML(result, stream){
-    return makeResultHTML(result, (entry) => `${entry.players[0].name} vs ${entry.players[1].name}`, stream);
+function makePairsListHTML(result, stream, displayTimeSinceLast){
+    return makeResultHTML(result, (entry) => `${entry.players[0].name} vs ${entry.players[1].name}`, stream, displayTimeSinceLast);
 }
 
-function makePlayersListHTML(result, stream){
+function makePlayersListHTML(result, stream, displayTimeSinceLast){
     console.log(result);
-    return makeResultHTML(result, (entry) => entry.player.name, stream);
+    return makeResultHTML(result, (entry) => entry.player.name, stream, displayTimeSinceLast);
+}
+
+function getSinceLastString(entry){
+    const lastMatch = entry.matches[0];
+    const days = getDaysSinceTimestamp(lastMatch.completedAt);
+    return `<div class="since-last">(${days.toFixed(0)} days since last set)</div>`
 }
 
 /**
@@ -77,9 +84,10 @@ function makePlayersListHTML(result, stream){
  * @
  * @param {(entry: T) => string} entryNameFunction 
  * @param {boolean} stream 
+ * @param {boolean} displayTimeSinceLast 
  * @returns 
  */
-function makeResultHTML(result, entryNameFunction, stream){
+function makeResultHTML(result, entryNameFunction, stream, displayTimeSinceLast){
     let html = ""
     for (let entry of result){
         const n = entry.n ?? entry.matches.length;
@@ -91,14 +99,18 @@ function makeResultHTML(result, entryNameFunction, stream){
         } else {
             html += `
                 <div class = "entry-title" onclick="entryTitleOnClick(this)">
-                    <span class ="dropdown-button-sideways">►</span>${entryNameFunction(entry)} - ${nText}    
+                    <span class="dropdown-button-sideways">►</span><div class="entry-name">
+                        ${entryNameFunction(entry)} - ${nText}    
+                        ${displayTimeSinceLast ? getSinceLastString(entry) : ""}
+                    </div>
                 </div>
                 <div class ="entry-details">
                 ${
                     entry.matches.map(match => {
                         const date = new Date(match.completedAt * 1000);
                         return `
-                            <div data-event-slug="${match.event.slug}"><a target="_blank" class = "ninja-link" title="Event : ${match.event.slug}" href = "https://start.gg/${match.event.slug}/set/${match.id}">${match.event.tournament.name} - ${match.event.name} (${date.getFullYear()}/${date.getMonth()}/${date.getDate()}) - ${match.fullRoundText} </a><span class="cross-button" onclick="onCrossClicked(this)" title="Remove this event from everyone's results">❌</span> ${stream && match.stream ? makeStreamHTML(match) : ""}</div><br>
+                            <div data-event-slug="${match.event.slug}"><a target="_blank" class = "ninja-link" title="Event : ${match.event.slug}" href = "https://start.gg/${match.event.slug}/set/${match.id}">${match.event.tournament.name} - ${match.event.name} (${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}) - ${match.fullRoundText} </a><span class="cross-button" onclick="onCrossClicked(this)" title="Remove this event from everyone's results">❌</span> ${stream && match.stream ? makeStreamHTML(match) : ""}</div>
+
                         `
                     }
 
@@ -160,7 +172,7 @@ const resultFunctions = {
         let result = get_rematches(players, getFiltersArray(request));
         result = sortResultList(result, request);
         //result = applyFilters(result, request);
-        return makePairsListHTML(result, false);
+        return makePairsListHTML(result, false, request.timeSinceLast);
     },
     "stream-pairs": (players, request) => {
         let result = get_rematches(players, getFiltersArray(request));
@@ -175,8 +187,8 @@ const resultFunctions = {
         result = sortResultList(result, request);
         
         let html = request.streamName ?
-            `<h3 class="result-title">Sets streamed on ${request.streamName} only</h3>` + makePairsListHTML(result, false) :
-            '<h3 class="result-title">Steamed sets only</h3>' + makePairsListHTML(result, true)
+            `<h3 class="result-title">Sets streamed on ${request.streamName} only</h3>` + makePairsListHTML(result, false, request.timeSinceLast) :
+            '<h3 class="result-title">Steamed sets only</h3>' + makePairsListHTML(result, true, request.timeSinceLast)
 
         return html;
     },
@@ -185,8 +197,8 @@ const resultFunctions = {
         result = sortResultList(result, request);
         
         let html = request.streamName ? 
-            `<h3 class="result-title">Stream appearances on ${request.streamName}</h3>` + makePlayersListHTML(result, false) : 
-            '<h3 class="result-title">Stream appearances</h3>' + makePlayersListHTML(result, true);
+            `<h3 class="result-title">Stream appearances on ${request.streamName}</h3>` + makePlayersListHTML(result, false, request.timeSinceLast) : 
+            '<h3 class="result-title">Stream appearances</h3>' + makePlayersListHTML(result, true, request.timeSinceLast);
 
         return html;
     }
@@ -194,6 +206,10 @@ const resultFunctions = {
 
 function updateResultHTML(players, request){
     console.log(request)
+    const resultElement = document.querySelector(".result");
+    if (request.timeSinceLast) resultElement.classList.add("low-gap")
+    else resultElement.classList.remove("low-gap")
+
     const mode = request.streamMode ?? "none";
     const f = resultFunctions[mode];
     if (!f){
@@ -202,7 +218,7 @@ function updateResultHTML(players, request){
     }
     let html = f(players, request);
 
-    document.querySelector(".result").innerHTML = html;
+    resultElement.innerHTML = html;
     showResult();
 }
 
@@ -375,6 +391,11 @@ function onEventCountModeChanged(event){
     refreshResult(currentRequest);
 }
 
+function onTimeSinceLastChanged(event){
+    currentRequest.timeSinceLast = event.target.checked;
+    refreshResult(currentRequest);
+}
+
 //------ SCRIPT -----
 
 //-- Page init
@@ -383,6 +404,7 @@ function onEventCountModeChanged(event){
 document.querySelector("#stream-mode").addEventListener("change", onStreamModeChanged);
 document.querySelector("#invert-mode").addEventListener("change", onInvertModeChanged);
 document.querySelector("#event-count-mode").addEventListener("change", onEventCountModeChanged);
+document.querySelector("#time-since-last").addEventListener("change", onTimeSinceLastChanged);
 
 window.addEventListener("popstate", onPopstate);
 

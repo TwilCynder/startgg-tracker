@@ -30,10 +30,9 @@ export async function initOauth(app){
         token: "/token"
     }, {
         tokenEndpoint: true,
-        state: (req) => req.query.source,
+        state: (req) => encodeURIComponent(req.query.source),
         finalCallback: (req, res) => {
             let source_page = req.query.state;
-            console.log(source_page)
             if (source_page && source_page != "undefined"){
                 source_page = decodeURIComponent(source_page);
                 console.log("Target page :", source_page);

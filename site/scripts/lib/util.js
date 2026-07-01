@@ -52,3 +52,15 @@ export function deep_get(obj, path, def = null){
 export function compareStrArray(arr1, arr2){
     return arr1.length == arr2.length && arr1.every((elt, index) => elt == arr2[index]);
 }
+
+/**
+ * @param {Date} date 
+ */
+export function getDaysInDate(date){
+    return date.getTime() / 86400000; //1000 * 3600 * 24
+}
+
+
+export function getDaysSinceTimestamp(timestamp){
+    return getDaysInDate(new Date(Date.now() - timestamp * 1000))
+}
