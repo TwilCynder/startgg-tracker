@@ -8,7 +8,8 @@ export function presentError(err){
     console.error(err);
     if (err instanceof PresentableError){
         alert(err.message);
-        return err.message;
+    } else {
+        alert("Internal error");
     }
-    return "Internal error"
+    
 }

@@ -1,7 +1,8 @@
 import { getAuthStatus } from "./lib/auth.js";
 import { show, hide, showNotif, hideNotif, showNotifTemp } from "./lib/DOMUtil.js";
 import { initLoginElements } from "./lib/loginElements.js";
-import { processEventSlug } from "./lib/util.js";
+import { goToPageWithInputEvent } from "./lib/UICommon.js";
+import { processEventIdentifier } from "./lib/util.js";
 
 function displayMainMenu(){
     hide("#login");
@@ -18,16 +19,7 @@ function hideMainMenu(){
 await initLoginElements(displayMainMenu);
 
 function eventModeGOCallback(){
-    /**@type {string} */
-    let slug = document.querySelector("#event-mode .mode-area-input").value;
-    
-    slug = processEventSlug(slug);
-    if (!slug){
-        alert("Please enter a valid event URL. Go to the page of your event on start.gg and copy the content of the URL bar.");
-        return;
-    }
-
-    window.location.href = "/event_sets.html?event=" + slug 
+    goToPageWithInputEvent(document.querySelector("#event-mode .mode-area-input"), "event_sets");
 }
 document.querySelector("#event-mode .button").addEventListener("click", eventModeGOCallback)
 document.querySelector("#event-mode .mode-area-input").addEventListener("keydown", (event) => {
@@ -37,16 +29,8 @@ document.querySelector("#event-mode .mode-area-input").addEventListener("keydown
 })
 
 function stationModeGOCallback(){
-    /**@type {string} */
-    let slug = document.querySelector(".station-mode .input").value;
-
-    slug = processEventSlug(slug);
-    if (!slug){
-        alert("Please enter a valid event URL. Go to the page of your event on start.gg and copy the content of the URL bar.");
-        return;
-    }
-
-    window.location.href = "/station_sets.html?event=" + slug;
+    console.log("allo")
+    goToPageWithInputEvent(document.querySelector(".station-mode .input"), "station_sets");
 }
 document.querySelector(".station-mode .button").addEventListener("click", stationModeGOCallback);
 document.querySelector(".station-mode .input").addEventListener("keypress", (event) => {

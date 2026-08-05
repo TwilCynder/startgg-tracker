@@ -1,5 +1,5 @@
-query CalledSets($slug: String) {
-	event(slug: $slug){
+query CalledSets($slug: String, $id: ID) {
+	event(slug: $slug, id: $id){
     sets(page: 0, perPage: 100,filters: {
       state: [2, 6]
     }){

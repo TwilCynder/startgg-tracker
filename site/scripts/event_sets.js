@@ -1,63 +1,43 @@
 
 import { SGGHelperClient } from "./lib/api/sgg-helper.js";
 import { initLayout } from "./lib/sets_display.js";
-import { processEventSlug } from "./lib/util.js";
+import { getEventIdentifierFromParams, ID, Slug } from "./lib/util.js";
 import { getCalledSetsFactory } from "./lib/api/getCalledSets.js";
 import { resetContent, addSets } from "./lib/tracker_pages.js";
 import { PresentableError, presentError } from "./lib/error.js";
 import { getAuthStatus } from "./lib/auth.js";
 import { checkLogin } from "./lib/loginCheck.js";
+import { goToPageWithInputEvent } from "./lib/UICommon.js";
 
 const getCalledSets = await getCalledSetsFactory();
 
-export async function loadEventSets(client, slug, config){
-    if (!slug || slug == ""){
+async function loadEventSets(client, eventVariables, config){
+    if (!eventVariables){
         throw new PresentableError("Please specify an event's URL or slug")
     }
 
-    let event = await getCalledSets(slug, client);
+    let data = await getCalledSets(eventVariables, client);
 
     resetContent();
 
     //test
     //event.sets.nodes = Array(5).fill(event.sets.nodes).flat()
 
-    let colsN = Math.ceil(Math.sqrt(event.sets.nodes.length));
+    let colsN = Math.ceil(Math.sqrt(data.sets.nodes.length));
 
     if (window.screen.width > window.screen.height){
         document.querySelector(".content").style.setProperty("grid-template-columns", "1fr ".repeat(colsN > 0 ? colsN : 1))
     } else {
-        document.querySelector(".content").style.setProperty("grid-template-columns", "1fr " + (event.sets.nodes.length > 4 ? "1fr" : ""))
+        document.querySelector(".content").style.setProperty("grid-template-columns", "1fr " + (data.sets.nodes.length > 4 ? "1fr" : ""))
     }
     
-    addSets(event.sets.nodes);
+    addSets(data.sets.nodes);
 
 }
 
-let [config, token] = await Promise.all([
-    fetch("../config.json").then(response => response.json()),
-    checkLogin()
-]);
-
-console.log(token);
-
-/*
-let token = localStorage.getItem("token")
-
-if (!token){
-    console.log("No token. Going back to homepage");
-    window.location.href = "../index.html"
-}
-*/
-
-let searchParameters = new URLSearchParams(window.location.search);
-let event = searchParameters.get("event");
-
-let client = new SGGHelperClient("Bearer " + token);
-
-async function update(){
+async function update(client, config, event){
     try {
-        await loadEventSets(client, event, config);
+        await loadEventSets(client, event.getGraphQLVariables(), config);
     } catch (err){
         presentError(err);
         return false;
@@ -65,17 +45,8 @@ async function update(){
     return true;
 }
 
-document.querySelector(".event-input").value = event;
-
 function GOCallback(input){
-    let slug = processEventSlug(input.value);
-    if (!slug){
-        alert("Please input a valid start.gg event URL or slug. Go to the page of your event on start.gg and copy the content of the URL bar.");
-
-        return;
-    }
-
-    window.location.href = "/event_sets.html?event=" + slug 
+    goToPageWithInputEvent(input, "event_sets")
 }
 
 const inputElement = document.querySelector(".event-input");
@@ -90,11 +61,35 @@ document.querySelector(".event-input-container .button").addEventListener("click
     GOCallback(inputElement)
 });
 
-function startTimeout(){
-    setTimeout(async () => {
-        if (await update()) startTimeout();
-    }, 5000);
-}
+async function main(){
+    initLayout();
 
-initLayout();
-if (await update()) startTimeout();
+    let [config, token] = await Promise.all([
+        fetch("../config.json").then(response => response.json()),
+        checkLogin()
+    ]);    
+    console.log("Token : " + token);
+
+    let client = new SGGHelperClient("Bearer " + token);
+
+    let searchParameters = new URLSearchParams(window.location.search);
+    let event = getEventIdentifierFromParams(searchParameters);
+    console.log("Event :", event);
+
+    if (!event){
+        alert("No event specified");
+        return;
+    }
+
+    document.querySelector(".event-input").value = event.toString();
+
+    const run = async () => {if (await update(client, config, event)) startTimeout()};
+
+    function startTimeout(){
+        setTimeout(() => {
+            run();
+        }, 5000);
+    }
+    await run();
+}
+main();

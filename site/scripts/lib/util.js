@@ -1,21 +1,54 @@
+const slugRegex = /(tournament\/[^\/]*\/event\/[^\/]*)/g;
+const IDRegex = /tournament\/[^\/]*\/(?:event-edit|brackets|seeding)\/([0-9]*)/g;
+const IDAloneRegex = /^([0-9]+)$/g
+
+export class EventIdentifier{
+    /** @param {string} value  */
+    constructor(value) {this.value = value}
+    getURLProperty(){return this.constructor.propertyName + "=" + this.value}
+    getGraphQLVariables(){return {}}
+    toString(){return this.value}
+}
+
+export class Slug extends EventIdentifier {
+    constructor(slug){super(slug)}
+    static propertyName = "eventSlug";
+    getGraphQLVariables(){return {slug: this.value, id: null}}
+}
+
+export class ID extends EventIdentifier {
+    constructor(id){super(id)}
+    static propertyName = "eventID";
+    getGraphQLVariables(){return {slug: null, id: this.value}}
+}
+
 /**
  * 
- * @param {string} slug 
+ * @param {string?} slug 
  * @returns 
  */
-export function processEventSlug(slug){
+export function processEventIdentifier(slug){
     if (!slug) return slug;
-    slug = slug.replace("/events/", "/event/");
-    let split = slug.split("start.gg/");
 
-    slug = (split.length == 2) ? split[1] : split[0]
-    split = slug.split(/\//)
-    if (split[0] != "tournament" || (split[2] != "event" && split[2] != "events") || split.length < 4){
-        return false;
-    }
+    let res = slugRegex.exec(slug);
+    if (res) return new Slug(res[1]);
 
-    slug = split.slice(0, 4).join("/");
-    return slug;
+    res = IDRegex.exec(slug);
+    if (res) return new ID(res[1]);
+
+    res = IDAloneRegex.exec(slug);
+    if (res) return new ID(res[1]);
+
+    return null;
+}
+
+/**
+ * @param {URLSearchParams} searchParameters 
+ */
+export function getEventIdentifierFromParams(searchParameters){
+    let id = searchParameters.get(ID.propertyName);
+    let slug = searchParameters.get(Slug.propertyName);
+    return id ? new ID(id) : slug ? new Slug(slug) : null;
 }
 
 /**

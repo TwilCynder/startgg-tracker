@@ -1,5 +1,5 @@
 import { hide, hideElement, show, showElement } from "./lib/DOMUtil.js";
-import { compareStrArray, processEventSlug } from "./lib/util.js";
+import { compareStrArray, processEventIdentifier } from "./lib/util.js";
 
 export class RequestValidityError extends Error {}
 
@@ -59,7 +59,7 @@ export class Request {
     static fromURL(string){
         let params = new URLSearchParams(string);
         let slug = params.get("event");
-        slug = processEventSlug(slug);
+        slug = processEventIdentifier(slug);
         if (!slug){
             throw new RequestValidityError("Please specify a valid event URL. Go to the page of your event on start.gg and copy the content of the URL bar.");
         }
@@ -110,7 +110,7 @@ export class Request {
 export function getRequest(){
     let slug = document.querySelector("#event").value;
 
-    slug = processEventSlug(slug);
+    slug = processEventIdentifier(slug);
 
     if (!slug){
         throw new RequestValidityError("Please enter a valid event URL. Go to the page of your event on start.gg and copy the content of the URL bar.");

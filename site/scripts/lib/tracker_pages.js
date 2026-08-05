@@ -22,5 +22,3 @@ export function addSets(sets){
     $(".content").html(i ? html : '<div class = "no-matches">No matches</div>')
     fitPlayerNames(i);
 }
-
-
