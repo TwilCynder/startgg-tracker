@@ -6,7 +6,6 @@ export class EventIdentifier{
     /** @param {string} value  */
     constructor(value) {this.value = value}
     getURLProperty(){return this.constructor.propertyName + "=" + this.value}
-    getGraphQLVariables(){return {}}
     toString(){return this.value}
 }
 
@@ -14,12 +13,14 @@ export class Slug extends EventIdentifier {
     constructor(slug){super(slug)}
     static propertyName = "eventSlug";
     getGraphQLVariables(){return {slug: this.value, id: null}}
+    toReadableString(){return "<Slug: " + this.value + ">"}
 }
 
 export class ID extends EventIdentifier {
     constructor(id){super(id)}
     static propertyName = "eventID";
     getGraphQLVariables(){return {slug: null, id: this.value}}
+    toReadableString(){return "<ID: " + this.value + ">"}
 }
 
 /**
@@ -51,6 +52,14 @@ export function getEventIdentifierFromParams(searchParameters){
     return id ? new ID(id) : slug ? new Slug(slug) : null;
 }
 
+export function deep_get_raw(obj, def, ...names){
+    for (const name of names){
+        if (obj == undefined || obj == null) return def;
+        obj = obj[name];
+    };
+    return obj;
+}
+
 /**
  * 
  * @param {{}} obj 
@@ -70,11 +79,7 @@ export function deep_get(obj, path, def = null){
         }
     }
 
-    for (var i=0, len=path.length; i<len; i++){
-        if (obj == undefined || obj == null) return def;
-        obj = obj[path[i]];
-    };
-    return obj;
+    return deep_get_raw(obj, def, path);
 };
 
 /**

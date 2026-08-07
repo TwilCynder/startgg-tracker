@@ -5,11 +5,11 @@ const schema_filename = "./schemas/StationSets.graphql";
 export async function getStationSetsFactory(){
     let query = await queryManager.tryQuery("stationSets", new URL(schema_filename, import.meta.url));
 
-    return async function getStationSets(slug, client){
-        let sets = await query.executePaginated(client, {slug, perPage: 50}, "event.sets", null, {}, false)
+    return async function getStationSets(eventIdentifier, client){
+        let sets = await query.executePaginated(client, Object.assign(eventIdentifier.getGraphQLVariables(), {perPage: 50}), "event.sets", null, {}, false)
 
         if (!sets){
-            throw new Error("Couldn't fetch sets from " + slug + " ; invalid response (might indicate non-existent event ; check the URL)");
+            throw new Error("Couldn't fetch sets from " + eventIdentifier.toReadableString() + " ; invalid response (might indicate non-existent event ; check the URL)");
         }
 
         let stations = {"unknown": []};

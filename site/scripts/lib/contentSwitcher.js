@@ -23,7 +23,7 @@ export class LoadingContentManager extends ContentSwitcher {
         const loadingElement = document.querySelector(".loading-display-container.loading");
         super(loadingElement);
         this.#loading = loadingElement;
-        this.#error = document.querySelector(".loading-error-container");
+        this.#error = document.querySelector(".loading-display-container.loading-error");
         this.#errorText = document.querySelector(".loading-error-text");
         this.#content = document.querySelector(".content");
     }

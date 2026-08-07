@@ -6,10 +6,13 @@ export class PresentableError extends Error {
 
 export function presentError(err){
     console.error(err);
+    let message = null;
     if (err instanceof PresentableError){
-        alert(err.message);
+        message = err.message;
     } else {
-        alert("Internal error");
+        message = "Internal error";
     }
     
+    alert(message);
+    return message;
 }

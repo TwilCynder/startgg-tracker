@@ -1,18 +1,17 @@
 
 import { SGGHelperClient } from "./lib/api/sgg-helper.js";
-import { processEventSlug } from "./lib/util.js";
+import { getEventIdentifierFromParams } from "./lib/util.js";
 import { getStationSetsFactory } from "./lib/api/getStationSets.js";
-import { initLayout, makeSetHTML, resetContent } from "./lib/sets_display.js";
+import { initSetsDisplayLayout, makeSetHTML, resetContent } from "./lib/sets_display.js";
 import { presentError } from "./lib/error.js";
 import { FitText } from "./lib/DOMUtil.js";
 import { fitPlayerNames } from "./lib/tracker_pages.js";
 import { SwitchElement } from "./lib/switchElement.js";
 import { checkLogin } from "./lib/loginCheck.js";
 import { LoadingContentManager } from "./lib/contentSwitcher.js";
+import { goToPageWithInputEvent } from "./lib/UICommon.js";
 
 const contentManager = new LoadingContentManager;
-
-try {
 
 const getStationSets = await getStationSetsFactory();
 
@@ -22,9 +21,9 @@ let content = {
 }
 let loaded = false;
 
-// -------- Content update functions
-
 const switchElement = new SwitchElement(document.querySelector(".switch-container"));
+
+// -------- Content update functions
 
 function makeSetLists(lists, className, titlePrefix = ""){
     let single = Object.keys(lists).length < 2;
@@ -52,7 +51,6 @@ function displayList(list){
     if (list && list.count){
         $(".content").html(list.html);
         fitPlayerNames(list.count);
-        console.log($(".t0 .text")[0].scrollWidth)
         fitTitles(list.listsCount);
     } else {
         $(".content").html('<div class = "no-matches">No matches</div>'); //TODO 
@@ -73,9 +71,10 @@ function updateContentCheck(){
     updateContent(switchElement.isChecked());
 }
 
-async function loadStationSets(client, slug, config){
+// -------- Callbacks
 
-    let res = await getStationSets(slug, client);
+async function update(client, eventIdentifier, config){
+    let res = await getStationSets(eventIdentifier, client);
 
     console.log(res);
 
@@ -86,44 +85,15 @@ async function loadStationSets(client, slug, config){
     updateContentCheck();
 }
 
-// -------- Loading
-
-let [config, token] = await Promise.all([
-    fetch("../config.json").then(response => response.json()),
-    checkLogin()
-]);
-
-//console.log(token);
-
-let searchParameters = new URLSearchParams(window.location.search);
-let event = searchParameters.get("event");
-
-let client = new SGGHelperClient("Bearer " + token);
-
-// -------- Callbacks
-
-async function update(){
-    await loadStationSets(client, event, config);
-}
-
 document.querySelector(".event-input").value = event;
 
 function GOCallback(input){
-    let slug = processEventSlug(input.value);
-    if (!slug){
-        alert("Please input a valid start.gg event URL or slug. Go to the page of your event on start.gg and copy the content of the URL bar.");
-
-        return;
-    }
-
-    window.location.href = "/station_sets.html?event=" + slug 
+    goToPageWithInputEvent(input, "station_sets")
 }
 
 const inputElement = document.querySelector(".event-input");
 inputElement.addEventListener("keydown", (event) => {
     if (event.code == "Enter"){
-        //console.log(event)
-        console.log(event.target.value)
         GOCallback(event.target);
     }
 })
@@ -131,18 +101,44 @@ document.querySelector(".event-input-container .button").addEventListener("click
     GOCallback(inputElement)
 })
 
-switchElement.init(updateContent);
-
-initLayout();
-update();
-setInterval(() => {
+async function try_(f){
     try {
-        update();
-    } catch (error){
-        presentError(error);
+      await f();
+    } catch(error){
+        contentManager.showError(error);
     }
-}, 20000);
-
-} catch (error){
-    contentManager.showError(error);
 }
+
+async function main(){
+    switchElement.init(updateContent);
+    initSetsDisplayLayout();
+
+    // -------- Loading
+
+    let [config, token] = await Promise.all([
+        fetch("../config.json").then(response => response.json()),
+        checkLogin()
+    ]);    
+    console.log("Token : " + token);
+
+    let client = new SGGHelperClient("Bearer " + token);
+
+    let searchParameters = new URLSearchParams(window.location.search);
+    let eventIdentifier = getEventIdentifierFromParams(searchParameters);
+    console.log("Event :", eventIdentifier);
+
+    if (!eventIdentifier){
+        alert("No event specified");
+        return;
+    }
+
+    document.querySelector(".event-input").value = eventIdentifier.toString();
+
+    await update(client, eventIdentifier, config);
+    setInterval(
+        try_.bind(undefined, () => update(client, eventIdentifier, config)), 
+        20000
+    );
+}
+await try_(main);
+

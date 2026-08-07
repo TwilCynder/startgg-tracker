@@ -1,6 +1,6 @@
+import { deep_get, deep_get_raw } from "./util.js";
 
-
-export function initLayout(columns){
+export function initSetsDisplayLayout(columns){
     $("#content").empty();
     let html = ""
 
@@ -53,6 +53,10 @@ function setInfoBoxHTML(set){
     `
 }
 
+function getEntrantName(set, i){
+    return deep_get_raw(set.slots[i], "Unknown Entrant", "entrant", "name");
+}
+
 export function makeSetHTML(set, index){
     return `
         <div class = "set s${index} ${set.state == 6 ? "called" : "started"}">
@@ -60,14 +64,14 @@ export function makeSetHTML(set, index){
                 <div class = "player p1">
                     <div class = "playerName">
                         <div class = "text">
-                            ${set.slots[0].entrant.name}
+                            ${getEntrantName(set, 0)}
                         </div>
                     </div>
                 </div>
                 <div class = "player p2">
                     <div class = "playerName">
                         <div class = "text">
-                            ${set.slots[1].entrant.name}
+                            ${getEntrantName(set, 1)}
                         </div>
                     </div>
                 </div>

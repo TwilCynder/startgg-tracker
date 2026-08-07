@@ -1,6 +1,6 @@
 
 import { SGGHelperClient } from "./lib/api/sgg-helper.js";
-import { initLayout } from "./lib/sets_display.js";
+import { initSetsDisplayLayout } from "./lib/sets_display.js";
 import { getEventIdentifierFromParams, ID, Slug } from "./lib/util.js";
 import { getCalledSetsFactory } from "./lib/api/getCalledSets.js";
 import { resetContent, addSets } from "./lib/tracker_pages.js";
@@ -62,7 +62,7 @@ document.querySelector(".event-input-container .button").addEventListener("click
 });
 
 async function main(){
-    initLayout();
+    initSetsDisplayLayout();
 
     let [config, token] = await Promise.all([
         fetch("../config.json").then(response => response.json()),
@@ -83,13 +83,13 @@ async function main(){
 
     document.querySelector(".event-input").value = event.toString();
 
-    const run = async () => {if (await update(client, config, event)) startTimeout()};
+    const updateAndContinue = async () => {if (await update(client, config, event)) startTimeout()};
 
     function startTimeout(){
         setTimeout(() => {
-            run();
+            updateAndContinue();
         }, 5000);
     }
-    await run();
+    await updateAndContinue();
 }
 main();

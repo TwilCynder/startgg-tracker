@@ -1,5 +1,5 @@
-query Test($slug: String, $page: Int, $perPage: Int){
-    event(slug: $slug) {
+query Test($slug: String, $id: ID, $page: Int, $perPage: Int){
+    event(slug: $slug, id: $id) {
         sets(page: $page, perPage: $perPage){
             nodes {
                 id
