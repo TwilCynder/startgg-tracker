@@ -3,7 +3,7 @@ import { get_rematches, getSets, getStreamedMatchesForPlayer, getStreamedSetFilt
 import { LoadingContentManager } from "./lib/contentSwitcher.js";
 import { show, hide, toggleClass } from "./lib/DOMUtil.js";
 import { checkLogin } from "./lib/loginCheck.js";
-import { deep_get, getDaysSinceTimestamp } from "./lib/util.js";
+import { getDaysSinceTimestamp } from "./lib/util.js";
 import { handleSelectedRadioButton, init, Request } from "./rematchbuster-common.js";
 
 const contentManager = new LoadingContentManager;

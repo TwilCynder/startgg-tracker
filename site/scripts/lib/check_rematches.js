@@ -1,6 +1,6 @@
-import { getEventEntrantsFactory } from "./api/getEntrants.js"
+import { getEventEntrantsFactory } from "./api/getEntrants.js";
 import { getUserSetsFactory } from "./api/getUserSets.js";
-import { deep_get } from "./util.js";
+import { deep_get_raw } from "./util.js";
 
 const getEventEntrants = await getEventEntrantsFactory();
 const getUserSets = await getUserSetsFactory();
@@ -81,7 +81,7 @@ const unknown_event = {slug: "unknown_event", name: "Unknown Event", tournament:
  * @param {Object} set 
  */
 function isEventFiltered(filters, set){
-    let slug = deep_get(set, "event.slug");
+    let slug = deep_get_raw(set, null, "event", "slug");
     if (!slug) {
         console.warn("No event slug for match", set);
         return true;
@@ -126,7 +126,7 @@ function buildMatchesMatrix(playersLists, eventFilters, streamed){
                 console.error("PLAYER NOT FOUND IN OWN SET", set, id, playerData.player.slug);
                 continue;
             }
-            let otherPlayerID = deep_get(set, `slots.${1 - currentPlayerSlotIndex}.entrant.participants.0.player.id`);
+            let otherPlayerID = deep_get_raw(set, null, "slots", 1 - currentPlayerSlotIndex, "entrant", "participants", 0, "player", "id");
             if (otherPlayerID === null){
                 console.warn("Other player doesn't have a user ID", set, id, playerData.player.slug);
                 continue;

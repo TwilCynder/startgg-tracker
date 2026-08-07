@@ -1,15 +1,15 @@
-import { deep_get, deep_get_raw } from "./util.js";
+import { deep_get_raw } from "./util.js";
 
-export function initSetsDisplayLayout(columns){
-    $("#content").empty();
-    let html = ""
-
-    $(".content").html(html);
+export function contentDiv(){
+    return document.querySelector(".content");
 }
 
-
 export function resetContent(){
-    $(".content").empty();
+    contentDiv().innerHTML = ""
+}
+
+export function initSetsDisplayLayout(columns){
+    resetContent()
 }
 
 /**

@@ -1,22 +1,24 @@
-export function FitText(target) {
+/**
+ * @param {HTMLElement} element 
+ */
+export function FitText(element) {
     document.fonts.ready.then(() => {
-        if (target == null) return;
-        if (target.css("font-size") == null) return;
-        if (target.css("width") == null) return;
+        if (element == null) return;
+        if (element.style.fontSize == null) return;
+        if (element.style.width == null) return;
     
-        let textElement = target.find(".text");
-        //RegisterFit(target);
+        let textElement = element.querySelector(".text");
     
-        if (textElement.text().trim().toLowerCase() == "undefined") {
+        if (textElement.textContent.trim().toLowerCase() == "undefined") {
             textElement.html("");
         }
-    
-        textElement.css("transform", "");
-        let scaleX = 1;
+        
+        textElement.style.transform = ""
+        let w = element.getBoundingClientRect().width
 
-        if (textElement[0].scrollWidth * scaleX > target.width()) {
-            scaleX = target.width() / textElement[0].scrollWidth;
-            textElement.css("transform", "scaleX(" + scaleX + ")");
+        if (textElement.scrollWidth > w) {
+            let scaleX = w / textElement.scrollWidth;
+            textElement.style.transform = "scaleX(" + scaleX + ")"
         }
     });
 }

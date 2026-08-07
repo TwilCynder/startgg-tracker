@@ -2,7 +2,7 @@
 import { SGGHelperClient } from "./lib/api/sgg-helper.js";
 import { getEventIdentifierFromParams } from "./lib/util.js";
 import { getStationSetsFactory } from "./lib/api/getStationSets.js";
-import { initSetsDisplayLayout, makeSetHTML, resetContent } from "./lib/sets_display.js";
+import { contentDiv, initSetsDisplayLayout, makeSetHTML, resetContent } from "./lib/sets_display.js";
 import { presentError } from "./lib/error.js";
 import { FitText } from "./lib/DOMUtil.js";
 import { fitPlayerNames } from "./lib/tracker_pages.js";
@@ -42,18 +42,18 @@ function makeSetLists(lists, className, titlePrefix = ""){
 
 function fitTitles(count){
     for (let i = 0; i < count; i++){
-        FitText($(`.t${i}`));
+        FitText(document.querySelector(`.t${i}`));
     } 
 }
 
 function displayList(list){
     resetContent();
     if (list && list.count){
-        $(".content").html(list.html);
+        contentDiv().innerHTML = list.html
         fitPlayerNames(list.count);
         fitTitles(list.listsCount);
     } else {
-        $(".content").html('<div class = "no-matches">No matches</div>'); //TODO 
+        contentDiv().innerHTML = '<div class = "no-matches">No matches</div>'
     }
 }
 
