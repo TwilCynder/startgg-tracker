@@ -24,7 +24,7 @@ export function FitText(element) {
 }
 
 export function showElement(element){
-    element.style.setProperty(`display`, "flex");
+    element.style.setProperty('display', "flex");
     element.style.setProperty('opacity', "100%");
 }
 
@@ -34,7 +34,7 @@ export function show(elementName){
 }
 
 export function hideElement(element){
-    element.style.setProperty(`display`, "none");
+    element.style.setProperty('display', "none");
     element.style.setProperty('opacity', "0");
 }
 

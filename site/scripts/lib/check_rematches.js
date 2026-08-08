@@ -103,6 +103,7 @@ function buildMatchesMatrix(playersLists, eventFilters, streamed){
     }, {});
 
     let res = playersLists.map((playerData, currentIndex) => {
+        /**@type {{}[][]} */
         let h2h = Array(playersLists.length - currentIndex - 1).fill(null).map(_ => ([]));
         let id = playerData.player.id;
         
@@ -147,7 +148,7 @@ function buildMatchesMatrix(playersLists, eventFilters, streamed){
  * @param {ReturnType<buildMatchesMatrix>} matrix 
  */
 function getRematchesList(matrix){
-    let res = [];
+    /*let res = [];
     matrix.forEach((playerData, lineIndex) => {
         playerData.h2h.forEach((matches, colIndex) => {
             let otherPlayerData = matrix[lineIndex + colIndex + 1];
@@ -155,7 +156,12 @@ function getRematchesList(matrix){
         })
     })
 
-    return res;
+    return res;*/
+
+    return matrix.map((playerData, lineIndex) => playerData.h2h.map((matches, colIndex) => {
+        let otherPlayerData = matrix[lineIndex + colIndex + 1];
+        return {players: [playerData.player, otherPlayerData.player], matches}
+    })).flat()
 }
 
 export function getStreamedSetFilterFunction(streamName){

@@ -1,6 +1,6 @@
 
 import { SGGHelperClient } from "./lib/api/sgg-helper.js";
-import { getEventIdentifierFromParams } from "./lib/util.js";
+import { getEventIdentifierFromParams, HtmlString, htmlT } from "./lib/util.js";
 import { getStationSetsFactory } from "./lib/api/getStationSets.js";
 import { contentDiv, initSetsDisplayLayout, makeSetHTML, resetContent } from "./lib/sets_display.js";
 import { presentError } from "./lib/error.js";
@@ -28,14 +28,14 @@ const switchElement = new SwitchElement(document.querySelector(".switch-containe
 function makeSetLists(lists, className, titlePrefix = ""){
     let single = Object.keys(lists).length < 2;
 
-    let html = ""; let index = 0; let list_index = 0;
+    let html = new HtmlString; let index = 0; let list_index = 0;
     for (const list_id in lists){
         const station = lists[list_id];
-        let sets_html = "";
-        for (const set of station){
-            sets_html += makeSetHTML(set, index++);
-        }
-        html += `<div class = "setlist-container ${className} ${single ? "setlist-wrap" : ""}"><div class = "t${list_index++} setlist-title ${className}-title"><div class = "text">${titlePrefix}${list_id}</div></div><div class = "setlist">${sets_html}</div></div>`
+        let sets_html = HtmlString.from(...station.map(set => makeSetHTML(set, index++)));
+        /*for (const set of station){
+            sets_html.append(makeSetHTML(set, index++));
+        }*/
+        html.append(htmlT`<div class = "setlist-container ${className} ${single ? "setlist-wrap" : ""}"><div class = "t${list_index++} setlist-title ${className}-title"><div class = "text">${titlePrefix}${list_id}</div></div><div class = "setlist">${sets_html}</div></div>`)
     }
     return {html, count: index, listsCount: list_index};
 }

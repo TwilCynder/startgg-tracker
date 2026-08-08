@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 SITE_PATH="${1:-"./site"}"
 echo "Building into" $SITE_PATH
 

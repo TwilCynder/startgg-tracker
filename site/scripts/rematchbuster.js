@@ -3,7 +3,7 @@ import { get_rematches, getSets, getStreamedMatchesForPlayer, getStreamedSetFilt
 import { LoadingContentManager } from "./lib/contentSwitcher.js";
 import { show, hide, toggleClass } from "./lib/DOMUtil.js";
 import { checkLogin } from "./lib/loginCheck.js";
-import { getDaysSinceTimestamp } from "./lib/util.js";
+import { getDaysSinceTimestamp, HtmlString, htmlT } from "./lib/util.js";
 import { handleSelectedRadioButton, init, Request } from "./rematchbuster-common.js";
 
 const contentManager = new LoadingContentManager;
@@ -57,21 +57,28 @@ function showResult(){
 
 function makeIgnoredEventsHTML(list){
     if (list.length < 1) return "";
-    let html = "Ignored Events";
+    let html = new HtmlString("Ignored Events");
     list.forEach((slug, i) =>{
-        html += `<div data-slug="${slug}" data-i=${i}>${slug}<span class="cross-button" onclick="onCrossClicked2(this)" title="Remove this event from ignored events">❌</span></div>`
+        html.append(htmlT`<div data-slug="${slug}" data-i=${i}>${slug}<span class="cross-button" onclick="onCrossClicked2(this)" title="Remove this event from ignored events">❌</span></div>`)
     })
     return html;
 }
 
 function makeStreamHTML(match){
-    return `<br > <a class="stream ninja-link" href="https://twitch.tv/${match.stream.streamName}" target="_blank">streamed on <span class="stream-name">${match.stream.streamName}</span></a>`
+    return htmlT`<br > <a class="stream ninja-link" href="https://twitch.tv/${match.stream.streamName}" target="_blank">streamed on <span class="stream-name">${match.stream.streamName}</span></a>`
 }
 
+/**
+ * @typedef {ReturnType<get_rematches>} PairEntries
+ * @typedef {ReturnType<getStreamedMatchesForPlayer>} PlayerEntries
+ */
+
+/**@param {PairEntries} result @param {boolean} stream @param {boolean} displayTimeSinceLast */
 function makePairsListHTML(result, stream, displayTimeSinceLast){
     return makeResultHTML(result, (entry) => `${entry.players[0].name} vs ${entry.players[1].name}`, stream, displayTimeSinceLast);
 }
 
+/**@param {PlayerEntries} result @param {boolean} stream @param {boolean} displayTimeSinceLast */
 function makePlayersListHTML(result, stream, displayTimeSinceLast){
     console.log(result);
     return makeResultHTML(result, (entry) => entry.player.name, stream, displayTimeSinceLast);
@@ -80,29 +87,29 @@ function makePlayersListHTML(result, stream, displayTimeSinceLast){
 function getSinceLastString(entry){
     const lastMatch = entry.matches[0];
     const days = getDaysSinceTimestamp(lastMatch.completedAt);
-    return `<div class="since-last">(${days.toFixed(0)} days since last set)</div>`
+    return htmlT`<div class="since-last">(${days.toFixed(0)} days since last set)</div>`
 }
 
 /**
- * @template T
- * @param {T[]} result 
- * @
+ * @typedef {PairEntries | PlayerEntries} Entries
+ * @param {Entries} result 
  * @param {(entry: T) => string} entryNameFunction 
  * @param {boolean} stream 
  * @param {boolean} displayTimeSinceLast 
  * @returns 
  */
 function makeResultHTML(result, entryNameFunction, stream, displayTimeSinceLast){
-    let html = ""
+    let html = new HtmlString
     for (let entry of result){
         const n = entry.n ?? entry.matches.length;
         const nText = entry.nText ?? n + " matches";
+
         if (n < 1){
-            html += `
+            html.append(htmlT`
                 <div class = "entry-title">${entryNameFunction(entry)} - ${nText}</div>
-            `
+            `)
         } else {
-            html += `
+            html.append(htmlT`
                 <div class = "entry-title" onclick="entryTitleOnClick(this)">
                     <span class="dropdown-button-sideways">►</span><div class="entry-name">
                         ${entryNameFunction(entry)} - ${nText}    
@@ -113,16 +120,14 @@ function makeResultHTML(result, entryNameFunction, stream, displayTimeSinceLast)
                 ${
                     entry.matches.map(match => {
                         const date = new Date(match.completedAt * 1000);
-                        return `
+                        return htmlT`
                             <div data-event-slug="${match.event.slug}"><a target="_blank" class = "ninja-link" title="Event : ${match.event.slug}" href = "https://start.gg/${match.event.slug}/set/${match.id}">${match.event.tournament.name} - ${match.event.name} (${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}) - ${match.fullRoundText} </a><span class="cross-button" onclick="onCrossClicked(this)" title="Remove this event from everyone's results">❌</span> ${stream && match.stream ? makeStreamHTML(match) : ""}</div>
 
                         `
-                    }
-
-                    ).join("")
+                    })
                 }
                 </div>
-            `
+            `)
         }
         
     }
@@ -192,8 +197,8 @@ const resultFunctions = {
         result = sortResultList(result, request);
         
         let html = request.streamName ?
-            `<h3 class="result-title">Sets streamed on ${request.streamName} only</h3>` + makePairsListHTML(result, false, request.timeSinceLast) :
-            '<h3 class="result-title">Steamed sets only</h3>' + makePairsListHTML(result, true, request.timeSinceLast)
+            htmlT`<h3 class="result-title">Sets streamed on ${request.streamName} only</h3> ${makePairsListHTML(result, false, request.timeSinceLast)}` :
+            new HtmlString('<h3 class="result-title">Steamed sets only</h3>').append(makePairsListHTML(result, true, request.timeSinceLast))
 
         return html;
     },
@@ -202,8 +207,8 @@ const resultFunctions = {
         result = sortResultList(result, request);
         
         let html = request.streamName ? 
-            `<h3 class="result-title">Stream appearances on ${request.streamName}</h3>` + makePlayersListHTML(result, false, request.timeSinceLast) : 
-            '<h3 class="result-title">Stream appearances</h3>' + makePlayersListHTML(result, true, request.timeSinceLast);
+            htmlT`<h3 class="result-title">Stream appearances on ${request.streamName}</h3> ${makePlayersListHTML(result, false, request.timeSinceLast)}` : 
+            new HtmlString('<h3 class="result-title">Stream appearances</h3>').append(makePlayersListHTML(result, true, request.timeSinceLast));
 
         return html;
     }

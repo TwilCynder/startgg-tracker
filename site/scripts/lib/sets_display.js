@@ -1,4 +1,4 @@
-import { deep_get_raw } from "./util.js";
+import { deep_get_raw, HtmlString, htmlT } from "./util.js";
 
 export function contentDiv(){
     return document.querySelector(".content");
@@ -29,7 +29,7 @@ function getTimeString(time){
     result += minutes.toString().padStart(2, "0") + ":";
     result += seconds.toString().padStart(2, "0");
     
-    return result
+    return result;
 }
 
 const state_names = {
@@ -48,17 +48,17 @@ function setInfoBoxHTML(set){
 
     let timeElapsed = new Date() - new Date(set.startedAt * 1000);
 
-    return `
+    return new HtmlString(`
         <div class = "set-infobox set-infobox-${state_name}">${getTimeString(timeElapsed)}</div>
-    `
+    `)
 }
 
 function getEntrantName(set, i){
-    return deep_get_raw(set.slots[i], "Unknown Entrant", "entrant", "name");
+    return deep_get_raw(set.slots[i], "<Unknown Entrant>", "entrant", "name");
 }
 
 export function makeSetHTML(set, index){
-    return `
+    return htmlT`
         <div class = "set s${index} ${set.state == 6 ? "called" : "started"}">
             <div class = "players-container">
                 <div class = "player p1">
