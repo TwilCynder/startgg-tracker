@@ -41,3 +41,15 @@ export class LoadingContentManager extends ContentSwitcher {
         this.showElement(this.#content);
     }
 }
+
+export class LoadingContentManagerWithProgress extends LoadingContentManager {
+    #loadingProgress;
+    constructor(){
+        super();
+        this.#loadingProgress = document.getElementById("loading-progress");
+    }
+
+    setLoadingProgressText(text){
+        this.#loadingProgress.textContent = text;
+    }
+}

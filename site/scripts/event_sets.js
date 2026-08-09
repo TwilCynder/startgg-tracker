@@ -1,15 +1,19 @@
 
 import { SGGHelperClient } from "./lib/api/sgg-helper.js";
 import { initSetsDisplayLayout } from "./lib/sets_display.js";
-import { getEventIdentifierFromParams, ID, Slug } from "./lib/util.js";
+import { ID, Slug } from "./lib/util.js";
 import { getCalledSetsFactory } from "./lib/api/getCalledSets.js";
 import { resetContent, addSets } from "./lib/tracker_pages.js";
 import { PresentableError, presentError } from "./lib/error.js";
 import { getAuthStatus } from "./lib/auth.js";
 import { checkLogin } from "./lib/loginCheck.js";
 import { goToPageWithInputEvent } from "./lib/UICommon.js";
+import { LoadingContentManager } from "./lib/contentSwitcher.js";
+import { getEventIdentifierFromParams } from "./lib/contentUtil.js";
 
 const getCalledSets = await getCalledSetsFactory();
+
+const contentManager = new LoadingContentManager;
 
 async function loadEventSets(client, eventVariables, config){
     if (!eventVariables){
@@ -32,6 +36,7 @@ async function loadEventSets(client, eventVariables, config){
     }
     
     addSets(data.sets.nodes);
+    contentManager.showContent();
 
 }
 
@@ -56,10 +61,18 @@ inputElement.addEventListener("keydown", (event) => {
         console.log(event.target.value)
         GOCallback(event.target);
     }
-})
+});
 document.querySelector(".event-input-container .button").addEventListener("click", () => {
     GOCallback(inputElement)
 });
+
+async function try_(f){
+    try {
+      await f();
+    } catch(error){
+        contentManager.showError(error);
+    }
+}
 
 async function main(){
     initSetsDisplayLayout();
@@ -92,4 +105,4 @@ async function main(){
     }
     await updateAndContinue();
 }
-main();
+await try_(main, contentManager)

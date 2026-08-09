@@ -1,6 +1,9 @@
 query Test($slug: String, $id: ID, $page: Int, $perPage: Int){
     event(slug: $slug, id: $id) {
         sets(page: $page, perPage: $perPage){
+            pageInfo {
+                totalPages
+            }
             nodes {
                 id
                 station {

@@ -8,6 +8,7 @@
         <link rel="stylesheet" href="/styles/set-tracking-pages.css">
         <link rel="stylesheet" href="/styles/event_sets.css">
         <link rel="stylesheet" href="/styles/login.css">
+        <link rel="stylesheet" href="/styles/loading.css">
     </head>
     <body>
         <%- include("./fragments/login-overlay.html") %>
@@ -16,7 +17,15 @@
             <div class = "sggt-container"><a class="sggt" href = "/index.html">SggT</a> <div class = "pub">by TwilCynder</div> </div>
             <div class = "event-input-container">Event : <input class = "input event-input" type="text"><div class ="button">GO</div></div>
         </div>
-        <div class = "content double-column"></div>
+        <div class = "content-container">
+            <%- include("./fragments/loading-error.html") %>
+            <div class ="loading-display-container loading">
+                <div class="loader"></div>
+                <div class = "loading-progress-line">Loading matches <span id="loading-progress">...</span></div>
+                <div class="loading-text"></div>
+            </div>
+            <div class = "content double-column"></div>
+        </div>
         <script src = "/scripts/event_sets.js" type="module"></script>
     </body>
 </html>

@@ -1,3 +1,7 @@
+.content {
+    display: none;
+}
+
 .event-input-container {
     flex-grow: 1;
     display: flex;

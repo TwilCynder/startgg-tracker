@@ -6,20 +6,22 @@ export class EventIdentifier{
     /** @param {string} value  */
     constructor(value) {this.value = value}
     getURLProperty(){return this.constructor.propertyName + "=" + this.value}
+    getRawGraphQLVariables(){}
+    getGraphQLVariables(obj){return obj ? Object.assign(obj, this.getRawGraphQLVariables()) : this.getRawGraphQLVariables()}
     toString(){return this.value}
 }
 
 export class Slug extends EventIdentifier {
     constructor(slug){super(slug)}
     static propertyName = "eventSlug";
-    getGraphQLVariables(){return {slug: this.value, id: null}}
+    getRawGraphQLVariables(){return {slug: this.value, id: null}}
     toReadableString(){return "<Slug: " + this.value + ">"}
 }
 
 export class ID extends EventIdentifier {
     constructor(id){super(id)}
     static propertyName = "eventID";
-    getGraphQLVariables(){return {slug: null, id: this.value}}
+    getRawGraphQLVariables(){return {slug: null, id: this.value}}
     toReadableString(){return "<ID: " + this.value + ">"}
 }
 
@@ -41,15 +43,6 @@ export function processEventIdentifier(slug){
     if (res) return new ID(res[1]);
 
     return null;
-}
-
-/**
- * @param {URLSearchParams} searchParameters 
- */
-export function getEventIdentifierFromParams(searchParameters){
-    let id = searchParameters.get(ID.propertyName);
-    let slug = searchParameters.get(Slug.propertyName);
-    return id ? new ID(id) : slug ? new Slug(slug) : null;
 }
 
 export function deep_get_raw(obj, def, ...names){

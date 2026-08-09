@@ -2,7 +2,7 @@
     height: calc(100% - var(--header-height) - 35px);
 }
 
-.stations-content {
+.content {
     height: 100%;
 
     display: none;
@@ -95,9 +95,4 @@
 .stream-title {
     background-color: rgb(227, 85, 255);
     color: black;
-}
-
-.loading-display-container {
-    height: 100%;
-    justify-content: center;
 }

@@ -3,6 +3,7 @@
 SITE_PATH="${1:-"./site"}"
 echo "Building into" $SITE_PATH
 
+echo "---- NPM Install ----"
 npm install
 echo "---- Webpack ----"
 cd build

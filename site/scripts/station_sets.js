@@ -1,6 +1,6 @@
 
 import { SGGHelperClient } from "./lib/api/sgg-helper.js";
-import { getEventIdentifierFromParams, HtmlString, htmlT } from "./lib/util.js";
+import { HtmlString, htmlT } from "./lib/util.js";
 import { getStationSetsFactory } from "./lib/api/getStationSets.js";
 import { contentDiv, initSetsDisplayLayout, makeSetHTML, resetContent } from "./lib/sets_display.js";
 import { presentError } from "./lib/error.js";
@@ -8,12 +8,13 @@ import { FitText } from "./lib/DOMUtil.js";
 import { fitPlayerNames } from "./lib/tracker_pages.js";
 import { SwitchElement } from "./lib/switchElement.js";
 import { checkLogin } from "./lib/loginCheck.js";
-import { LoadingContentManager } from "./lib/contentSwitcher.js";
+import { LoadingContentManagerWithProgress } from "./lib/contentSwitcher.js";
 import { goToPageWithInputEvent } from "./lib/UICommon.js";
-
-const contentManager = new LoadingContentManager;
+import { contentManagerErrorCallbackFactory, getEventIdentifierFromParams, runLoop, try_ } from "./lib/contentUtil.js";
 
 const getStationSets = await getStationSetsFactory();
+
+const contentManager = new LoadingContentManagerWithProgress;
 
 let content = {
     stations: null,
@@ -32,9 +33,6 @@ function makeSetLists(lists, className, titlePrefix = ""){
     for (const list_id in lists){
         const station = lists[list_id];
         let sets_html = HtmlString.from(...station.map(set => makeSetHTML(set, index++)));
-        /*for (const set of station){
-            sets_html.append(makeSetHTML(set, index++));
-        }*/
         html.append(htmlT`<div class = "setlist-container ${className} ${single ? "setlist-wrap" : ""}"><div class = "t${list_index++} setlist-title ${className}-title"><div class = "text">${titlePrefix}${list_id}</div></div><div class = "setlist">${sets_html}</div></div>`)
     }
     return {html, count: index, listsCount: list_index};
@@ -59,12 +57,12 @@ function displayList(list){
 
 function updateContent(streams){
     if (!loaded) return;
-    contentManager.showContent();
     if (streams){
         displayList(content.streams);
     } else {
         displayList(content.stations);
     }
+    contentManager.showContent();
 }
 
 function updateContentCheck(){
@@ -74,7 +72,11 @@ function updateContentCheck(){
 // -------- Callbacks
 
 async function update(client, eventIdentifier, config){
-    let res = await getStationSets(eventIdentifier, client);
+    console.log(client, eventIdentifier, config);
+    let res = await getStationSets(eventIdentifier, client, (currentPage, totalPages) => {
+        console.log(currentPage, totalPages)
+        contentManager.setLoadingProgressText(totalPages ? Math.round(currentPage / totalPages * 100) + "%" : "...")
+    });
 
     console.log(res);
 
@@ -101,13 +103,7 @@ document.querySelector(".event-input-container .button").addEventListener("click
     GOCallback(inputElement)
 })
 
-async function try_(f){
-    try {
-      await f();
-    } catch(error){
-        contentManager.showError(error);
-    }
-}
+const errCallback = contentManagerErrorCallbackFactory(contentManager);
 
 async function main(){
     switchElement.init(updateContent);
@@ -134,11 +130,16 @@ async function main(){
 
     document.querySelector(".event-input").value = eventIdentifier.toString();
 
+    /*
+    const updateAndContinue = async () => {if (await update(client, eventIdentifier, config)) startTimeout()};
     await update(client, eventIdentifier, config);
     setInterval(
-        try_.bind(undefined, () => update(client, eventIdentifier, config)), 
+        try_.bind(undefined, () => update(client, eventIdentifier, config), contentManager), 
         20000
     );
+    */
+
+    runLoop(() => update(client, eventIdentifier, config), errCallback, 20000);
 }
-await try_(main);
+await try_(main, errCallback);
 

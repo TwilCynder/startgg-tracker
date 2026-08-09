@@ -32,6 +32,10 @@ body {
     transform-origin: center;
 }
 
+.content-container {
+    height: calc(100% - var(--header-height) - 35px);
+}
+
 .double-column {
     width: 100%;
     height: 100%;
