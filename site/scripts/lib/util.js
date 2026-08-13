@@ -5,8 +5,14 @@ const IDAloneRegex = /^([0-9]+)$/g
 export class EventIdentifier{
     /** @param {string} value  */
     constructor(value) {this.value = value}
-    getURLProperty(){return this.constructor.propertyName + "=" + this.value}
+    
+    //Abstract functions
     getRawGraphQLVariables(){}
+    toReadableString(){}
+
+    /** @param {URLSearchParams} searchParams*/
+    setURLSearchParam(searchParams){searchParams.set(this.constructor.propertyName, this.value)}
+    getURLPropertyString(){return this.constructor.propertyName + "=" + this.value}
     getGraphQLVariables(obj){return obj ? Object.assign(obj, this.getRawGraphQLVariables()) : this.getRawGraphQLVariables()}
     toString(){return this.value}
 }
@@ -26,7 +32,6 @@ export class ID extends EventIdentifier {
 }
 
 /**
- * 
  * @param {string?} slug 
  * @returns 
  */

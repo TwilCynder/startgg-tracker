@@ -1,11 +1,12 @@
+import { LoadingContentManager } from "./lib/contentSwitcher.js";
+import { getEventIdentifierFromParams, safeCallbackFactory, try_ } from "./lib/contentUtil.js";
 import { hide, hideElement, show, showElement } from "./lib/DOMUtil.js";
-import { compareStrArray, processEventIdentifier } from "./lib/util.js";
-
-export class RequestValidityError extends Error {}
+import { PresentableError, presentError } from "./lib/error.js";
+import { compareStrArray, EventIdentifier, processEventIdentifier } from "./lib/util.js";
 
 export class Request {
     /**
-     * @param {string} slug 
+     * @param {EventIdentifier} slug 
      * @param {{date?: number, duration?: number}} timePeriod 
      * @param {string} filters 
      * @param {string[]} ignoredEvents 
@@ -13,7 +14,7 @@ export class Request {
      * @param {boolean} invert 
      */
     constructor(slug, timePeriod = {}, filters, ignoredEvents = [], streamMode, invert, countEvents, streamName, timeSinceLast){
-        this.slug = slug;
+        this.eventIdentifier = slug;
         this.date = timePeriod.date;
         this.duration = timePeriod.duration;
         this.eventFilters = filters;
@@ -27,7 +28,7 @@ export class Request {
 
     getURL(){
         let params = new URLSearchParams();
-        params.set("event", this.slug);
+        this.eventIdentifier.setURLSearchParam(params);
         if (this.date){
             params.set("date", this.date);
         } else {
@@ -58,11 +59,8 @@ export class Request {
 
     static fromURL(string){
         let params = new URLSearchParams(string);
-        let slug = params.get("event");
-        slug = processEventIdentifier(slug);
-        if (!slug){
-            throw new RequestValidityError("Please specify a valid event URL. Go to the page of your event on start.gg and copy the content of the URL bar.");
-        }
+        let eventIdentifier = getEventIdentifierFromParams(params);
+
         let timePeriod = {
             date: params.get("date"),
             duration: params.get("duration")
@@ -75,7 +73,7 @@ export class Request {
         let streamName = params.get("streamName");
         if (streamName == "undefined" || streamName == "null" || !streamName) streamName = undefined;
 
-        return new Request(slug, timePeriod,
+        return new Request(eventIdentifier, timePeriod,
             params.get("filters"),
             ignoredEventsStr ? ignoredEventsStr.split(/,/g).map(str => str.trim()).filter(str => !!str) : [],
             params.get("streamMode"),
@@ -90,7 +88,7 @@ export class Request {
      * @param {Request} other 
      */
     compare(other){
-        if (this.slug != other.slug || (this.date ? (this.date != other.date) : (this.duration != other.duration))){
+        if (this.eventIdentifier != other.eventIdentifier || (this.date ? (this.date != other.date) : (this.duration != other.duration))){
             return false;
         } else if (
             this.eventFilters != other.eventFilters || 
@@ -108,12 +106,15 @@ export class Request {
 }
 
 export function getRequest(){
-    let slug = document.querySelector("#event").value;
+    let textInput = document.querySelector("#event").value;
+    if (!textInput){
+        throw new PresentableError("Please enter an event's URL.")
+    }
 
-    slug = processEventIdentifier(slug);
+    let slug = processEventIdentifier(textInput);
 
     if (!slug){
-        throw new RequestValidityError("Please enter a valid event URL. Go to the page of your event on start.gg and copy the content of the URL bar.");
+        throw new PresentableError("Please enter a valid event URL. Go to the page of your event on start.gg and copy the content of the URL bar.");
     }
 
     let timePeriod = {};
@@ -122,7 +123,7 @@ export function getRequest(){
     } else {
         let dateString = document.querySelector(".time-inputs-container .dateInput").value;
         if (!dateString){  
-            throw new RequestValidityError("Please select a date.");
+            throw new PresentableError("Please select a date.");
         }
         timePeriod.date = dateString;
     }
@@ -189,11 +190,7 @@ function GO(goCallback){
         req = getRequest();
         goCallback(req);
     } catch (err){
-        if (err instanceof RequestValidityError){
-            alert(err.message);
-        } else {
-            throw err;
-        }
+        presentError(err);
     }
 }
 
@@ -215,12 +212,12 @@ export function initDropdownSection(className){
 }
 
 /**
- * 
  * @param {(req: Request) => void} goCallback 
+ * @param {(err: Error) => void} errorCallback 
  */
-export function init(goCallback){
-    window.numberInputOnChange = numberInputOnChange;
-    window.radioButtonOnChanged = radioButtonOnChanged;
+export function init(goCallback, errorCallback){
+    window.numberInputOnChange = safeCallbackFactory(numberInputOnChange, errorCallback);
+    window.radioButtonOnChanged = safeCallbackFactory(radioButtonOnChanged, errorCallback);
     window.auto_grow = auto_grow;
 
     handleSelectedRadioButton();
@@ -228,25 +225,23 @@ export function init(goCallback){
     initDropdownSection("event-filters-container");
     initDropdownSection("display-options-container");
 
-    document.querySelector("#GO").addEventListener("click", () => {
-        GO(goCallback);
-    });
-    document.querySelector(".form-column").addEventListener("keydown", function(event){
+    document.querySelector("#GO").addEventListener("click", safeCallbackFactory(() => GO(goCallback), errorCallback));
+    document.querySelector(".form-column").addEventListener("keydown", safeCallbackFactory((event) => {
         if (event.key == "Enter"){
             event.preventDefault();
             GO(goCallback);
         }
-    });
+    }, errorCallback))
 
     const streamNameElement = document.querySelector(".stream-name-container");
-    document.querySelector("#stream-mode").addEventListener("change", (event) => {
+    document.querySelector("#stream-mode").addEventListener("change", safeCallbackFactory((event) => {
         const newValue = event.target.value;
         if (newValue.includes("stream")){
             showElement(streamNameElement);
         } else {
             hideElement(streamNameElement);
         }
-    })
+    }, errorCallback))
 
     document.querySelectorAll(".dateInput").forEach(el => el.max = new Date().toISOString().split("T")[0]);
 }

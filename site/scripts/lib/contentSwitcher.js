@@ -32,8 +32,8 @@ export class LoadingContentManager extends ContentSwitcher {
         this.showElement(this.#loading);
     }
 
-    showError(error){
-        this.#errorText.textContent = presentError(error);
+    showError(errorText){
+        this.#errorText.textContent = errorText;
         this.showElement(this.#error);
     }
 

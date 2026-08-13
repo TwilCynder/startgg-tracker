@@ -1,7 +1,8 @@
-.content {
+.page-content {
     width: 65%;
     max-width: 960px;
     min-width: 500px;
+    min-height: 100vh;
 }
 
 .content-center {

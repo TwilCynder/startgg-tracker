@@ -1,4 +1,4 @@
-import { PresentableError, presentError } from "./error.js";
+import { PresentableError, presentError, RequestValidityError } from "./error.js";
 import { ID, processEventIdentifier, Slug } from "./util.js";
 
 /**
@@ -11,7 +11,7 @@ export function getEventIdentifierFromParams(searchParameters){
     let event = searchParameters.get("event");
     if (event) {
         eventIdentifier = processEventIdentifier(event);
-        if (!eventIdentifier) throw new PresentableError(`Event identifier ${event} is invalid - use the URL of a page related to the event`);
+        if (!eventIdentifier) throw new RequestValidityError(`Event identifier ${event} is invalid - use the URL of a page related to the event`);
         return eventIdentifier;
     }
     let id = searchParameters.get(ID.propertyName);
@@ -19,20 +19,24 @@ export function getEventIdentifierFromParams(searchParameters){
 
     eventIdentifier = id ? new ID(id) : slug ? new Slug(slug) : null;
     if (!eventIdentifier){
-        throw new PresentableError(`No event specified`);
+        throw new RequestValidityError(`No event specified`);
     }
     return eventIdentifier;
 }
 
 /**
+ * @typedef {(err: Error) => void} ErrorCallback
+ */
+
+/**
  * 
- * @param {() => void} f 
- * @param {(Error) => void} errorCallback 
+ * @param {() => void | Promise<void>} f 
+ * @param {ErrorCallback} errorCallback 
  * @returns 
  */
-export async function try_(f, errorCallback){
+export async function try_(f, errorCallback, ...args){
     try {
-      await f();
+      await f(...args);
     } catch(error){
         errorCallback(error);
         return false;
@@ -41,9 +45,17 @@ export async function try_(f, errorCallback){
 }
 
 /**
+ * @param {(...any) => void} f 
+ * @param {ErrorCallback} errorCallback 
+ */
+export function safeCallbackFactory(f, errorCallback){
+    return try_.bind(null, f, errorCallback)
+}
+
+/**
  * 
- * @param {() => void} f 
- * @param {(Error) => void} errorCallback 
+ * @param {() => void | Promise<void>} f 
+ * @param {ErrorCallback} errorCallback 
  * @param {number} delay 
  */
 export async function runLoop(f, errorCallback, delay){

@@ -90,7 +90,11 @@ async function update(client, eventIdentifier, config){
 document.querySelector(".event-input").value = event;
 
 function GOCallback(input){
-    goToPageWithInputEvent(input, "station_sets")
+    try {
+        goToPageWithInputEvent(input, "station_sets")
+    } catch (err) {
+        presentError(err);
+    }
 }
 
 const inputElement = document.querySelector(".event-input");

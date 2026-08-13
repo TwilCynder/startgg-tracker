@@ -4,6 +4,13 @@ export class PresentableError extends Error {
     }
 }
 
+export class RequestValidityError extends PresentableError {
+    constructor(message, wrongValue){
+        super ("Request validity error : " + message + " ; is the URL was not modified manually, this is a bug");
+        this.wrongValue = wrongValue;
+    }
+}
+
 export function presentError(err){
     console.error(err);
     let message = null;

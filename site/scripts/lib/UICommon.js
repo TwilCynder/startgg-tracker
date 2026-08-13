@@ -1,3 +1,4 @@
+import { PresentableError } from "./error.js";
 import { processEventIdentifier } from "./util.js";
 
 /**
@@ -9,10 +10,9 @@ export function processEventIdentifierInput(inputElement){
 
     const identifier = processEventIdentifier(input);
     if (!identifier){
-        alert("Please enter a valid event URL. Go to the page of your event on start.gg and copy the content of the URL bar.");
-        return;
+        throw new PresentableError("Please enter a valid event URL. Go to the page of your event on start.gg and copy the content of the URL bar.");
     }
-    return identifier.getURLProperty();
+    return identifier.getURLPropertyString();
 }
 
 /**

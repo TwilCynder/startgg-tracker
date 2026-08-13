@@ -9,7 +9,7 @@ import { getAuthStatus } from "./lib/auth.js";
 import { checkLogin } from "./lib/loginCheck.js";
 import { goToPageWithInputEvent } from "./lib/UICommon.js";
 import { LoadingContentManager } from "./lib/contentSwitcher.js";
-import { getEventIdentifierFromParams } from "./lib/contentUtil.js";
+import { contentManagerErrorCallbackFactory, getEventIdentifierFromParams, runLoop } from "./lib/contentUtil.js";
 
 const getCalledSets = await getCalledSetsFactory();
 
@@ -51,7 +51,11 @@ async function update(client, config, event){
 }
 
 function GOCallback(input){
-    goToPageWithInputEvent(input, "event_sets")
+    try {
+        goToPageWithInputEvent(input, "event_sets");
+    } catch (err) {
+        presentError(err);
+    }
 }
 
 const inputElement = document.querySelector(".event-input");
@@ -66,13 +70,8 @@ document.querySelector(".event-input-container .button").addEventListener("click
     GOCallback(inputElement)
 });
 
-async function try_(f){
-    try {
-      await f();
-    } catch(error){
-        contentManager.showError(error);
-    }
-}
+
+const errCallback = contentManagerErrorCallbackFactory(contentManager);
 
 async function main(){
     initSetsDisplayLayout();
@@ -89,20 +88,8 @@ async function main(){
     let event = getEventIdentifierFromParams(searchParameters);
     console.log("Event :", event);
 
-    if (!event){
-        alert("No event specified");
-        return;
-    }
-
     document.querySelector(".event-input").value = event.toString();
 
-    const updateAndContinue = async () => {if (await update(client, config, event)) startTimeout()};
-
-    function startTimeout(){
-        setTimeout(() => {
-            updateAndContinue();
-        }, 5000);
-    }
-    await updateAndContinue();
+    runLoop(() => update(client, config, event), errCallback, 5000);
 }
-await try_(main, contentManager)
+await try_(main, errCallback)

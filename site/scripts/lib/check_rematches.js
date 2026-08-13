@@ -34,9 +34,9 @@ export class NoPlayerDataError {
     }
 }
 
-export async function getSets(client, slug, after, limiter, statusCallback, countCallback, errorCallback){
+export async function getSets(client, eventIdentifier, after, limiter, statusCallback, countCallback, errorCallback){
     console.log("Fetching event entrants")
-    let entrantsList = await getEventEntrants(slug, client, limiter);
+    let entrantsList = await getEventEntrants(eventIdentifier, client, limiter);
     console.log(entrantsList.length, "entrants");
     if (countCallback) countCallback(entrantsList.length);
     let players = entrantsList.map(entrant => {

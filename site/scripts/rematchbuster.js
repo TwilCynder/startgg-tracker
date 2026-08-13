@@ -1,12 +1,15 @@
 import { RateLimitingSGGHelperClient, StartGGDelayQueryLimiter } from "./lib/api/sgg-helper.js";
 import { get_rematches, getSets, getStreamedMatchesForPlayer, getStreamedSetFilterFunction } from "./lib/check_rematches.js";
-import { LoadingContentManager } from "./lib/contentSwitcher.js";
+import { LoadingContentManager, LoadingContentManagerWithProgress } from "./lib/contentSwitcher.js";
+import { contentManagerErrorCallbackFactory, safeCallbackFactory } from "./lib/contentUtil.js";
 import { show, hide, toggleClass } from "./lib/DOMUtil.js";
+import { PresentableError } from "./lib/error.js";
 import { checkLogin } from "./lib/loginCheck.js";
 import { getDaysSinceTimestamp, HtmlString, htmlT } from "./lib/util.js";
-import { handleSelectedRadioButton, init, Request } from "./rematchbuster-common.js";
+import { handleRadioButtons, handleSelectedRadioButton, init, Request } from "./rematchbuster-common.js";
 
-const contentManager = new LoadingContentManager;
+const contentManager = new LoadingContentManagerWithProgress;
+const contentManagerErrorCallback = contentManagerErrorCallbackFactory(contentManager);
 
 //------ Functions --------
 
@@ -21,7 +24,7 @@ let currentData = null;
  * @param {Request} request 
  */
 function updateUIFromRequest(request){
-    document.querySelector("#event").value = request.slug;
+    document.querySelector("#event").value = request.eventIdentifier.toString();
     if (request.date){
         document.querySelector("#date-mode").checked = true;
         document.querySelector(".dateInput.timeInput").value = request.date;
@@ -43,16 +46,6 @@ function updateUIFromRequest(request){
         hide(".stream-name-container");
     }
     document.querySelector("#time-since-last").value = request.timeSinceLast;
-}
-
-function showLoader(){
-    show(".loading-container");
-    hide(".result");
-}
-
-function showResult(){
-    hide(".loading-container");
-    show(".result");
 }
 
 function makeIgnoredEventsHTML(list){
@@ -229,7 +222,7 @@ function updateResultHTML(players, request){
     let html = f(players, request);
 
     resultElement.innerHTML = html;
-    showResult();
+    contentManager.showContent();
 }
 
 //--
@@ -239,48 +232,41 @@ function updateResultHTML(players, request){
  */
 async function loadFromRequest(client, request, limiter){
     let date = request.getDate();
-    showLoader();
+    contentManager.showLoading();
 
     console.log("Loading ...");
-    try {
-        
-        console.log("Request : ", request);
+    console.log("Request : ", request);
 
-        let progressElt = document.getElementById("loading-progress");
-        let entrantsCount = "?";
+    let progressElt = document.getElementById("loading-progress");
+    let entrantsCount = "?";
 
-        let errors = [];
+    let errors = [];
 
-        let players = await getSets(client, request.slug, Math.floor(date.getTime() / 1000), limiter, 
-            (currentCount) => {
-                console.log("Loaded", currentCount);
-                progressElt.innerHTML = `(${currentCount}/${entrantsCount})`
-            },
-            (totalCount) => {
-                entrantsCount = totalCount;
-                progressElt.innerHTML = `(0/${totalCount})`;
-            },
-            (error) => {
-                errors.push(error.getConsoleMessage());
-            }
-        );
-        if (errors.length > 1){
-            console.warn("Errors :")
-            for (const err of errors){
-                console.warn("-", err);
-            }
+    let players = await getSets(client, request.eventIdentifier, Math.floor(date.getTime() / 1000), limiter, 
+        (currentCount) => {
+            console.log("Loaded", currentCount);
+            progressElt.innerHTML = `(${currentCount}/${entrantsCount})`
+        },
+        (totalCount) => {
+            entrantsCount = totalCount;
+            progressElt.innerHTML = `(0/${totalCount})`;
+        },
+        (error) => {
+            errors.push(error.getConsoleMessage());
         }
-
-        
-        currentData = players;
-        currentRequest = request;
-
-        updateResultHTML(players, request);
-    } catch (err){
-        console.error(err);
-        alert("There was a problem fetching data from the start.gg API. Please check that the event URL is correct, and try again")
-        hide(".loading-container");
+    );
+    if (errors.length > 1){
+        console.warn("Errors :")
+        for (const err of errors){
+            console.warn("-", err);
+        }
     }
+
+    
+    currentData = players;
+    currentRequest = request;
+
+    updateResultHTML(players, request);
 
 }
 
@@ -411,14 +397,14 @@ function onTimeSinceLastChanged(event){
 //-- Page init
 
 
-document.querySelector("#stream-mode").addEventListener("change", onStreamModeChanged);
-document.querySelector("#invert-mode").addEventListener("change", onInvertModeChanged);
-document.querySelector("#event-count-mode").addEventListener("change", onEventCountModeChanged);
-document.querySelector("#time-since-last").addEventListener("change", onTimeSinceLastChanged);
+document.querySelector("#stream-mode").addEventListener("change", safeCallbackFactory(onStreamModeChanged, contentManagerErrorCallback));
+document.querySelector("#invert-mode").addEventListener("change", safeCallbackFactory(onInvertModeChanged, contentManagerErrorCallback));
+document.querySelector("#event-count-mode").addEventListener("change", safeCallbackFactory(onEventCountModeChanged, contentManagerErrorCallback));
+document.querySelector("#time-since-last").addEventListener("change", safeCallbackFactory(onTimeSinceLastChanged, contentManagerErrorCallback));
 
-window.addEventListener("popstate", onPopstate);
+window.addEventListener("popstate", safeCallbackFactory(onpopstate, contentManagerErrorCallback));
 
-init(goCallback)
+init(goCallback, contentManagerErrorCallback);
 
 //-- Various init
 
@@ -444,7 +430,7 @@ if (request){
 }
 
 } catch (err){
-    contentManager.showError(err);
+    contentManagerErrorCallback(err);
 }
 
 
