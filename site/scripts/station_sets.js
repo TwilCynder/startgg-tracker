@@ -123,11 +123,6 @@ async function main(){
     let eventIdentifier = getEventIdentifierFromParams(searchParameters);
     console.log("Event :", eventIdentifier);
 
-    if (!eventIdentifier){
-        alert("No event specified");
-        return;
-    }
-
     document.querySelector(".event-input").value = eventIdentifier.toString();
 
     /*

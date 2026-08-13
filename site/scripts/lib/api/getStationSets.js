@@ -1,3 +1,4 @@
+import { PresentableError } from "../error.js";
 import queryManager from "../queryManager.js";
 
 const schema_filename = "./schemas/StationSets.graphql";
@@ -9,7 +10,7 @@ export async function getStationSetsFactory(){
         let sets = await query.executePaginated(client, eventIdentifier.getGraphQLVariables({perPage: 50}), "event.sets", null, {callback: (_l, _c, currentPage, totalPages) => progressionCallback && progressionCallback(currentPage, totalPages)}, false)
 
         if (!sets){
-            throw new Error("Couldn't fetch sets from " + eventIdentifier.toReadableString() + " ; invalid response (might indicate non-existent event ; check the URL)");
+            throw new PresentableError("Couldn't fetch sets from " + eventIdentifier.toReadableString() + " - it seems that the event doesn't exist, check the URL");
         }
 
         let stations = {"unknown": []};

@@ -31,7 +31,7 @@ export class ID extends EventIdentifier {
  * @returns 
  */
 export function processEventIdentifier(slug){
-    if (!slug) return slug;
+    if (!slug) return null;
 
     let res = slugRegex.exec(slug);
     if (res) return new Slug(res[1]);

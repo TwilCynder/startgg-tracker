@@ -1,13 +1,27 @@
-import { presentError } from "./error.js";
-import { ID, Slug } from "./util.js";
+import { PresentableError, presentError } from "./error.js";
+import { ID, processEventIdentifier, Slug } from "./util.js";
 
 /**
+ * Returns the EventIdentifer based on search parameters. Handles error cases, guaranteed to return
  * @param {URLSearchParams} searchParameters 
  */
 export function getEventIdentifierFromParams(searchParameters){
+    let eventIdentifier;
+
+    let event = searchParameters.get("event");
+    if (event) {
+        eventIdentifier = processEventIdentifier(event);
+        if (!eventIdentifier) throw new PresentableError(`Event identifier ${event} is invalid - use the URL of a page related to the event`);
+        return eventIdentifier;
+    }
     let id = searchParameters.get(ID.propertyName);
     let slug = searchParameters.get(Slug.propertyName);
-    return id ? new ID(id) : slug ? new Slug(slug) : null;
+
+    eventIdentifier = id ? new ID(id) : slug ? new Slug(slug) : null;
+    if (!eventIdentifier){
+        throw new PresentableError(`No event specified`);
+    }
+    return eventIdentifier;
 }
 
 /**
